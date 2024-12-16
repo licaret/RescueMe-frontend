@@ -1,37 +1,9 @@
 <template>
-  <footer class="footer">
-    <p class="footer-text">2024 © RescueMe | All rights reserved</p>
+  <footer class="fixed bottom-0 left-0 z-20 w-full p-4 bg-white border-t border-gray-200 shadow md:flex md:items-center md:justify-between md:p-1 dark:bg-gray-800 dark:border-gray-600">
+    <div class="w-full mx-auto max-w-screen-xl p-4 md:flex md:items-center md:justify-between">
+      <span class="text-sm text-gray-500 sm:text-center dark:text-gray-400">© 2023 RescueMe™ | All Rights Reserved.
+    </span>
+    </div>
   </footer>
 </template>
 
-<style scoped>
-.footer {
-  width: 100%;
-  padding: 1rem;
-  background-color: white;
-  color: grey;
-  border-top: 1px solid rgba(0, 0, 0, 0.2);
-  margin: 0;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  padding: 1rem 15rem;
-}
-
-.footer-text {
-  font-size: clamp(0.8rem, 1vw, 0.9rem);
-  color: gray;
-  margin: 0;
-}
-
-@media (max-width: 768px) {
-  .footer {
-    padding: 0.5rem 0;
-  }
-
-  .footer-text {
-    font-size: 0.8rem;
-    padding-left: 15px;
-  }
-}
-</style>

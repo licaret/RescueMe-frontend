@@ -1,7 +1,7 @@
 <template>
   <section class="hero">
     <h1 class="hero-title">
-      AD<span class="highlight">O</span>PT
+      AD<span class="highlight">o</span>PT
     </h1>
     <img src="@/assets/dog.png" alt="Dog" class="hero-image" />
     <div class="button-container">
@@ -20,13 +20,13 @@
   background-color: white;
   margin: 0;
   padding: 0;
-  height: 100vh;
+  height: auto;
   overflow: hidden;
 }
 
 .hero-title {
   position: absolute;
-  bottom: -10%;
+  bottom: 15%;
   left: 50%;
   transform: translateX(-50%);
   font-size: clamp(10rem, 15vw, 35rem);
@@ -43,11 +43,10 @@
 
 .hero-image {
   position: absolute;
-  bottom: 0;
-  left: 49%;
+  left: 50%;
   transform: translateX(-50%);
   width: auto;
-  max-height: 110%;
+  max-height: 100%;
   z-index: 2;
 }
 

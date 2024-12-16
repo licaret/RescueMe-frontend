@@ -1,140 +1,29 @@
-<script>
-export default {
-  name: "IntroNavbar",
-  data() {
-    return {
-      isMenuOpen: false, 
-    };
-  },
-  methods: {
-    toggleMenu() {
-      this.isMenuOpen = !this.isMenuOpen;
-    },
-  },
-};
-</script>
-
 <template>
-  <nav class="navbar">
-    <div class="logo">
-      RESCUE<span>ME</span>
+  <nav class="bg-white border-gray-200 dark:bg-gray-900">
+    <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-8">
+      <a href="#" class="flex items-center">
+        <span class="self-center text-2xl font-medium whitespace-nowrap">
+          <span class="text-gray-700 font-light">RESCUE</span>
+          <span class="text-red-600 font-bold">ME</span>
+        </span>
+      </a>
+      <div class="hidden w-full md:block md:w-auto" id="navbar-default">
+        <ul class="font-light flex flex-col p-6 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-12 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+          <li>
+            <a href="#" class="block py-4 px-6 text-gray-800 text-lg rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-red-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">HOME</a>
+          </li>
+          <li>
+            <a href="#" class="block py-4 px-6 text-gray-800 text-lg rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-red-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">ABOUT</a>
+          </li>
+          <li>
+            <a href="#" class="block py-4 px-6 text-gray-800 text-lg rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-red-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">CONTACT</a>
+          </li>
+          <li>
+            <a href="#" class="block py-4 px-6 text-red-600 text-lg rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-red-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">LOGIN</a>
+          </li>
+        </ul>
+      </div>
     </div>
-    <div class="hamburger" @click="toggleMenu">
-      <div class="line"></div>
-      <div class="line"></div>
-      <div class="line"></div>
-    </div>
-    <ul :class="['nav-links', { 'nav-active': isMenuOpen }]">
-      <li><a href="#">HOME</a></li>
-      <li><a href="#">ABOUT</a></li>
-      <li><a href="#">CONTACT</a></li>
-      <li><a href="#" class="login-button">LOGIN</a></li>
-    </ul>
   </nav>
 </template>
 
-<style scoped>
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 2rem 15rem;
-  background-color: white;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-}
-
-.logo {
-  font-size: 1.7rem;
-  font-weight: bold;
-  color: rgba(0, 0, 0, 0.7);
-  cursor: default;
-}
-
-.logo span {
-  color: red;
-}
-
-.nav-links {
-  display: flex;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  transition: transform 0.3s ease-in-out;
-}
-
-.nav-links li {
-  margin-left: 4rem;
-}
-
-.nav-links a {
-  text-decoration: none;
-  color: rgba(0, 0, 0, 0.8);
-  font-weight: 500;
-  font-size: 1.1rem;
-  transition: color 0.3s;
-}
-
-.nav-links a:hover {
-  color: red;
-}
-
-.login-button {
-  border: 3px solid red;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  color: red;
-  font-weight: bold;
-  transition: background-color 0.3s, color 0.3s;
-}
-
-.login-button:hover {
-  background-color: red !important;
-  color: white !important;
-}
-
-.hamburger {
-  display: none;
-  flex-direction: column;
-  cursor: pointer;
-  gap: 0.3rem;
-}
-
-.hamburger .line {
-  width: 2rem;
-  height: 0.2rem;
-  background-color: rgba(0, 0, 0, 0.8);
-}
-
-.nav-active {
-  transform: translateX(0);
-}
-
-@media (max-width: 768px) {
-  .navbar {
-    padding: 1.5rem 2rem;
-  }
-
-  .nav-links {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    background-color: white;
-    flex-direction: column;
-    align-items: flex-start;
-    width: 100%;
-    height: calc(100vh - 4rem);
-    padding: 2rem;
-    transform: translateX(100%);
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-    z-index: 10;
-  }
-
-  .nav-links li {
-    margin: 1rem 0;
-  }
-
-  .hamburger {
-    display: flex;
-  }
-}
-</style>
