@@ -1,7 +1,7 @@
 <template>
   <section class="hero">
     <h1 class="hero-title">
-      AD<span class="highlight">o</span>PT
+      AD<span class="highlight invisible-o">O</span>PT
     </h1>
     <img src="@/assets/dog.png" alt="Dog" class="hero-image" />
     <div class="button-container">
@@ -27,7 +27,7 @@
 .hero-title {
   position: absolute;
   bottom: 15%;
-  left: 50%;
+  left:50%;
   transform: translateX(-50%);
   font-size: clamp(10rem, 15vw, 35rem);
   font-weight: bold;
@@ -74,6 +74,11 @@
   transform: scale(1.1);
   background-color: darkred;
 }
+
+.invisible-o {
+  opacity: 0; 
+}
+
 
 @media (max-width: 768px) {
   .hero-title {
