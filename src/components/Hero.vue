@@ -1,3 +1,14 @@
+<script>
+export default {
+  methods: {
+    goToSignUp() {
+      this.$router.push("/signup"); 
+    },
+  },
+};
+</script>
+
+
 <template>
   <section class="hero">
     <h1 class="hero-title">
@@ -5,7 +16,8 @@
     </h1>
     <img src="@/assets/dog.png" alt="Dog" class="hero-image" />
     <div class="button-container">
-      <button class="action-button">JOIN US</button>
+      <button class="action-button" @click="goToSignUp">JOIN US</button>
+
     </div>
   </section>
 </template>

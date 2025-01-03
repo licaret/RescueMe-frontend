@@ -8,12 +8,12 @@ import { RouterLink, RouterView } from 'vue-router'
 
 <style>
 body {
-  margin: 0;
-  font-family: 'Roboto', sans-serif; 
-  background-color: white;
+  /* margin: 0; */
+  /* font-family: 'Inter', sans-serif; */
+  /* background-color: white; */
 }
 
-html, body {
+/* html, body {
   margin: 0;
   padding: 0; 
   overflow-x: hidden;
@@ -25,7 +25,7 @@ html, body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-}
+} */
 
 
 </style>

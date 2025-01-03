@@ -1,14 +1,14 @@
 <script>
 import IntroNavbar from "@/components/IntroNavbar.vue";
 import Hero from "@/components/Hero.vue";
-// import IntroFooter from "@/components/IntroFooter.vue";
+import IntroFooter from "@/components/IntroFooter.vue";
 
 export default {
   name: "LandingPage",
   components: {
     IntroNavbar,
     Hero,
-    // IntroFooter,
+    IntroFooter,
   },
 };
 </script>
