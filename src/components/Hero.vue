@@ -1,7 +1,7 @@
 <script>
 export default {
   methods: {
-    goToSignUp() {
+    navigateToSignUp() {
       this.$router.push("/signup"); 
     },
   },
@@ -16,8 +16,7 @@ export default {
     </h1>
     <img src="@/assets/dog.png" alt="Dog" class="hero-image" />
     <div class="button-container">
-      <button class="action-button" @click="goToSignUp">JOIN US</button>
-
+      <button class="action-button" @click="navigateToSignUp">JOIN US</button>
     </div>
   </section>
 </template>

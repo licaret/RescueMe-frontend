@@ -50,4 +50,47 @@ async function registerShelter(shelterData) {
   }
 }
 
-export { registerAdopter, registerShelter };
+async function login(email, password) {
+  try {
+    const response = await fetch(`${API_URL}/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Login failed");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error logging in:", error);
+    throw error;
+  }
+}
+
+async function fetchWithAuth(endpoint, options = {}) {
+  const token = localStorage.getItem("token");
+
+  const response = await fetch(endpoint, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+      ...options.headers,
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Failed to fetch");
+  }
+
+  return await response.json();
+}
+
+
+export { registerAdopter, registerShelter, login, fetchWithAuth };
