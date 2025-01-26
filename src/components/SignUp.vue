@@ -38,7 +38,7 @@
               </div>
               <div>
                 <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your email</label>
-                <input v-model="formData.email" type="email" name="email" id="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="name@company.com" required="true">
+                <input v-model="formData.email" @blur="validateEmail" type="email" name="email" id="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="name@company.com" required="true">
               </div>
               <div>
                 <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
@@ -125,7 +125,7 @@
                 </div>
                 <div>
                   <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your email</label>
-                  <input v-model="formData.email" type="email" name="email" id="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="shelter@domain.com" required="true">
+                  <input v-model="formData.email" @blur="validateEmail" type="email" name="email" id="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="shelter@domain.com" required="true">
                 </div>
                 <div>
                   <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
@@ -234,8 +234,9 @@
 </template>
 
 <script>
-import { registerAdopter, registerShelter } from "@/services/user_service";
+import { registerAdopter, registerShelter, checkEmailExists } from "@/services/user_service";
 import TermsModal from '@/components/TermsModal.vue';
+
 
 export default {
   components: {
@@ -246,6 +247,7 @@ export default {
       isAdopter: true,
       showPassword: false,
       showTermsModal: false,
+      emailExists: false,
       formData: {
         username: "",
         email: "",
@@ -334,33 +336,51 @@ export default {
     navigateToLogin() {
       this.$router.push('/login'); 
     },
-    async handleSubmit() {
-        try {
-            if (this.isAdopter) {
-                const response = await registerAdopter({
-                    username: this.formData.username,
-                    email: this.formData.email,
-                    phoneNumber: this.formData.phoneNumber,
-                    password: this.formData.password,
-                });
-                alert(response.message); 
-            } else {
-                const response = await registerShelter({
-                    username: this.formData.username,
-                    email: this.formData.email,
-                    phoneNumber: this.formData.phoneNumber,
-                    password: this.formData.password,
-                    county: this.selectedCounty,
-                    city: this.selectedCity,
-                    shelterType: this.selectedShelterType,
-                });
-                alert(response.message); 
-            }
-        } catch (error) {
-            alert("Registration failed: " + error.message);
-        }
+
+
+    async validateEmail() {
+      try {
+        const emailExists = await checkEmailExists(this.formData.email);
+        if (emailExists) {
+          alert("Email already exists! Please use a different email.");
+        } 
+      } catch (error) {
+        alert("Error checking email: " + error.message);
+      }
     },
-  },
+    
+    async handleSubmit() {
+      try {
+        const emailExists = await checkEmailExists(this.formData.email);
+        if (emailExists) {
+          alert("Email already exists! Please use a different email.");
+          return; 
+        }
+        if (this.isAdopter) {
+          const response = await registerAdopter({
+            username: this.formData.username,
+            email: this.formData.email,
+            phoneNumber: this.formData.phoneNumber,
+            password: this.formData.password,
+          });
+          alert(response.message);
+        } else {
+          const response = await registerShelter({
+            username: this.formData.username,
+            email: this.formData.email,
+            phoneNumber: this.formData.phoneNumber,
+            password: this.formData.password,
+            county: this.selectedCounty,
+            city: this.selectedCity,
+            shelterType: this.selectedShelterType,
+          });
+          alert(response.message);
+        }
+      } catch (error) {
+        alert("Registration failed: " + error.message);
+      }
+    },
+    },
 };
 </script>
 
@@ -382,13 +402,5 @@ export default {
 
   a, .terms-button, .login-button {
     cursor: pointer;
-    /* text-decoration: underline;
-    color: #ff0000; 
-    font-weight: 600; */
   }
-
-  /* a:hover, .terms-button:hover, .login-button:hover {
-    color: #cc0000; 
-    text-decoration: none; 
-  } */
 </style>

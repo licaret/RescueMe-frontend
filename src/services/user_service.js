@@ -93,4 +93,26 @@ async function fetchWithAuth(endpoint, options = {}) {
 }
 
 
-export { registerAdopter, registerShelter, login, fetchWithAuth };
+async function checkEmailExists(email) {
+  try {
+    const response = await fetch(`http://localhost:8080/api/v1/auth/check-email?email=${encodeURIComponent(email)}`);
+    if (!response.ok) {
+      console.error("Raw response:", response);
+      throw new Error("Failed to check email: " + response.status);
+    }
+
+    const data = await response.json();
+    // console.log("Parsed data:", data);
+    return data.emailExists;
+  } catch (error) {
+    console.error("Error in checkEmailExists:", error);
+    throw new Error("Failed to check email: " + error.message);
+  }
+}
+
+
+
+
+
+
+export { registerAdopter, registerShelter, login, fetchWithAuth, checkEmailExists  };
