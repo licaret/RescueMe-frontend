@@ -111,8 +111,22 @@ async function checkEmailExists(email) {
 }
 
 
+async function checkUsernameExists(username) {
+  try {
+    const response = await fetch(`http://localhost:8080/api/v1/auth/check-username?username=${encodeURIComponent(username)}`);
+    if (!response.ok) {
+      console.error("Raw response:", response);
+      throw new Error("Failed to check username: " + response.status);
+    }
+
+    const data = await response.json();
+    // console.log("Parsed data:", data);
+    return data.usernameExists;
+  } catch (error) {
+    console.error("Error in checkUsernameExists:", error);
+    throw new Error("Failed to check username: " + error.message);
+  }
+}
 
 
-
-
-export { registerAdopter, registerShelter, login, fetchWithAuth, checkEmailExists  };
+export { registerAdopter, registerShelter, login, fetchWithAuth, checkEmailExists, checkUsernameExists  };

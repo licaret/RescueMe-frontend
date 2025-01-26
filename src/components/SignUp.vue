@@ -34,7 +34,7 @@
             <form v-if="isAdopter" @submit.prevent="handleSubmit" class="space-y-4 md:space-y-6 mb-8">
               <div>
                 <label for="username" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Username</label>
-                <input v-model="formData.username" type="text" name="username" id="username" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Your username" required="true">
+                <input v-model="formData.username" @blur="validateUsername" type="text" name="username" id="username" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Your username" required="true">
               </div>
               <div>
                 <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your email</label>
@@ -121,7 +121,7 @@
               <form v-else @submit.prevent="handleSubmit" class="space-y-4 md:space-y-6 mb-8">
                 <div>
                   <label for="shelter-name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Username</label>
-                  <input v-model="formData.username" type="text" name="shelter-name" id="shelter-name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Your Shelter's Name" required="true">
+                  <input v-model="formData.username" @blur="validateUsername" type="text" name="shelter-name" id="shelter-name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Your Shelter's Name" required="true">
                 </div>
                 <div>
                   <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your email</label>
@@ -234,7 +234,7 @@
 </template>
 
 <script>
-import { registerAdopter, registerShelter, checkEmailExists } from "@/services/user_service";
+import { registerAdopter, registerShelter, checkEmailExists, checkUsernameExists } from "@/services/user_service";
 import TermsModal from '@/components/TermsModal.vue';
 
 
@@ -248,6 +248,7 @@ export default {
       showPassword: false,
       showTermsModal: false,
       emailExists: false,
+      usernameExists: false,
       formData: {
         username: "",
         email: "",
@@ -348,12 +349,28 @@ export default {
         alert("Error checking email: " + error.message);
       }
     },
+
+    async validateUsername() {
+      try {
+        const usernameExists = await checkUsernameExists(this.formData.username);
+        if (usernameExists) {
+          alert("Username already exists! Please use a different username.");
+        } 
+      } catch (error) {
+        alert("Error checking username: " + error.message);
+      }
+    },
     
     async handleSubmit() {
       try {
         const emailExists = await checkEmailExists(this.formData.email);
+        const usernameExists = await checkUsernameExists(this.formData.username);
         if (emailExists) {
           alert("Email already exists! Please use a different email.");
+          return; 
+        }
+        if (usernameExists) {
+          alert("Username already exists! Please use a different username.");
           return; 
         }
         if (this.isAdopter) {
