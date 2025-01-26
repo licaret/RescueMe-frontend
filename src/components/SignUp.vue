@@ -45,6 +45,7 @@
                 <div class="relative">
                   <input 
                     v-model="formData.password" 
+                    @blur="validatePassword"
                     :type="showPassword ? 'text' : 'password'" 
                     name="password" 
                     id="password" 
@@ -132,6 +133,7 @@
                   <div class="relative">
                     <input 
                       v-model="formData.password" 
+                      @blur="validatePassword"
                       :type="showPassword ? 'text' : 'password'" 
                       name="password" 
                       id="password" 
@@ -340,17 +342,29 @@ export default {
 
 
     async validateEmail() {
+      const email = this.formData.email;
+      
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        alert("Invalid email format. Please include '@' and a domain.");
+        return;
+      }
+
       try {
-        const emailExists = await checkEmailExists(this.formData.email);
+        const emailExists = await checkEmailExists(email);
         if (emailExists) {
           alert("Email already exists! Please use a different email.");
-        } 
+        }
       } catch (error) {
         alert("Error checking email: " + error.message);
       }
     },
 
     async validateUsername() {
+      if (this.formData.username.length < 3 || this.formData.username.length > 20) {
+        alert("Username must be between 3 and 20 characters.");
+        return;
+      }
       try {
         const usernameExists = await checkUsernameExists(this.formData.username);
         if (usernameExists) {
@@ -360,8 +374,30 @@ export default {
         alert("Error checking username: " + error.message);
       }
     },
+
+    validatePassword(password) {
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()]).{8,20}$/;
+      if (!passwordRegex.test(password)) {
+        alert("Password must be 8-20 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character.");
+        return false;
+      }
+      return true;
+    },
+
     
     async handleSubmit() {
+      const email = this.formData.email;
+      
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        alert("Invalid email format. Please include '@' and a domain.");
+        return;
+      }
+
+      if (!this.validatePassword(this.formData.password)) {
+        return;
+      }
+
       try {
         const emailExists = await checkEmailExists(this.formData.email);
         const usernameExists = await checkUsernameExists(this.formData.username);
@@ -372,6 +408,10 @@ export default {
         if (usernameExists) {
           alert("Username already exists! Please use a different username.");
           return; 
+        }
+        if (this.formData.username.length < 3 || this.formData.username.length > 20) {
+          alert("Username must be between 3 and 20 characters.");
+          return;
         }
         if (this.isAdopter) {
           const response = await registerAdopter({
