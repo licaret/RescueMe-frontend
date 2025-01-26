@@ -45,11 +45,11 @@
                 <div class="relative">
                   <input 
                     v-model="formData.password" 
-                    @blur="validatePassword"
                     :type="showPassword ? 'text' : 'password'" 
                     name="password" 
                     id="password" 
                     placeholder="••••••••" 
+                    @blur="validatePassword($event.target.value)"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
                     required="true"
                   >
@@ -133,11 +133,11 @@
                   <div class="relative">
                     <input 
                       v-model="formData.password" 
-                      @blur="validatePassword"
                       :type="showPassword ? 'text' : 'password'" 
                       name="password" 
                       id="password" 
                       placeholder="••••••••" 
+                      @blur="validatePassword($event.target.value)"
                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
                       required="true"
                     >
@@ -376,9 +376,13 @@ export default {
     },
 
     validatePassword(password) {
-      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()]).{8,20}$/;
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,20}$/;
+      console.log("Password being validated:", password);
+      console.log("Regex test result:", passwordRegex.test(password));
       if (!passwordRegex.test(password)) {
-        alert("Password must be 8-20 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character.");
+        alert(
+          "Password must be 8-20 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character."
+        );
         return false;
       }
       return true;
@@ -391,10 +395,6 @@ export default {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
         alert("Invalid email format. Please include '@' and a domain.");
-        return;
-      }
-
-      if (!this.validatePassword(this.formData.password)) {
         return;
       }
 
@@ -411,6 +411,9 @@ export default {
         }
         if (this.formData.username.length < 3 || this.formData.username.length > 20) {
           alert("Username must be between 3 and 20 characters.");
+          return;
+        }
+        if (!this.validatePassword(this.formData.password)) {
           return;
         }
         if (this.isAdopter) {
