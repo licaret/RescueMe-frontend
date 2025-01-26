@@ -17,7 +17,7 @@ export default {
   <div class="login-page">
     <IntroNavbar />
     <Login />
-    <IntroFooter />
+    <!-- <IntroFooter /> -->
   </div>
 </template>
 

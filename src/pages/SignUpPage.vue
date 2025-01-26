@@ -18,7 +18,7 @@ export default {
   <div class="signup-page">
     <IntroNavbar />
     <SignUp />
-    <IntroFooter />
+    <!-- <IntroFooter /> -->
   </div>
 </template>
 
