@@ -27,7 +27,7 @@ const router = createRouter({
       path: '/home',
       name: 'HomePage',
       component: HomePage, 
-      meta: { requiresAuth: true },
+      // meta: { requiresAuth: true },
     },
     {
       path: '/shelter-dashboard',
@@ -39,6 +39,7 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
+  
   const isAuthenticated = !!localStorage.getItem('token'); 
 
   console.log('From:', from.path, 'To:', to.path);
