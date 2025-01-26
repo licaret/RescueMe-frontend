@@ -376,7 +376,7 @@ export default {
   }
 
   button {
-    user-select: auto;
+    user-select: none;
     cursor: pointer;
   }
 

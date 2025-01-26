@@ -146,5 +146,6 @@ export default {
 
   button, a {
     cursor: pointer;
+    user-select: none;
   }
 </style>
