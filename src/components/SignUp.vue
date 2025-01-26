@@ -365,4 +365,30 @@ export default {
 </script>
 
 <style scoped>
+  section, section * {
+    user-select: none;
+    cursor: default;
+  }
+
+  input, textarea, select, button {
+    user-select: auto;
+    cursor: text;
+  }
+
+  button {
+    user-select: auto;
+    cursor: pointer;
+  }
+
+  a, .terms-button, .login-button {
+    cursor: pointer;
+    /* text-decoration: underline;
+    color: #ff0000; 
+    font-weight: 600; */
+  }
+
+  /* a:hover, .terms-button:hover, .login-button:hover {
+    color: #cc0000; 
+    text-decoration: none; 
+  } */
 </style>

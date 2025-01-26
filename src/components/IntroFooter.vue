@@ -7,3 +7,8 @@
   </footer>
 </template>
 
+<style>
+  footer * {
+    user-select: none;
+  }
+</style>

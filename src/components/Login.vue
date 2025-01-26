@@ -131,3 +131,20 @@ export default {
   },
 };
 </script>
+
+
+<style>
+  section, section * {
+    user-select: none;
+    cursor: default;
+  }
+
+  input, textarea, select, button {
+    user-select: auto;
+    cursor: text;
+  }
+
+  button, a {
+    cursor: pointer;
+  }
+</style>

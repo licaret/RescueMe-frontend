@@ -39,3 +39,9 @@ export default{
   },
 };
 </script>
+
+<style>
+  nav, nav * {
+    user-select: none;
+  }
+</style>

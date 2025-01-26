@@ -22,6 +22,10 @@ export default {
 </template>
 
 <style scoped>
+h1, img, .hero {
+  user-select: none;
+}
+
 .hero {
   position: relative;
   display: flex;
@@ -84,6 +88,11 @@ export default {
 .action-button:hover {
   transform: scale(1.1);
   background-color: darkred;
+}
+
+button {
+  user-select: none; 
+  cursor: pointer; 
 }
 
 .invisible-o {

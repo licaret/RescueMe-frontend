@@ -39,10 +39,10 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  
+
   const isAuthenticated = !!localStorage.getItem('token'); 
 
-  console.log('From:', from.path, 'To:', to.path);
+  // console.log('From:', from.path, 'To:', to.path);
 
   if (
     (from.path === '/login' || from.path === '/signup') && 
