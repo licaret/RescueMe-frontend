@@ -34,11 +34,27 @@
             <form v-if="isAdopter" @submit.prevent="handleSubmit" class="space-y-4 md:space-y-6 mb-8">
               <div>
                 <label for="username" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Username</label>
-                <input v-model="formData.username" @blur="validateUsername" type="text" name="username" id="username" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Your username" required="true">
+                <input v-model="formData.username" type="text" name="username" id="username" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Your username" required="true">
               </div>
               <div>
                 <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your email</label>
-                <input v-model="formData.email" @blur="validateEmail" type="email" name="email" id="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="name@company.com" required="true">
+                <input
+                  v-model="formData.email"
+                  @input="validateEmail" 
+                  type="email"
+                  name="email"
+                  id="email"
+                  :class="{
+                    'border-red-600 focus:ring-red-600 focus:border-red-600': emailError,
+                    'border-gray-300 focus:ring-primary-600 focus:border-primary-600': !emailError,
+                  }"
+                  class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                  placeholder="name@company.com"
+                  required
+                >
+                <p v-if="emailError" class="text-sm text-red-600 mt-2">
+                  {{ emailError }}
+                </p>
               </div>
               <div>
                 <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
@@ -49,7 +65,11 @@
                     name="password" 
                     id="password" 
                     placeholder="••••••••" 
-                    @blur="validatePassword($event.target.value)"
+                    @input="validatePassword($event.target.value)"
+                    :class="{
+                      'border-red-600 focus:ring-red-600 focus:border-red-600': passwordError,
+                      'border-gray-300 focus:ring-primary-600 focus:border-primary-600': !passwordError,
+                    }"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
                     required="true"
                   >
@@ -79,6 +99,7 @@
                     </svg>
                   </button>
                 </div>
+                <p v-if="passwordError" class="mt-2 text-sm text-red-600">{{ passwordError }}</p>
               </div>
               <div>
                 <label for="phone-number" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Phone Number</label>
@@ -122,11 +143,27 @@
               <form v-else @submit.prevent="handleSubmit" class="space-y-4 md:space-y-6 mb-8">
                 <div>
                   <label for="shelter-name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Username</label>
-                  <input v-model="formData.username" @blur="validateUsername" type="text" name="shelter-name" id="shelter-name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Your Shelter's Name" required="true">
+                  <input v-model="formData.username" type="text" name="shelter-name" id="shelter-name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Your Shelter's Name" required="true">
                 </div>
                 <div>
                   <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your email</label>
-                  <input v-model="formData.email" @blur="validateEmail" type="email" name="email" id="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="shelter@domain.com" required="true">
+                  <input 
+                  v-model="formData.email" 
+                  @input="validateEmail" 
+                  type="email" 
+                  name="email" 
+                  id="email"
+                  :class="{
+                    'border-red-600 focus:ring-red-600 focus:border-red-600': emailError,
+                    'border-gray-300 focus:ring-primary-600 focus:border-primary-600': !emailError,
+                  }" 
+                  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
+                  placeholder="shelter@domain.com" 
+                  required="true"
+                  >
+                  <p v-if="emailError" class="text-sm text-red-600 mt-2">
+                    {{ emailError }}
+                  </p>
                 </div>
                 <div>
                   <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
@@ -137,7 +174,11 @@
                       name="password" 
                       id="password" 
                       placeholder="••••••••" 
-                      @blur="validatePassword($event.target.value)"
+                      @input="validatePassword($event.target.value)"
+                      :class="{
+                        'border-red-600 focus:ring-red-600 focus:border-red-600': passwordError,
+                        'border-gray-300 focus:ring-primary-600 focus:border-primary-600': !passwordError,
+                      }"
                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
                       required="true"
                     >
@@ -167,6 +208,7 @@
                       </svg>
                     </button>
                   </div>
+                  <p v-if="passwordError" class="mt-2 text-sm text-red-600">{{ passwordError }}</p>
                 </div>
                 <div>
                   <label for="phone-number" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Phone Number</label>
@@ -251,6 +293,8 @@ export default {
       showTermsModal: false,
       emailExists: false,
       usernameExists: false,
+      passwordError: "",
+      emailError: "",
       formData: {
         username: "",
         email: "",
@@ -341,51 +385,37 @@ export default {
     },
 
 
-    async validateEmail() {
-      const email = this.formData.email;
-      
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        alert("Invalid email format. Please include '@' and a domain.");
-        return;
-      }
-
-      try {
-        const emailExists = await checkEmailExists(email);
-        if (emailExists) {
-          alert("Email already exists! Please use a different email.");
-        }
-      } catch (error) {
-        alert("Error checking email: " + error.message);
+    validateEmail() {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Expresie pentru un email valid
+      if (!emailRegex.test(this.formData.email)) {
+        this.emailError = "Invalid email format. Please include '@' and a domain.";
+      } else {
+        this.emailError = ""; // Eliminăm eroarea dacă emailul devine valid
       }
     },
 
-    async validateUsername() {
-      if (this.formData.username.length < 3 || this.formData.username.length > 20) {
-        alert("Username must be between 3 and 20 characters.");
-        return;
-      }
-      try {
-        const usernameExists = await checkUsernameExists(this.formData.username);
-        if (usernameExists) {
-          alert("Username already exists! Please use a different username.");
-        } 
-      } catch (error) {
-        alert("Error checking username: " + error.message);
-      }
-    },
+    // async validateUsername() {
+    //   if (this.formData.username.length < 3 || this.formData.username.length > 20) {
+    //     alert("Username must be between 3 and 20 characters.");
+    //     return;
+    //   }
+    //   try {
+    //     const usernameExists = await checkUsernameExists(this.formData.username);
+    //     if (usernameExists) {
+    //       alert("Username already exists! Please use a different username.");
+    //     } 
+    //   } catch (error) {
+    //     alert("Error checking username: " + error.message);
+    //   }
+    // },
 
     validatePassword(password) {
       const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,20}$/;
-      console.log("Password being validated:", password);
-      console.log("Regex test result:", passwordRegex.test(password));
       if (!passwordRegex.test(password)) {
-        alert(
-          "Password must be 8-20 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character."
-        );
-        return false;
+        this.passwordError = "Password must be 8-20 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character.";
+      } else {
+        this.passwordError = ""; // Resetare eroare
       }
-      return true;
     },
 
     
