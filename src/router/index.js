@@ -4,6 +4,7 @@ import SignUpPage from '@/pages/SignUpPage.vue';
 import LoginPage from '@/pages/LoginPage.vue';
 import HomePage from '@/pages/HomePage.vue';
 import ShelterDashboardPage from '@/pages/ShelterDashboardPage.vue';
+import ContactUsPage from '@/pages/ContactUsPage.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -34,6 +35,12 @@ const router = createRouter({
       name: 'ShelterDashboardPage',
       component: ShelterDashboardPage, 
       meta: { requiresAuth: true },
+    },
+    {
+      path: '/contact',
+      name: 'ContactUsPage',
+      component: ContactUsPage, 
+      // meta: { requiresAuth: true },
     },
   ],
 });
