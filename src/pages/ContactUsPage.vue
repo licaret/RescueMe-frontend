@@ -228,7 +228,6 @@
 
 * {
   user-select: none; 
-  pointer-events: none; 
 }
 
 
