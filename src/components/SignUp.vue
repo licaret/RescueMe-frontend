@@ -424,6 +424,8 @@ export default {
     },
 
     validateEmail() {
+      this.errorMessageEmail = ""; // Resetează eroarea anterioară de "email taken"
+      this.emailError = false; // Scoate stilul de eroare dacă există
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
       if (!emailRegex.test(this.formData.email)) {
         this.wrongFormatedEmail = "Invalid email format. Please include '@' and a domain.";
@@ -456,8 +458,15 @@ export default {
       this.emailError = false;
       this.wrongFormatedEmail = "";
       this.errorMessageEmail = ""; 
-
       this.usernameError = "";
+
+      this.validateUsername();
+      this.validateEmail();
+      this.validatePassword(this.formData.password);
+
+      if (this.usernameError || this.wrongFormatedEmail || this.passwordError) {
+        return;
+      }
 
       try {
         const emailExists = await checkEmailExists(this.formData.email); 
