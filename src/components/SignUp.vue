@@ -247,20 +247,40 @@
                   <label for="phone-number" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Phone Number</label>
                   <input v-model="formData.phoneNumber" type="tel" name="phone-number" id="phone-number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="+40 xxx xxx xxx" required="true">
                 </div>
-                <div>
-                  <label for="county" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">County</label>
-                  <select v-model="selectedCounty" @change="updateCities" id="county" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required="true">
-                    <option value="">Select County</option>
-                    <option v-for="county in counties" :key="county" :value="county">{{ county }}</option>
-                  </select>
-                </div>
-                <div>
-                  <label for="city" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">City</label>
-                  <select v-model="selectedCity" id="city" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required="true" :disabled="!selectedCounty">
-                    <option value="">Select City</option>
-                    <option v-for="city in availableCities" :key="city" :value="city">{{ city }}</option>
-                  </select>
-                </div>
+
+                <!-- Updated County Dropdown -->
+                <label for="county" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                  County
+                </label>
+                <select 
+                  v-model="selectedCounty" 
+                  @change="handleCountyChange"
+                  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  required
+                >
+                  <option value="">Select County</option>
+                  <option v-for="county in counties" :key="county.auto" :value="county.auto">
+                    {{ county.nume }}
+                  </option>
+                </select>
+
+                <!-- Updated City Dropdown -->
+                <label for="city" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                  City
+                </label>
+                <select 
+                  v-model="selectedCity" 
+                  id="city"
+                  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  required 
+                  :disabled="!selectedCounty"
+                >
+                  <option value="">Select City</option>
+                  <option v-for="city in cities" :key="city" :value="city">
+                    {{ city }}
+                  </option>
+                </select>
+
                 <div>
                   <label for="shelter-type" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Shelter Type</label>
                   <select v-model="selectedShelterType" id="shelter-type" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required="true">
@@ -338,60 +358,11 @@ export default {
         password: "",
       },
       selectedCounty: '',
+      selectedCountyName: '',
       selectedCity: '',
       selectedShelterType: '',
-      counties: [
-        'Alba', 'Arad', 'Argeș', 'Bacău', 'Bihor', 'Bistrița-Năsăud', 'Botoșani', 'Brăila',
-        'Brașov', 'București', 'Buzău', 'Călărași', 'Caraș-Severin', 'Cluj', 'Constanța',
-        'Covasna', 'Dâmbovița', 'Dolj', 'Galați', 'Giurgiu', 'Gorj', 'Harghita', 'Hunedoara',
-        'Ialomița', 'Iași', 'Ilfov', 'Maramureș', 'Mehedinți', 'Mureș', 'Neamț', 'Olt',
-        'Prahova', 'Sălaj', 'Satu Mare', 'Sibiu', 'Suceava', 'Teleorman', 'Timiș', 'Tulcea',
-        'Vâlcea', 'Vaslui', 'Vrancea'
-      ],
-      citiesByCounty: {
-        "Alba": ["Alba Iulia", "Blaj", "Cugir", "Ocna Mureș", "Sebeș", "Teiuș", "Zlatna"],
-        "Arad": ["Arad", "Chișineu-Criș", "Curtici", "Ineu", "Lipova", "Nădlac", "Pecica", "Sântana", "Sebis"],
-        "Argeș": ["Pitești", "Câmpulung", "Costești", "Curtea de Argeș", "Mioveni", "Ștefănești", "Topoloveni"],
-        "Bacău": ["Bacău", "Comănești", "Dărmănești", "Moinești", "Onești", "Slănic-Moldova", "Târgu Ocna"],
-        "Bihor": ["Oradea", "Alesd", "Beiuș", "Marghita", "Salonta", "Săcueni", "Ștei", "Valea lui Mihai", "Vașcău"],
-        "Bistrița-Năsăud": ["Bistrița", "Beclean", "Năsăud", "Sângeorz-Băi"],
-        "Botoșani": ["Botoșani", "Bujoreni", "Darabani", "Flămânzi", "Ștefănești", "Dorohoi"],
-        "Brăila": ["Brăila", "Făurei", "Ianca", "Însurăței"],
-        "Brașov": ["Brașov", "Codlea", "Făgăraș", "Ghimbav", "Predeal", "Râșnov", "Rupea", "Săcele", "Victoria", "Zărnești"],
-        "București": ["Sector 1", "Sector 2", "Sector 3", "Sector 4", "Sector 5", "Sector 6"],
-        "Buzău": ["Buzău", "Nehoiu", "Pătârlagele", "Pogoanele", "Râmnicu Sărat"],
-        "Călărași": ["Călărași", "Budești", "Fundulea", "Lehliu Gară", "Oltenița"],
-        "Caraș-Severin": ["Reșița", "Anina", "Băile Herculane", "Bocșa", "Caransebeș", "Moldova Nouă", "Oțelu Roșu", "Oravița"],
-        "Cluj": ["Cluj-Napoca", "Câmpia Turzii", "Dej", "Gherla", "Huedin", "Turda"],
-        "Constanța": ["Constanța", "Băneasa", "Cernavodă", "Eforie", "Hârșova", "Mangalia", "Medgidia", "Murfatlar", "Năvodari", "Negru Vodă", "Ovidiu", "Techirghiol"],
-        "Covasna": ["Sfântu Gheorghe", "Baraolt", "Covasna", "Târgu Secuiesc", "Întorsura Buzăului"],
-        "Dâmbovița": ["Târgoviște", "Fieni", "Găești", "Morenii", "Pucioasa", "Răcari", "Titu"],
-        "Dolj": ["Craiova", "Băilești", "Bechet", "Calafat", "Dăbuleni", "Filiași", "Segarcea"],
-        "Galați": ["Galați", "Berești", "Târgu Bujor", "Tecuci"],
-        "Giurgiu": ["Giurgiu", "Bolintin Vale", "Mihăilești"],
-        "Gorj": ["Târgu Jiu", "Bumbești-Jiu", "Motru", "Novaci", "Rovinari", "Târgu Cărbunești", "Tismana", "Țicleni", "Turceni"],
-        "Harghita": ["Miercurea Ciuc", "Bălan", "Borsec", "Cristuru Secuiesc", "Gheorgheni", "Odorheiu Secuiesc", "Vlăhița", "Toplița"],
-        "Hunedoara": ["Deva", "Aninoasa", "Brad", "Călan", "Geoagiu", "Hațeg", "Hunedoara", "Lupeni", "Orăștie", "Petrila", "Petroșani", "Simeria", "Uricani", "Vulcan"],
-        "Ialomița": ["Slobozia", "Amara", "Căzănești", "Fetești", "Fierbinți-Târg", "Țăndărei", "Urziceni"],
-        "Iași": ["Iași", "Hârlău", "Pașcani", "Podu Iloaiei", "Târgu Frumos"],
-        "Ilfov": ["Bragadiru", "Buftea", "Chitila", "Măgurele", "Otopeni", "Pantelimon", "Popești-Leordeni", "Voluntari"],
-        "Maramureș": ["Baia Mare", "Borșa", "Cavnic", "Dragomirești", "Săliștea de Sus", "Seini", "Sighetu Marmației", "Târgu Lăpuș", "Ulmeni", "Vișeu de Sus"],
-        "Mehedinți": ["Drobeta-Turnu Severin", "Baia de Aramă", "Orșova", "Strehaia", "Vânju Mare"],
-        "Mureș": ["Târgu Mureș", "Iernut", "Luduș", "Reghin", "Sărmașu", "Sângeorgiu de Pădure", "Sovata", "Târnăveni"],
-        "Neamț": ["Piatra Neamț", "Bicaz", "Roman", "Roznov", "Târgu Neamț"],
-        "Olt": ["Slatina", "Balș", "Caracal", "Corabia", "Drăgănești-Olt", "Piatra-Olt", "Potcoava", "Scornicești"],
-        "Prahova": ["Ploiești", "Azuga", "Băicoi", "Boldești-Scăeni", "Breaza", "Bușteni", "Comarnic", "Mizil", "Plopeni", "Sinaia", "Slănic", "Urlați", "Vălenii de Munte"],
-        "Sălaj": ["Zalău", "Cehu Silvaniei", "Jibou", "Șimleu Silvaniei"],
-        "Satu Mare": ["Satu Mare", "Ardud", "Carei", "Livada", "Tășnad", "Negrești-Oaș"],
-        "Sibiu": ["Sibiu", "Agnita", "Avrig", "Cisnădie", "Copșa Mică", "Dumbrăveni", "Miercurea Sibiului", "Ocna Sibiului", "Săliște", "Tălmaciu"],
-        "Suceava": ["Suceava", "Cajvana", "Dolhasca", "Fălticeni", "Frasin", "Gura Humorului", "Liteni", "Milișăuți", "Rădăuți", "Siret", "Solca", "Vicovu de Sus", "Vatra Dornei"],
-        "Teleorman": ["Alexandria", "Roșiorii de Vede", "Turnu Măgurele", "Zimnicea", "Videle"],
-        "Timiș": ["Timișoara", "Buziaș", "Ciacova", "Deta", "Făget", "Gătaia", "Jimbolia", "Recaș", "Sânnicolau Mare"],
-        "Tulcea": ["Tulcea", "Babadag", "Isaccea", "Măcin", "Sulina"],
-        "Vâlcea": ["Râmnicu Vâlcea", "Băbeni", "Băile Olănești", "Bălcești", "Berbești", "Brezoi", "Călimănești", "Drăgășani", "Horezu", "Ocnele Mari"],
-        "Vaslui": ["Vaslui", "Bârlad", "Huși", "Murgeni"],
-        "Vrancea": ["Focșani", "Adjud", "Mărășești", "Odobești", "Panciu"]
-      },
+      counties: [],
+      cities: [],
       shelterTypes: [
         'Municipal Shelter',
         'Private Shelter',
@@ -404,20 +375,20 @@ export default {
       ]
     };
   },
-  computed: {
-    availableCities() {
-      return this.selectedCounty ? (this.citiesByCounty[this.selectedCounty] || []) : [];
-    }
+
+  mounted() {
+    this.fetchCounties();
   },
+
   methods: {
 
     togglePasswordVisibility() {
       this.showPassword = !this.showPassword;
     },
 
-    updateCities() {
-      this.selectedCity = '';
-    },
+    // updateCities() {
+    //   this.selectedCity = '';
+    // },
 
     navigateToLogin() {
       this.$router.push('/login'); 
@@ -453,7 +424,61 @@ export default {
       }
     },
 
-    
+    async fetchCounties() {
+      try {
+        const response = await fetch('https://roloca.coldfuse.io/judete');
+        const data = await response.json();
+        this.counties = data;
+        console.log('Counties fetched:', this.counties);
+      } catch (error) {
+        console.error('Error fetching counties:', error);
+      }
+    },
+
+    async handleCountyChange() {
+      console.log('Selected county code:', this.selectedCounty);
+      this.selectedCity = '';
+      this.cities = [];
+      
+      // Save the county name for the selected code
+      const selectedCountyObj = this.counties.find(county => county.auto === this.selectedCounty);
+      if (selectedCountyObj) {
+        this.selectedCountyName = selectedCountyObj.nume;
+      }
+      
+      if (this.selectedCounty) {
+        await this.fetchCitiesByCounty(this.selectedCounty);
+      }
+    },
+
+    async fetchCitiesByCounty(countyCode) {
+      try {
+        console.log('Fetching cities for county code:', countyCode);
+        
+        const response = await fetch(`https://roloca.coldfuse.io/orase/${countyCode}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('Cities data received:', data);
+        
+        if (Array.isArray(data)) {
+          // Use the 'nume' field directly from each city object
+          this.cities = data.map(city => city.nume);
+          console.log('Processed cities:', this.cities);
+        } else {
+          console.error('Received data is not an array:', data);
+          this.cities = [];
+        }
+      } catch (error) {
+        console.error('Error fetching cities:', error);
+        this.cities = [];
+      }
+    },
+
+
+
     async handleSubmit() {
       this.emailError = false;
       this.wrongFormatedEmail = "";
@@ -497,13 +522,14 @@ export default {
             email: this.formData.email,
             phoneNumber: this.formData.phoneNumber,
             password: this.formData.password,
-            county: this.selectedCounty,
+            county: this.selectedCountyName,
             city: this.selectedCity,
             shelterType: this.selectedShelterType,
           });
             this.$router.push('/shelter-dashboard'); 
         }
       } catch (error) {
+        console.error('Submit error:', error);
         this.errorMessageEmail = "An unexpected error occurred. Please try again later.";
       }
     }
