@@ -490,7 +490,7 @@ export default {
             phoneNumber: this.formData.phoneNumber,
             password: this.formData.password,
           });
-          alert(response.message); 
+            this.$router.push('/home');
         } else {
           const response = await registerShelter({
             username: this.formData.username,
@@ -501,7 +501,7 @@ export default {
             city: this.selectedCity,
             shelterType: this.selectedShelterType,
           });
-          alert(response.message); 
+            this.$router.push('/shelter-dashboard'); 
         }
       } catch (error) {
         this.errorMessageEmail = "An unexpected error occurred. Please try again later.";
