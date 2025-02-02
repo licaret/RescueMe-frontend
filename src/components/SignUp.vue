@@ -36,7 +36,22 @@
             <form v-if="isAdopter" @submit.prevent="handleSubmit" class="space-y-4 md:space-y-6 mb-8">
               <div>
                 <label for="username" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Username</label>
-                <input v-model="formData.username" type="text" name="username" id="username" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Your username" required="true">
+                <input 
+                  v-model="formData.username"
+                  @input="validateUsername"  
+                  type="text" name="username" 
+                  id="username" 
+                  :class="{
+                    'border-red-600 focus:ring-red-600 focus:border-red-600': usernameError ,
+                    'border-gray-300 focus:ring-primary-600 focus:border-primary-600': !usernameError,
+                  }"
+                  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
+                  placeholder="Your username" 
+                  required="true"
+                >
+                <p v-if="usernameError" class="text-sm text-red-600 mt-2">
+                  {{ usernameError }}
+                </p>
               </div>
               <div>
                 <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your email</label>
@@ -145,7 +160,23 @@
               <form v-else @submit.prevent="handleSubmit" class="space-y-4 md:space-y-6 mb-8">
                 <div>
                   <label for="shelter-name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Username</label>
-                  <input v-model="formData.username" type="text" name="shelter-name" id="shelter-name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Your Shelter's Name" required="true">
+                  <input 
+                    v-model="formData.username" 
+                    @input="validateUsername"
+                    type="text" 
+                    name="shelter-name" 
+                    id="shelter-name" 
+                    :class="{
+                      'border-red-600 focus:ring-red-600 focus:border-red-600': usernameError,
+                      'border-gray-300 focus:ring-primary-600 focus:border-primary-600': !usernameError,
+                    }"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
+                    placeholder="Your Shelter's Name" 
+                    required="true"
+                  >
+                  <p v-if="usernameError" class="text-sm text-red-600 mt-2">
+                    {{ usernameError }}
+                  </p>
                 </div>
                 <div>
                   <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your email</label>
@@ -299,6 +330,7 @@ export default {
       emailError: false, //pt bordura rosie
       wrongFormatedEmail: "", // daca lipseste @ sau .
       errorMessageEmail: "", //pt invalid or taken email
+      usernameError: "",
       formData: {
         username: "",
         email: "",
@@ -392,33 +424,23 @@ export default {
     },
 
     validateEmail() {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Expresie pentru un email valid
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
       if (!emailRegex.test(this.formData.email)) {
         this.wrongFormatedEmail = "Invalid email format. Please include '@' and a domain.";
       } else {
-        this.wrongFormatedEmail = ""; // Eliminăm eroarea dacă emailul devine valid
+        this.wrongFormatedEmail = ""; 
       }
     },
 
-    // handleEmailInput() {
-    //   this.emailError = false;
-    //   this.errorMessageEmail = "";
-    // },
+    validateUsername() {
+      const usernameRegex = /^[^\s]{3,20}$/;
+      if (!usernameRegex.test(this.formData.username)) {
+        this.usernameError = "Username must be 3-20 characters long and cannot contain spaces.";
+      } else {
+        this.usernameError = ""; 
+      }
+    },
 
-    // async validateUsername() {
-    //   if (this.formData.username.length < 3 || this.formData.username.length > 20) {
-    //     alert("Username must be between 3 and 20 characters.");
-    //     return;
-    //   }
-    //   try {
-    //     const usernameExists = await checkUsernameExists(this.formData.username);
-    //     if (usernameExists) {
-    //       alert("Username already exists! Please use a different username.");
-    //     } 
-    //   } catch (error) {
-    //     alert("Error checking username: " + error.message);
-    //   }
-    // },
 
     validatePassword(password) {
       const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,20}$/;
@@ -435,22 +457,22 @@ export default {
       this.wrongFormatedEmail = "";
       this.errorMessageEmail = ""; 
 
+      this.usernameError = "";
+
       try {
         const emailExists = await checkEmailExists(this.formData.email); 
-        
         if (emailExists) {
           this.emailError = true;
           this.errorMessageEmail = "Email is invalid or taken. Please login or click Forgot password to reset.";
           return; 
         }
-        
 
-        // // Verificăm dacă terms checkbox este bifat
-        // const termsAccepted = document.getElementById('terms').checked;
-        // if (!termsAccepted) {
-        //   this.errorMessage = "Please accept the Terms and Conditions to continue.";
-        //   return;
-        // }
+        const usernameExists = await checkUsernameExists(this.formData.username); 
+        if (usernameExists) {
+          this.usernameError = "Username is already taken. Please choose a different one.";
+          return; 
+        }
+        
         
         if (this.isAdopter) {
           const response = await registerAdopter({
