@@ -7,50 +7,47 @@
                       <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-700 md:text-2xl dark:text-white">
                           Sign in to your account
                       </h1>
+                      <div v-if="loginError" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+                        {{ loginError }}
+                      </div>
                       <form @submit.prevent="handleLogin" class="space-y-4 md:space-y-6 mb-8" action="#">
-                          <div>
-                              <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your email</label>
-                              <input v-model="email" type="email" name="email" id="email" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-red-600 focus:border-red-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="name@company.com" required="true">
-                          </div>
-                          <div>
-                              <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
-                              <div class="relative">
-                                  <input 
-                                      v-model="password" 
-                                      :type="showPassword ? 'text' : 'password'" 
-                                      name="password" 
-                                      id="password" 
-                                      placeholder="••••••••" 
-                                      class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-red-600 focus:border-red-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
-                                      required="true"
-                                  >
-                                  <button 
-                                      type="button"
-                                      @click="togglePasswordVisibility"
-                                      class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
-                                  >
-                                      <svg 
-                                          class="w-5 h-5" 
-                                          :class="{ 'hidden': showPassword }"
-                                          fill="none" 
-                                          stroke="currentColor" 
-                                          viewBox="0 0 24 24"
-                                      >
-                                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                      </svg>
-                                      <svg 
-                                          class="w-5 h-5" 
-                                          :class="{ 'hidden': !showPassword }"
-                                          fill="none" 
-                                          stroke="currentColor" 
-                                          viewBox="0 0 24 24"
-                                      >
-                                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-                                      </svg>
-                                  </button>
-                              </div>
-                          </div>
+                        <div>
+                          <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your email</label>
+                          <input v-model="email" @input="validateEmail" type="email" name="email" id="email" 
+                            :class="{
+                              'border-red-600 focus:ring-red-600 focus:border-red-600': emailError,
+                              'border-gray-300 focus:ring-primary-600 focus:border-primary-600': !emailError
+                            }"
+                            class="bg-gray-50 border text-gray-900 rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                            placeholder="name@company.com" required>
+                          <p v-if="emailError" class="text-sm text-red-600 mt-2">{{ emailError }}</p>
+                        </div>
+                        <div>
+                <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
+                <div class="relative">
+                  <input 
+                    v-model="password" 
+                    :type="showPassword ? 'text' : 'password'" 
+                    name="password" id="password" 
+                    placeholder="••••••••" 
+                    class="bg-gray-50 border text-gray-900 rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white" 
+                    required>
+                  <button 
+                    type="button"
+                    @click="togglePasswordVisibility"
+                    class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
+                  >
+                    <svg v-if="!showPassword" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268-2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                    </svg>
+                  </button>
+                </div>
+                <p v-if="passwordError" class="text-sm text-red-600 mt-2">{{ passwordError }}</p>
+              </div>
                           <div class="flex items-center justify-between">
                               <div class="flex items-start">
                                   <div class="flex items-center h-5">
@@ -89,16 +86,71 @@ export default {
       email: "",
       password: "",
       showPassword: false,
+      loginError:"",
+      emailError: "",
+      passwordError: "",
     };
   },
   methods: {
     togglePasswordVisibility() {
       this.showPassword = !this.showPassword;
     },
+
     navigateToSignUp() {
       this.$router.push('/signup'); 
     },
+
+    // validateEmail() {
+    //   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    //   this.emailError = emailRegex.test(this.email) ? "" : "Invalid email format.";
+    // },
+
+    validateEmail() {
+      const emailRegex = /^(?!.*\s)[^\s@]+@[^\s@]+\.[^\s@]+$/; // Nu permite spații și verifică formatul corect
+      if (!emailRegex.test(this.email)) {
+        this.emailError = "Invalid email format. Please include '@' and a domain.";
+      } else {
+        this.emailError = ""; 
+      }
+    },
+
+    // validateEmail() {
+    //   this.errorMessageEmail = ""; // Resetează eroarea anterioară de "email taken"
+    //   this.emailError = false; // Scoate stilul de eroare dacă există
+    //   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
+    //   if (!emailRegex.test(this.formData.email)) {
+    //     this.wrongFormatedEmail = "Invalid email format. Please include '@' and a domain.";
+    //   } else {
+    //     this.wrongFormatedEmail = ""; 
+    //   }
+    // },
+
+    // validatePassword(password) {
+    //   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,20}$/;
+    //   if (!passwordRegex.test(password)) {
+    //     this.passwordError = "Password must be 8-20 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character, and must not contain spaces.";
+    //   } else {
+    //     this.passwordError = "";
+    //   }
+    // },
+
+    // validatePassword() {
+    //   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])[^ ]{8,20}$/;
+    //   if (!passwordRegex.test(this.password)) {
+    //     this.passwordError = "Password must be 8-20 characters long, include at least one uppercase letter, one lowercase letter, one number, one special character, and must not contain spaces.";
+    //   } else {
+    //     this.passwordError = "";
+    //   }
+    // },
+
+
     async handleLogin() {
+      this.loginError = "";
+      this.validateEmail();
+      // this.validatePassword();
+
+      if (this.emailError || this.passwordError) return; 
+
       try {
         const response = await fetch("http://localhost:8080/api/v1/auth/login", {
           method: "POST",
@@ -125,7 +177,7 @@ export default {
           this.$router.push("/home"); 
         }
       } catch (error) {
-        alert("Login failed: " + error.message);
+        this.loginError = "Invalid email or password. Please try again or reset your password.";
       }
     },
   },
