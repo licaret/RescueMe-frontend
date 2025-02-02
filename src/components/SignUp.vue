@@ -24,9 +24,11 @@
             Shelter
           </button>
         </div>
-    
         <div class="w-full bg-white rounded-lg shadow dark:border sm:max-w-md mx-auto xl:p-0 dark:bg-gray-800 dark:border-gray-700">
           <div class="p-6 pb-12 space-y-4 md:space-y-6 sm:p-8 sm:pb-12">
+            <div  v-if="errorMessageEmail" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+              {{ errorMessageEmail }}
+            </div>
             <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-700 md:text-2xl dark:text-white">
               Create an account
             </h1>
@@ -45,15 +47,15 @@
                   name="email"
                   id="email"
                   :class="{
-                    'border-red-600 focus:ring-red-600 focus:border-red-600': emailError,
-                    'border-gray-300 focus:ring-primary-600 focus:border-primary-600': !emailError,
+                    'border-red-600 focus:ring-red-600 focus:border-red-600': emailError || wrongFormatedEmail,
+                    'border-gray-300 focus:ring-primary-600 focus:border-primary-600': !emailError || !wrongFormatedEmail,
                   }"
                   class="bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                   placeholder="name@company.com"
                   required
                 >
-                <p v-if="emailError" class="text-sm text-red-600 mt-2">
-                  {{ emailError }}
+                <p v-if="wrongFormatedEmail" class="text-sm text-red-600 mt-2">
+                  {{ wrongFormatedEmail }}
                 </p>
               </div>
               <div>
@@ -112,8 +114,8 @@
                     aria-describedby="terms" 
                     type="checkbox" 
                     class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800" 
-                    required
-                  />
+                    required="true"
+                    />
                 </div>
                 <div class="ml-3 text-sm">
                   <label for="terms" class="font-light text-gray-500 dark:text-gray-300">
@@ -154,15 +156,15 @@
                   name="email" 
                   id="email"
                   :class="{
-                    'border-red-600 focus:ring-red-600 focus:border-red-600': emailError,
-                    'border-gray-300 focus:ring-primary-600 focus:border-primary-600': !emailError,
+                    'border-red-600 focus:ring-red-600 focus:border-red-600': wrongFormatedEmail,
+                    'border-gray-300 focus:ring-primary-600 focus:border-primary-600': !wrongFormatedEmail,
                   }" 
                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
                   placeholder="shelter@domain.com" 
                   required="true"
                   >
-                  <p v-if="emailError" class="text-sm text-red-600 mt-2">
-                    {{ emailError }}
+                  <p v-if="wrongFormatedEmail" class="text-sm text-red-600 mt-2">
+                    {{ wrongFormatedEmail }}
                   </p>
                 </div>
                 <div>
@@ -244,7 +246,7 @@
                       aria-describedby="terms" 
                       type="checkbox" 
                       class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800" 
-                      required
+                      required="true"
                     />
                   </div>
                   <div class="ml-3 text-sm">
@@ -294,7 +296,9 @@ export default {
       emailExists: false,
       usernameExists: false,
       passwordError: "",
-      emailError: "",
+      emailError: false, //pt bordura rosie
+      wrongFormatedEmail: "", // daca lipseste @ sau .
+      errorMessageEmail: "", //pt invalid or taken email
       formData: {
         username: "",
         email: "",
@@ -374,25 +378,32 @@ export default {
     }
   },
   methods: {
+
     togglePasswordVisibility() {
       this.showPassword = !this.showPassword;
     },
+
     updateCities() {
       this.selectedCity = '';
     },
+
     navigateToLogin() {
       this.$router.push('/login'); 
     },
 
-
     validateEmail() {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Expresie pentru un email valid
       if (!emailRegex.test(this.formData.email)) {
-        this.emailError = "Invalid email format. Please include '@' and a domain.";
+        this.wrongFormatedEmail = "Invalid email format. Please include '@' and a domain.";
       } else {
-        this.emailError = ""; // Eliminăm eroarea dacă emailul devine valid
+        this.wrongFormatedEmail = ""; // Eliminăm eroarea dacă emailul devine valid
       }
     },
+
+    // handleEmailInput() {
+    //   this.emailError = false;
+    //   this.errorMessageEmail = "";
+    // },
 
     // async validateUsername() {
     //   if (this.formData.username.length < 3 || this.formData.username.length > 20) {
@@ -414,38 +425,33 @@ export default {
       if (!passwordRegex.test(password)) {
         this.passwordError = "Password must be 8-20 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character.";
       } else {
-        this.passwordError = ""; // Resetare eroare
+        this.passwordError = "";
       }
     },
 
     
     async handleSubmit() {
-      const email = this.formData.email;
-      
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        alert("Invalid email format. Please include '@' and a domain.");
-        return;
-      }
+      this.emailError = false;
+      this.wrongFormatedEmail = "";
+      this.errorMessageEmail = ""; 
 
       try {
-        const emailExists = await checkEmailExists(this.formData.email);
-        const usernameExists = await checkUsernameExists(this.formData.username);
+        const emailExists = await checkEmailExists(this.formData.email); 
+        
         if (emailExists) {
-          alert("Email already exists! Please use a different email.");
+          this.emailError = true;
+          this.errorMessageEmail = "Email is invalid or taken. Please login or click Forgot password to reset.";
           return; 
         }
-        if (usernameExists) {
-          alert("Username already exists! Please use a different username.");
-          return; 
-        }
-        if (this.formData.username.length < 3 || this.formData.username.length > 20) {
-          alert("Username must be between 3 and 20 characters.");
-          return;
-        }
-        if (!this.validatePassword(this.formData.password)) {
-          return;
-        }
+        
+
+        // // Verificăm dacă terms checkbox este bifat
+        // const termsAccepted = document.getElementById('terms').checked;
+        // if (!termsAccepted) {
+        //   this.errorMessage = "Please accept the Terms and Conditions to continue.";
+        //   return;
+        // }
+        
         if (this.isAdopter) {
           const response = await registerAdopter({
             username: this.formData.username,
@@ -453,7 +459,7 @@ export default {
             phoneNumber: this.formData.phoneNumber,
             password: this.formData.password,
           });
-          alert(response.message);
+          alert(response.message); 
         } else {
           const response = await registerShelter({
             username: this.formData.username,
@@ -464,12 +470,13 @@ export default {
             city: this.selectedCity,
             shelterType: this.selectedShelterType,
           });
-          alert(response.message);
+          alert(response.message); 
         }
       } catch (error) {
-        alert("Registration failed: " + error.message);
+        this.errorMessageEmail = "An unexpected error occurred. Please try again later.";
       }
-    },
+    }
+
     },
 };
 </script>
