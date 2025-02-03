@@ -4,6 +4,7 @@ import SignUpPage from '@/pages/SignUpPage.vue';
 import LoginPage from '@/pages/LoginPage.vue';
 import HomePage from '@/pages/HomePage.vue';
 import ShelterDashboardPage from '@/pages/ShelterDashboardPage.vue';
+import ForgotPasswordPage from '@/pages/ForgotPasswordPage.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -24,6 +25,11 @@ const router = createRouter({
       component: LoginPage, 
     },
     {
+      path: '/forgot-password',
+      name: 'ForgotPasswordPage',
+      component: ForgotPasswordPage, 
+    },
+    {
       path: '/home',
       name: 'HomePage',
       component: HomePage, 
@@ -40,9 +46,9 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
 
-  const isAuthenticated = !!localStorage.getItem('token'); 
+  const token = localStorage.getItem('token'); 
+  const isAuthenticated = !!token; 
 
-  // console.log('From:', from.path, 'To:', to.path);
 
   if (
     (from.path === '/login' || from.path === '/signup') && 

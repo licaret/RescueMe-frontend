@@ -57,7 +57,7 @@
                                       <label for="remember" class="text-gray-500 dark:text-gray-300">Remember me</label>
                                   </div>
                               </div>
-                              <a href="#" class="text-sm font-medium text-red-600 hover:underline dark:text-red-500">Forgot password?</a>
+                              <a @click.prevent="navigateToForgotPassword" class="text-sm font-medium text-red-600 hover:underline dark:text-red-500">Forgot password?</a>
                           </div>
                           <button type="submit" class="w-full text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">Sign in</button>
                           <p class="text-sm font-light text-gray-500 dark:text-gray-400">
@@ -100,13 +100,13 @@ export default {
       this.$router.push('/signup'); 
     },
 
-    // validateEmail() {
-    //   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    //   this.emailError = emailRegex.test(this.email) ? "" : "Invalid email format.";
-    // },
+    navigateToForgotPassword() {
+      this.$router.push('/forgot-password'); 
+    },
+
 
     validateEmail() {
-      const emailRegex = /^(?!.*\s)[^\s@]+@[^\s@]+\.[^\s@]+$/; // Nu permite spații și verifică formatul corect
+      const emailRegex = /^(?!.*\s)[^\s@]+@[^\s@]+\.[^\s@]+$/; 
       if (!emailRegex.test(this.email)) {
         this.emailError = "Invalid email format. Please include '@' and a domain.";
       } else {
@@ -114,34 +114,6 @@ export default {
       }
     },
 
-    // validateEmail() {
-    //   this.errorMessageEmail = ""; // Resetează eroarea anterioară de "email taken"
-    //   this.emailError = false; // Scoate stilul de eroare dacă există
-    //   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
-    //   if (!emailRegex.test(this.formData.email)) {
-    //     this.wrongFormatedEmail = "Invalid email format. Please include '@' and a domain.";
-    //   } else {
-    //     this.wrongFormatedEmail = ""; 
-    //   }
-    // },
-
-    // validatePassword(password) {
-    //   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,20}$/;
-    //   if (!passwordRegex.test(password)) {
-    //     this.passwordError = "Password must be 8-20 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character, and must not contain spaces.";
-    //   } else {
-    //     this.passwordError = "";
-    //   }
-    // },
-
-    // validatePassword() {
-    //   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])[^ ]{8,20}$/;
-    //   if (!passwordRegex.test(this.password)) {
-    //     this.passwordError = "Password must be 8-20 characters long, include at least one uppercase letter, one lowercase letter, one number, one special character, and must not contain spaces.";
-    //   } else {
-    //     this.passwordError = "";
-    //   }
-    // },
 
 
     async handleLogin() {
@@ -168,10 +140,11 @@ export default {
         }
 
         const data = await response.json();
-
         localStorage.setItem("token", data.token);
+        // localStorage.setItem("shelterUsername", data.username);
 
         if (data.role === "SHELTER") {
+          localStorage.setItem("shelterUsername", data.username);
           this.$router.push("/shelter-dashboard"); 
         } else {
           this.$router.push("/home"); 
