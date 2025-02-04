@@ -9,7 +9,7 @@ export default {
   components: {
     IntroNavbar,
     SignUp,
-    IntroFooter,
+    // IntroFooter,
   },
 };
 </script>

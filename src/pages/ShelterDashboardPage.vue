@@ -63,10 +63,13 @@
                 </a>
             </li>
             <li>
-                <a href="#" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                <router-link 
+                    to="/shelter-dashboard/manage-pets" 
+                    class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                >
                     <img src="../assets/available-pets.png" alt="Dog paw icon" class="w-5 h-5">
                     <span class="flex-1 ms-3 whitespace-nowrap">Manage Pets</span>
-                </a>
+                </router-link>
             </li>
             <li>
                 <a href="#" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
@@ -110,7 +113,8 @@
     </aside>
 
     <div class="p-4 sm:ml-64">
-    <div class="p-4 border-2 border-gray-200 border-dashed rounded-lg dark:border-gray-700 mt-14">
+        <router-view></router-view>
+    <!-- <div class="p-4 border-2 border-gray-200 border-dashed rounded-lg dark:border-gray-700 mt-14">
         <div class="grid grid-cols-3 gap-4 mb-4">
             <div class="flex items-center justify-center h-24 rounded-sm bg-gray-50 dark:bg-gray-800">
                 <p class="text-2xl text-gray-400 dark:text-gray-500">
@@ -208,14 +212,14 @@
                 </p>
             </div>
         </div>
-    </div>
+    </div> -->
     </div>
 </template>
 
 
 
 <script>
-    import { ref, onMounted } from "vue";
+    import { ref, onMounted, onUnmounted } from "vue";
     import { useRouter } from "vue-router";
 
     export default {
@@ -223,11 +227,19 @@
             const router = useRouter();
             const shelterUsername = ref("Shelter");
 
+            const blockBackButton = () => {
+                history.pushState(null, "", location.href); 
+            };
+
             const handleLogout = () => {
                 localStorage.removeItem("token");
                 localStorage.removeItem("shelterUsername");
+
+                window.removeEventListener("popstate", blockBackButton);
+
                 router.push("/login");
             };
+
 
             onMounted(() => {
                 const username = localStorage.getItem("shelterUsername");
@@ -236,6 +248,13 @@
                 } else {
                     console.error("Username not found in localStorage.");
                 }
+
+                window.history.pushState(null, "", window.location.href);
+                window.addEventListener("popstate", blockBackButton);
+            });
+
+            onUnmounted(() => {
+                window.removeEventListener("popstate", blockBackButton);
             });
 
             return {
