@@ -141,10 +141,12 @@ export default {
 
         const data = await response.json();
         localStorage.setItem("token", data.token);
-        // localStorage.setItem("shelterUsername", data.username);
+        localStorage.setItem("shelterId", data.id); 
+        localStorage.setItem("shelterUsername", data.username);
 
         if (data.role === "SHELTER") {
           localStorage.setItem("shelterUsername", data.username);
+          localStorage.setItem("shelterId", data.id); 
           this.$router.push("/shelter-dashboard"); 
         } else {
           this.$router.push("/home"); 

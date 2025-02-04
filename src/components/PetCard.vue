@@ -12,7 +12,7 @@
           </div>
           <span
             :class="`px-3 py-1 rounded-full text-sm ${
-              pet.status === 'Available' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+              pet.status === 'AVAILABLE' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
             }`"
           >
             {{ pet.status || '' }}
@@ -45,7 +45,7 @@
   
       <!-- Specifications Section -->
       <div class="p-4 pt-0">
-        <div class="flex flex-wrap gap-2">
+        <div class="flex flex-wrap gap-2 pl-3 pr-2">
           <div
             v-for="(value, key) in formattedSpecifications"
             :key="key"
