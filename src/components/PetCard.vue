@@ -30,10 +30,12 @@
         </button>
         <div class="flex items-center justify-center">
           <img
-            :src="pet.photos[currentIndex]"
+            v-if="pet.photoUrls && pet.photoUrls.length > 0"
+            :src="pet.photoUrls[currentIndex]"
             alt="Pet Photo"
             class="w-64 h-64 object-cover rounded-lg"
           />
+          <p v-else>No photo available</p>
         </div>
         <button
           class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-gray-200 rounded-full p-2 shadow-md hover:bg-gray-300"
@@ -42,6 +44,7 @@
           &gt;
         </button>
       </div>
+
   
       <!-- Specifications Section -->
       <div class="p-4 pt-0">
@@ -113,11 +116,11 @@
       const showStory = ref(false);
   
       const prevImage = () => {
-        currentIndex.value = (currentIndex.value - 1 + props.pet.photos.length) % props.pet.photos.length;
+        currentIndex.value = (currentIndex.value - 1 + props.pet.photoUrls.length) % props.pet.photoUrls.length;
       };
   
       const nextImage = () => {
-        currentIndex.value = (currentIndex.value + 1) % props.pet.photos.length;
+        currentIndex.value = (currentIndex.value + 1) % props.pet.photoUrls.length;
       };
   
       const toggleStory = () => {
