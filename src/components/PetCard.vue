@@ -88,12 +88,23 @@
             Edit
           </button>
           <button
+            @click="showModal = true"
             class="flex-1 border border-gray-200 py-2 rounded-lg flex items-center justify-center gap-2 text-red-600 hover:text-red-700"
-            @click="handleRemovePet"
           >
             <img src="../assets/trash.png" alt="Delete icon" class="w-4 h-4" />
             Remove
           </button>
+
+          <ConfirmationModal
+            :isOpen="showModal"
+            title="Delete Pet"
+            description="Are you sure you want to delete this pet? This action cannot be undone."
+            confirmButtonText="Yes, delete it"
+            cancelButtonText="Cancel"
+            @confirm="deletePet"
+            @cancel="showModal = false"
+            @update:isOpen="showModal = $event"
+          />
         </div>
       </div>
     </div>
@@ -104,9 +115,18 @@
   <script>
 import { ref, defineEmits } from "vue";
 import { deletePet } from "../services/pet_service"; 
+import ConfirmationModal from "@/components/ConfirmationModal.vue";
   
   export default {
     name: "PetCard",
+    components: {
+      ConfirmationModal,
+    },
+    data() {
+      return {
+        showModal: false,
+      };
+    },
     props: {
       pet: {
         type: Object,
@@ -182,6 +202,21 @@ import { deletePet } from "../services/pet_service";
         handleRemovePet,
       };
     },
+
+    methods: {
+      async deletePet() {
+        const shelterId = localStorage.getItem("shelterId");
+        const petId = this.pet.id;
+
+        try {
+          await deletePet(shelterId, petId);
+          this.$emit("petDeleted", petId); 
+          this.showModal = false; 
+        } catch (error) {
+          console.error("Error deleting pet:", error);
+        }
+      },
+    }
   };
   </script>
   

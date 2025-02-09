@@ -36,7 +36,12 @@
     
     <!-- Pets Grid -->
     <div v-if="pets.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-32">
-      <PetCard v-for="pet in pets" :key="pet.id" :pet="pet" @petDeleted="removePetFromList" />
+      <PetCard 
+        v-for="pet in pets" 
+        :key="pet.id" 
+        :pet="pet" 
+        @petDeleted="removePetFromList" 
+        />
     </div>
     <div v-else class="text-center py-20">
       <img src="../assets/empty-state.png" alt="No Pets" class="mx-auto w-50 h-48 mb-6" />
