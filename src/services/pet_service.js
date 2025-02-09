@@ -27,4 +27,26 @@ async function fetchShelterPets(shelterId) {
   }
 }
 
-export { fetchShelterPets };
+async function deletePet(shelterId, petId) {
+  try {
+    const response = await fetch(`http://localhost:8080/pets/${shelterId}/delete/${petId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to delete pet");
+    }
+
+    return true; 
+  } catch (error) {
+    console.error("Error deleting pet:", error);
+    return false; 
+  }
+}
+
+
+export { fetchShelterPets, deletePet };

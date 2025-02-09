@@ -89,6 +89,7 @@
           </button>
           <button
             class="flex-1 border border-gray-200 py-2 rounded-lg flex items-center justify-center gap-2 text-red-600 hover:text-red-700"
+            @click="handleRemovePet"
           >
             <img src="../assets/trash.png" alt="Delete icon" class="w-4 h-4" />
             Remove
@@ -101,7 +102,8 @@
   
   
   <script>
-  import { ref } from "vue";
+import { ref, defineEmits } from "vue";
+import { deletePet } from "../services/pet_service"; 
   
   export default {
     name: "PetCard",
@@ -111,7 +113,12 @@
         required: true,
       },
     },
-    setup(props) {
+
+    emits: ['petDeleted'],
+
+    setup(props, context) {
+      // const emit = defineEmits(["petDeleted"]);
+
       const currentIndex = ref(0);
       const showStory = ref(false);
   
@@ -140,6 +147,30 @@
         "Urgent Adoption Needed": props.pet.urgentAdoptionNeeded !== undefined ? (props.pet.urgentAdoptionNeeded ? 'Yes' : 'No') : '',
         "Time Spent in Shelter": props.pet.timeSpentInShelter || '',
       };
+
+      const handleRemovePet = async () => {
+        try {
+          const shelterId = localStorage.getItem("shelterId");
+          const petId = props.pet.id;
+
+          if (!shelterId || !petId) {
+            console.error("Shelter ID or Pet ID is missing");
+            return;
+          }
+
+          const success = await deletePet(shelterId, petId);
+          
+          if (success) {
+            console.log(`Pet with ID ${petId} deleted successfully`);
+            context.emit('petDeleted', petId);  // Use context.emit instead of emit
+          } else {
+            console.error("Failed to delete pet");
+          }
+        } catch (error) {
+          console.error("Error deleting pet:", error);
+        }
+      };
+
   
       return {
         currentIndex,
@@ -148,25 +179,26 @@
         showStory,
         toggleStory,
         formattedSpecifications,
+        handleRemovePet,
       };
     },
   };
   </script>
   
   <style scoped>
-  .fade-enter-active,
-  .fade-leave-active {
-    transition: opacity 0.5s;
-  }
-  
-  .fade-enter-from,
-  .fade-leave-to {
-    opacity: 0;
-  }
-  
-  button {
-    transition: color 0.3s ease;
-  }
+    .fade-enter-active,
+    .fade-leave-active {
+      transition: opacity 0.5s;
+    }
+    
+    .fade-enter-from,
+    .fade-leave-to {
+      opacity: 0;
+    }
+    
+    button {
+      transition: color 0.3s ease;
+    }
   </style>
   
 
