@@ -41,6 +41,7 @@
         :key="pet.id" 
         :pet="pet" 
         @petDeleted="removePetFromList" 
+        @pet-updated="updatePetInList"
         />
     </div>
     <div v-else class="text-center py-20">
@@ -56,15 +57,18 @@
       v-if="showAddPetForm" 
       @close="showAddPetForm = false"
       @pet-added="handlePetAdded"
+      :key="formKey"
     />
   </div>
 </template>
 
+
+
 <script>
   import { ref, computed,onMounted } from 'vue';
-  import PetCard from '@/components/PetCard.vue';
   import { fetchShelterPets } from "@/services/pet_service.js";
   import AddPetForm from '@/components/AddPetForm.vue';
+  import PetCard from '@/components/PetCard.vue';
 
   export default {
     name: 'ManagePets',
@@ -77,30 +81,30 @@
       const searchQuery = ref("");
       const shelterId = localStorage.getItem("shelterId");
       const showAddPetForm = ref(false);
+      const formKey = ref(0);
 
       const handlePetAdded = (newPet) => {   
-        newPet.photoUrls = newPet.photoUrls.map(url => `http://localhost:8080${url}`);
-        pets.value.push(newPet);
+        pets.value = [...pets.value, {
+          ...newPet,
+          photoUrls: newPet.photoUrls || []
+        }];
         showAddPetForm.value = false;
+        formKey.value++;
       };
 
-
+      
       const loadPets = async () => {
         if (!shelterId) {
           console.error("No shelter ID found");
           return;
         }
-
         try {
           const petsData = await fetchShelterPets(shelterId);
-          // console.log("Initial pets data:", petsData);
 
           pets.value = petsData.map(pet => ({
             ...pet,
-            photoUrls: pet.photoUrls.map(url => `http://localhost:8080${url}`)
+            photoUrls: pet.photoUrls ? pet.photoUrls : []
           }));
-
-          // console.log("Processed pets data with full photo URLs:", pets.value);
         } catch (error) {
           console.error("Error loading pets:", error);
         }
@@ -114,7 +118,15 @@
         console.log(`Pet with ID ${petId} removed from local list`);
       };
 
-
+      const updatePetInList = (updatedPet) => {
+        const index = pets.value.findIndex((p) => p.id === updatedPet.id);
+        if (index !== -1) {
+          pets.value[index] = {
+            ...updatedPet,
+            photoUrls: updatedPet.photoUrls ? updatedPet.photoUrls : []
+          };
+        }
+      };
 
       const filteredPets = computed(() =>
         pets.value.filter((pet) =>
@@ -122,7 +134,7 @@
         )
       );
 
-      return { searchQuery, pets: filteredPets, showAddPetForm, handlePetAdded, removePetFromList };
+      return { searchQuery, pets: filteredPets, showAddPetForm, handlePetAdded, removePetFromList, updatePetInList, formKey, };
     },
   
 };

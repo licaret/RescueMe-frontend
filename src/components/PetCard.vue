@@ -23,6 +23,7 @@
       <!-- Carousel Section -->
       <div class="p-4 pt-0 relative">
         <button
+          v-if="pet.photoUrls.length > 1"
           class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-gray-200 rounded-full p-2 shadow-md hover:bg-gray-300"
           @click="prevImage"
         >
@@ -30,7 +31,7 @@
         </button>
         <div class="flex items-center justify-center">
           <img
-            v-if="pet.photoUrls && pet.photoUrls.length > 0"
+            v-if="pet.photoUrls.length > 0"
             :src="pet.photoUrls[currentIndex]"
             alt="Pet Photo"
             class="w-64 h-64 object-cover rounded-lg"
@@ -38,6 +39,7 @@
           <p v-else>No photo available</p>
         </div>
         <button
+          v-if="pet.photoUrls.length > 1"
           class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-gray-200 rounded-full p-2 shadow-md hover:bg-gray-300"
           @click="nextImage"
         >
@@ -83,7 +85,9 @@
       <!-- Edit and Remove Buttons -->
       <div class="p-4 pt-0">
         <div class="flex gap-2">
-          <button class="flex-1 border border-gray-200 py-2 rounded-lg flex items-center justify-center gap-2">
+          <button 
+            @click="openEditForm"
+            class="flex-1 border border-gray-200 py-2 rounded-lg flex items-center justify-center gap-2">
             <img src="../assets/edit.png" alt="Edit icon" class="w-4 h-4" />
             Edit
           </button>
@@ -107,20 +111,26 @@
           />
         </div>
       </div>
+
+      <!-- Edit Form Modal -->
+      <AddPetForm v-if="showEditForm" :petToEdit="pet" @close="showEditForm = false" @pet-updated="updatePet" />
+
     </div>
   </template>
   
   
   
   <script>
-import { ref, defineEmits } from "vue";
+import { ref } from "vue";
 import { deletePet } from "../services/pet_service"; 
 import ConfirmationModal from "@/components/ConfirmationModal.vue";
+import AddPetForm from "@/components/AddPetForm.vue";
   
   export default {
     name: "PetCard",
     components: {
       ConfirmationModal,
+      AddPetForm,
     },
     data() {
       return {
@@ -134,14 +144,23 @@ import ConfirmationModal from "@/components/ConfirmationModal.vue";
       },
     },
 
-    emits: ['petDeleted'],
+    emits: ['petDeleted', 'petUpdated'],
 
-    setup(props, context) {
-      // const emit = defineEmits(["petDeleted"]);
+    setup(props, { emit } ) {
 
       const currentIndex = ref(0);
       const showStory = ref(false);
-  
+      const showEditForm = ref(false);
+
+      const openEditForm = () => {
+        showEditForm.value = true;
+      };
+
+      const updatePet = (updatedPet) => {
+        context.emit("pet-updated", updatedPet);
+        showEditForm.value = false;
+      };
+
       const prevImage = () => {
         currentIndex.value = (currentIndex.value - 1 + props.pet.photoUrls.length) % props.pet.photoUrls.length;
       };
@@ -182,7 +201,7 @@ import ConfirmationModal from "@/components/ConfirmationModal.vue";
           
           if (success) {
             console.log(`Pet with ID ${petId} deleted successfully`);
-            context.emit('petDeleted', petId);  // Use context.emit instead of emit
+            context.emit('petDeleted', petId);
           } else {
             console.error("Failed to delete pet");
           }
@@ -200,6 +219,9 @@ import ConfirmationModal from "@/components/ConfirmationModal.vue";
         toggleStory,
         formattedSpecifications,
         handleRemovePet,
+        showEditForm,
+        openEditForm,
+        updatePet,
       };
     },
 
@@ -219,6 +241,8 @@ import ConfirmationModal from "@/components/ConfirmationModal.vue";
     }
   };
   </script>
+  
+
   
   <style scoped>
     .fade-enter-active,

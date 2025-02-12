@@ -1,10 +1,11 @@
 <template>
   <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-8">
     <div class="bg-white rounded-lg w-full max-w-3xl max-h-[80vh] overflow-y-auto">
+
       <!-- Form Header -->
       <div class="p-6 border-b">
         <div class="flex justify-between items-center">
-          <h2 class="text-2xl font-bold">Add New Pet</h2>
+          <h2 class="text-2xl font-bold">{{ petToEdit ? 'Edit Pet' : 'Add New Pet' }}</h2>
           <button @click="$emit('close')" class="text-gray-500 hover:text-gray-700">
             <span class="text-2xl">×</span>
           </button>
@@ -171,12 +172,12 @@
                 </div>
               </label>
             </div>
-            <div v-if="photoPreview.length" class="mt-4 grid grid-cols-3 gap-4">
-              <div v-for="(photo, index) in photoPreview" :key="index" class="relative">
-                <img :src="photo" class="h-24 w-24 object-cover rounded" />
+            <div v-if="photoPreview.length" class="mt-4 grid grid-cols-3 gap-2">
+              <div v-for="(photo, index) in photoPreview" :key="index" class="relative w-24 h-24">
+                <img :src="photo" class="h-full w-full object-cover rounded-lg" />
                 <button
                   @click="removePhoto(index)"
-                  class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6"
+                  class="absolute -top-1 -right-8 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center"
                 >
                   ×
                 </button>
@@ -224,7 +225,7 @@
             type="submit"
             class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
           >
-            Add Pet
+            {{ petToEdit ? 'Edit Pet' : 'Add Pet' }}
           </button>
         </div>
       </form>
@@ -233,11 +234,15 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
+import { updatePet } from "../services/pet_service";
 
 export default {
   name: 'AddPetForm',
-  emits: ['close', 'pet-added'],
+  props: {
+    petToEdit: Object,
+  },
+  emits: ['close', 'pet-added', 'pet-updated'],
   setup(props, { emit }) {
     const petData = ref({
       name: '',
@@ -258,6 +263,18 @@ export default {
     const photoPreview = ref([]);
     const photoFiles = ref([]);
 
+    watch(
+      () => props.petToEdit,
+      (newPet) => {
+        if (newPet) {
+          petData.value = { ...newPet };
+          photoPreview.value = newPet.photoUrls || []; 
+        }
+      },
+      { immediate: true }
+    );
+
+
     const handlePhotoUpload = (event) => {
       const files = Array.from(event.target.files);
       files.forEach((file) => {
@@ -271,41 +288,55 @@ export default {
       console.log("Uploaded files:", photoFiles.value);
     };
 
+
     const removePhoto = (index) => {
       photoPreview.value.splice(index, 1);
       photoFiles.value.splice(index, 1);
     };
 
+
     const handleSubmit = async () => {
-      const formData = new FormData();
-      
-      formData.append("petData", JSON.stringify(petData.value));
-
-      photoFiles.value.forEach((file) => {
-          formData.append("photos", file);
-      });
-
       try {
-          const response = await fetch("http://localhost:8080/pets/add", {
-              method: "POST",
-              headers: {
-                  Authorization: `Bearer ${localStorage.getItem("token")}`,
-                  "shelterId": localStorage.getItem("shelterId"), 
-              },
-              body: formData,
-          });
+        const formData = new FormData();
+        const isUpdate = !!props.petToEdit;
 
-          if (response.ok) {
-              const newPet = await response.json();
-              emit("pet-added", newPet);
-              emit("close");
-          } else {
-              throw new Error("Failed to add pet");
-          }
+        formData.append("petData", JSON.stringify(petData.value));
+
+        if (photoFiles.value && photoFiles.value.length > 0) {
+          photoFiles.value.forEach((file) => {
+            formData.append("photos", file);
+          });
+        }
+
+        const url = isUpdate
+          ? `http://localhost:8080/pets/update/${petData.value.id}`
+          : "http://localhost:8080/pets/add";
+
+        const response = await fetch(url, {
+          method: isUpdate ? "PUT" : "POST",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "shelterId": localStorage.getItem("shelterId"),
+          },
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Failed to save pet: ${errorText}`);
+        }
+
+        const updatedPet = await response.json();
+
+        emit(isUpdate ? "pet-updated" : "pet-added", {
+          ...updatedPet,
+          photoUrls: updatedPet.photoUrls || []
+        });
+        emit("close");
       } catch (error) {
-          console.error("Error adding pet:", error);
+        console.error("Error saving pet:", error);
       }
-};
+    };
 
 
     return {
