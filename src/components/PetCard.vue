@@ -31,7 +31,7 @@
         </button>
         <div class="flex items-center justify-center">
           <img
-            v-if="pet.photoUrls.length > 0"
+            v-if="pet.photoUrls && pet.photoUrls.length > 0"
             :src="pet.photoUrls[currentIndex]"
             alt="Pet Photo"
             class="w-64 h-64 object-cover rounded-lg"
@@ -120,12 +120,13 @@
   
   
   
-  <script>
+<script>
 import { ref } from "vue";
 import { deletePet } from "../services/pet_service"; 
 import ConfirmationModal from "@/components/ConfirmationModal.vue";
 import AddPetForm from "@/components/AddPetForm.vue";
-  
+
+
   export default {
     name: "PetCard",
     components: {
@@ -146,8 +147,8 @@ import AddPetForm from "@/components/AddPetForm.vue";
 
     emits: ['petDeleted', 'petUpdated'],
 
-    setup(props, { emit } ) {
-
+    setup(props) {
+      //console.log("PetCard mounted with pet:", props.pet);
       const currentIndex = ref(0);
       const showStory = ref(false);
       const showEditForm = ref(false);
@@ -187,6 +188,7 @@ import AddPetForm from "@/components/AddPetForm.vue";
         "Time Spent in Shelter": props.pet.timeSpentInShelter || '',
       };
 
+      
       const handleRemovePet = async () => {
         try {
           const shelterId = localStorage.getItem("shelterId");

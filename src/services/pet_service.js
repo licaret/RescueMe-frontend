@@ -1,5 +1,7 @@
 async function fetchShelterPets(shelterId) {
   try {
+    console.log(`Fetching pets for shelter ID: ${shelterId}`);
+
     const response = await fetch(`http://localhost:8080/pets/${shelterId}`, {
       method: "GET",
       headers: {
@@ -8,17 +10,24 @@ async function fetchShelterPets(shelterId) {
       },
     });
 
+    //console.log("Response status:", response.status);
+
     if (!response.ok) {
       console.error("Failed to fetch pets. Response status:", response.status);
       throw new Error("Failed to fetch pets");
     }
 
     const data = await response.json();
+    //console.log("Raw pets data:", data);
 
-    return data.map(pet => ({
+    const processedData= data.map(pet => ({
       ...pet,
       photoUrls: pet.photoUrls ? pet.photoUrls : [] 
     }));
+
+    //console.log("Processed pets data:", processedData);
+    return processedData;
+
   } catch (error) {
     console.error("Error occurred while fetching pets:", error);
     return [];

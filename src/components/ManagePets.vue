@@ -83,14 +83,12 @@
       const showAddPetForm = ref(false);
       const formKey = ref(0);
 
-      const handlePetAdded = (newPet) => {   
-        pets.value = [...pets.value, {
-          ...newPet,
-          photoUrls: newPet.photoUrls || []
-        }];
-        showAddPetForm.value = false;
-        formKey.value++;
+      const handlePetAdded = async (newPet) => {   
+        // console.log("New pet added:", newPet);
+        await new Promise(resolve => setTimeout(resolve, 1000)); 
+        await loadPets(); 
       };
+
 
       
       const loadPets = async () => {
@@ -99,24 +97,33 @@
           return;
         }
         try {
+          console.log("Loading pets...");
           const petsData = await fetchShelterPets(shelterId);
+          console.log("Pets received in ManagePets:", petsData);
 
           pets.value = petsData.map(pet => ({
             ...pet,
             photoUrls: pet.photoUrls ? pet.photoUrls : []
           }));
+
+          console.log("Pets stored in state:", pets.value);
         } catch (error) {
           console.error("Error loading pets:", error);
         }
       };
 
 
+
       onMounted(loadPets);
+
+
 
       const removePetFromList = (petId) => {
         pets.value = pets.value.filter((pet) => pet.id !== petId);
         console.log(`Pet with ID ${petId} removed from local list`);
       };
+
+
 
       const updatePetInList = (updatedPet) => {
         const index = pets.value.findIndex((p) => p.id === updatedPet.id);
@@ -128,12 +135,16 @@
         }
       };
 
+
+
       const filteredPets = computed(() =>
         pets.value.filter((pet) =>
           pet.name.toLowerCase().includes(searchQuery.value.toLowerCase())
         )
       );
 
+
+      
       return { searchQuery, pets: filteredPets, showAddPetForm, handlePetAdded, removePetFromList, updatePetInList, formKey, };
     },
   
