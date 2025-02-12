@@ -54,12 +54,18 @@
           <div
             v-for="(value, key) in formattedSpecifications"
             :key="key"
-            class="border border-gray-300 rounded-full px-4 py-2 text-sm bg-gray-50"
+            :class="[
+              'border border-gray-300 rounded-full px-4 py-2 text-sm bg-gray-50',
+              key === 'Urgent Adoption Needed' && pet.urgentAdoptionNeeded
+                ? 'border-red-600 font-bold text-red-600'
+                : ''
+            ]"
           >
             <span class="font-semibold">{{ key }}:</span> {{ value }}
           </div>
         </div>
       </div>
+
   
       <!-- Read My Story Section -->
       <div class="p-4 text-center relative">
