@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-8">
+  <div class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-8 z-50">
     <div class="bg-white rounded-lg w-full max-w-3xl max-h-[80vh] overflow-y-auto">
 
       <!-- Form Header -->

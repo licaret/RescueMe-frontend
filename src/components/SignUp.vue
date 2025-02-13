@@ -439,7 +439,7 @@ export default {
       this.selectedCity = '';
       this.cities = [];
       
-      // Save the county name for the selected code
+      
       const selectedCountyObj = this.counties.find(county => county.auto === this.selectedCounty);
       if (selectedCountyObj) {
         this.selectedCountyName = selectedCountyObj.nume;
@@ -463,7 +463,6 @@ export default {
         console.log('Cities data received:', data);
         
         if (Array.isArray(data)) {
-          // Use the 'nume' field directly from each city object
           this.cities = data.map(city => city.nume);
           console.log('Processed cities:', this.cities);
         } else {
