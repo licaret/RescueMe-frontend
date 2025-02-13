@@ -264,6 +264,8 @@ export default {
     const photoPreview = ref([]);
     const photoFiles = ref([]);
     const deleteExistingPhotos = ref(false);
+    const existingPhotos = ref([]);
+
 
     watch(
       () => props.petToEdit,
@@ -285,12 +287,10 @@ export default {
             status: newPet.status,
             story: newPet.story
           };
-          if (newPet.photoUrls && newPet.photoUrls.length > 0) {
-            photoPreview.value = newPet.photoUrls;
-          } else {
-            photoPreview.value = [];
-          }
-          photoFiles.value = []; // Reset new photo files
+          // ✅ Asigură-te că nu duplici pozele existente
+          existingPhotos.value = newPet.photoUrls ? [...newPet.photoUrls] : [];
+          photoPreview.value = [...existingPhotos.value];
+          photoFiles.value = []; // Resetăm fișierele noi
         }
       },
       { immediate: true }
@@ -312,15 +312,15 @@ export default {
 
 
     const removePhoto = (index) => {
-      // If removing an existing photo in edit mode
-      if (props.petToEdit && index < (props.petToEdit.photoUrls?.length || 0)) {
-        deleteExistingPhotos.value = true;
-      }
-      photoPreview.value.splice(index, 1);
-      if (index < photoFiles.value.length) {
-        photoFiles.value.splice(index, 1);
+      if (index < existingPhotos.value.length) {
+        existingPhotos.value.splice(index, 1); // ✅ Elimină doar din lista de poze existente
+        deleteExistingPhotos.value = true;  // ✅ Marchează că pozele trebuie șterse pe backend
+      } else {
+        photoPreview.value.splice(index, 1); // ✅ Șterge doar fișierele noi
+        photoFiles.value.splice(index - existingPhotos.value.length, 1);
       }
     };
+
 
     const convertBase64ToFile = async (base64String) => {
       try {
@@ -354,20 +354,22 @@ export default {
 
         // Create a copy of petData
         const petDataToSend = { ...petData.value };
-        
-        // Remove photoUrls from being sent directly
         delete petDataToSend.photoUrls; 
-
         formData.append("petData", JSON.stringify(petDataToSend));
 
-        // Convert base64 images to files and append to formData
-        if (photoPreview.value.length > 0) {
-          for (const base64Image of photoPreview.value) {
-            const file = await convertBase64ToFile(base64Image);
-            if (file) {
-              formData.append("photos", file);
-            }
-          }
+        // // Convert base64 images to files and append to formData
+        // if (photoPreview.value.length > 0) {
+        //   for (const base64Image of photoPreview.value) {
+        //     const file = await convertBase64ToFile(base64Image);
+        //     if (file) {
+        //       formData.append("photos", file);
+        //     }
+        //   }
+        // }
+        if (photoFiles.value.length > 0) {
+          photoFiles.value.forEach((file) => {
+            formData.append("photos", file);
+          });
         }
 
 
