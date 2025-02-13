@@ -263,13 +263,34 @@ export default {
 
     const photoPreview = ref([]);
     const photoFiles = ref([]);
+    const deleteExistingPhotos = ref(false);
 
     watch(
       () => props.petToEdit,
       (newPet) => {
         if (newPet) {
-          petData.value = { ...newPet };
-          photoPreview.value = newPet.photoUrls || []; 
+          petData.value = {
+            id: newPet.id,
+            name: newPet.name,
+            species: newPet.species,
+            breed: newPet.breed,
+            sex: newPet.sex,
+            age: newPet.age,
+            size: newPet.size,
+            healthStatus: newPet.healthStatus,
+            vaccinated: newPet.vaccinated,
+            neutered: newPet.neutered,
+            urgentAdoptionNeeded: newPet.urgentAdoptionNeeded,
+            timeSpentInShelter: newPet.timeSpentInShelter,
+            status: newPet.status,
+            story: newPet.story
+          };
+          if (newPet.photoUrls && newPet.photoUrls.length > 0) {
+            photoPreview.value = newPet.photoUrls;
+          } else {
+            photoPreview.value = [];
+          }
+          photoFiles.value = []; // Reset new photo files
         }
       },
       { immediate: true }
@@ -291,8 +312,26 @@ export default {
 
 
     const removePhoto = (index) => {
+      // If removing an existing photo in edit mode
+      if (props.petToEdit && index < (props.petToEdit.photoUrls?.length || 0)) {
+        deleteExistingPhotos.value = true;
+      }
       photoPreview.value.splice(index, 1);
-      photoFiles.value.splice(index, 1);
+      if (index < photoFiles.value.length) {
+        photoFiles.value.splice(index, 1);
+      }
+    };
+
+    const convertBase64ToFile = async (base64String) => {
+      try {
+        const response = await fetch(base64String);
+        const blob = await response.blob();
+        const file = new File([blob], `photo_${Date.now()}.jpg`, { type: "image/jpeg" });
+        return file;
+      } catch (error) {
+        console.error("Error converting base64 to file:", error);
+        return null;
+      }
     };
 
 
@@ -301,16 +340,39 @@ export default {
         const formData = new FormData();
         const isUpdate = !!props.petToEdit;
 
-        formData.append("petData", JSON.stringify(petData.value));
+        // //console.log("Form data mmm:", formData);
 
-        if (photoFiles.value && photoFiles.value.length > 0) {
-          photoFiles.value.forEach((file) => {
-            formData.append("photos", file);
-          });
+        // formData.append("petData", JSON.stringify(petData.value));
+
+        // //console.log("Pet data aaa:", petData);
+
+        // if (photoFiles.value && photoFiles.value.length > 0) {
+        //   photoFiles.value.forEach((file) => {
+        //     formData.append("photos", file);
+        //   });
+        // }
+
+        // Create a copy of petData
+        const petDataToSend = { ...petData.value };
+        
+        // Remove photoUrls from being sent directly
+        delete petDataToSend.photoUrls; 
+
+        formData.append("petData", JSON.stringify(petDataToSend));
+
+        // Convert base64 images to files and append to formData
+        if (photoPreview.value.length > 0) {
+          for (const base64Image of photoPreview.value) {
+            const file = await convertBase64ToFile(base64Image);
+            if (file) {
+              formData.append("photos", file);
+            }
+          }
         }
 
+
         const url = isUpdate
-          ? `http://localhost:8080/pets/update/${petData.value.id}`
+          ? `http://localhost:8080/pets/update/${petData.value.id}?deleteExistingPhotos=${deleteExistingPhotos.value}`
           : "http://localhost:8080/pets/add";
 
         const response = await fetch(url, {
@@ -329,10 +391,7 @@ export default {
 
         const updatedPet = await response.json();
 
-        emit(isUpdate ? "pet-updated" : "pet-added", {
-          ...updatedPet,
-          photoUrls: updatedPet.photoUrls || []
-        });
+        emit(isUpdate ? "pet-updated" : "pet-added", updatedPet);
         emit("close");
       } catch (error) {
         console.error("Error saving pet:", error);

@@ -153,7 +153,7 @@ import AddPetForm from "@/components/AddPetForm.vue";
 
     emits: ['petDeleted', 'petUpdated'],
 
-    setup(props) {
+    setup(props, {emit}) {
       //console.log("PetCard mounted with pet:", props.pet);
       const currentIndex = ref(0);
       const showStory = ref(false);
@@ -164,9 +164,10 @@ import AddPetForm from "@/components/AddPetForm.vue";
       };
 
       const updatePet = (updatedPet) => {
-        context.emit("pet-updated", updatedPet);
+        emit("pet-updated", updatedPet);
         showEditForm.value = false;
       };
+
 
       const prevImage = () => {
         currentIndex.value = (currentIndex.value - 1 + props.pet.photoUrls.length) % props.pet.photoUrls.length;
