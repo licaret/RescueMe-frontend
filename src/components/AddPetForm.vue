@@ -173,10 +173,10 @@
               </label>
             </div>
             <div v-if="photoPreview.length" class="mt-4 grid grid-cols-3 gap-2">
-              <div v-for="(photo, index) in photoPreview" :key="index" class="relative w-24 h-24">
-                <img :src="photo" class="h-full w-full object-cover rounded-lg" />
+              <div v-for="(photo, index) in photoPreview" :key="photo.id || index" class="relative w-24 h-24">
+                <img :src="photo.url" class="h-full w-full object-cover rounded-lg" />
                 <button
-                  @click="removePhoto(index)"
+                  @click.prevent="handleRemovePhoto(index)"
                   class="absolute -top-1 -right-8 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center"
                 >
                   ×
@@ -263,42 +263,36 @@ export default {
 
     const photoPreview = ref([]);
     const photoFiles = ref([]);
-    const deleteExistingPhotos = ref(false);
+    // const deleteExistingPhotos = ref(false);
     const existingPhotos = ref([]);
+    const photoIdsToDelete = ref([]);
 
 
-    watch(
-      () => props.petToEdit,
-      (newPet) => {
-        if (newPet) {
-          petData.value = {
-            id: newPet.id,
-            name: newPet.name,
-            species: newPet.species,
-            breed: newPet.breed,
-            sex: newPet.sex,
-            age: newPet.age,
-            size: newPet.size,
-            healthStatus: newPet.healthStatus,
-            vaccinated: newPet.vaccinated,
-            neutered: newPet.neutered,
-            urgentAdoptionNeeded: newPet.urgentAdoptionNeeded,
-            timeSpentInShelter: newPet.timeSpentInShelter,
-            status: newPet.status,
-            story: newPet.story
-          };
-          if (newPet.photoUrls && newPet.photoUrls.length > 0) {
-            existingPhotos.value = [...newPet.photoUrls]; // ✅ Reține pozele inițiale separat
-            photoPreview.value = [...newPet.photoUrls];
-          } else {
-            existingPhotos.value = [];
-            photoPreview.value = [];
-          }
-          photoFiles.value = [];
+    // Reparat watch function
+    watch(() => props.petToEdit, (newPet) => {
+      if (newPet) {
+        petData.value = { ...newPet };
+
+        photoFiles.value = [];
+        photoIdsToDelete.value = [];
+
+        if (newPet.photos && newPet.photos.length > 0) {
+          existingPhotos.value = newPet.photos.map(photo => ({
+            id: photo.id,
+            url: photo.url.startsWith("data:image") ? photo.url : `data:image/jpeg;base64,${photo.url}`
+          }));
+          photoPreview.value = [...existingPhotos.value];
+        } else {
+          existingPhotos.value = [];
+          photoPreview.value = [];
         }
-      },
-      { immediate: true }
-    );
+
+        console.log("State after initialization:", {
+          photoPreview: photoPreview.value,
+          existingPhotos: existingPhotos.value
+        });
+      }
+    }, { immediate: true });
 
 
     const handlePhotoUpload = (event) => {
@@ -307,56 +301,36 @@ export default {
         const reader = new FileReader();
         reader.onload = (e) => {
           photoPreview.value.push(e.target.result);
+          photoFiles.value.push(file);
         };
         reader.readAsDataURL(file);
-        photoFiles.value.push(file);
       });
-      console.log("Uploaded files:", photoFiles.value);
     };
 
+    const handleRemovePhoto = (index) => {
+    console.log("Removing photo at index:", index);
 
-    const removePhoto = (index) => {
-      console.log("Removing photo at index:", index);
-      console.log("Existing photos:", existingPhotos.value);
-      console.log("Photo preview before removal:", photoPreview.value);
-
-      if (index < existingPhotos.value.length) {
-        // 🔴 Dacă e o poză existentă, setează un flag pentru a o șterge la salvare
-        deleteExistingPhotos.value = true;
-        existingPhotos.value.splice(index, 1);
-      } else {
-        // 🔴 Dacă e o poză nouă, elimină din photoFiles și photoPreview
-        const newIndex = index - existingPhotos.value.length;
-        if (newIndex >= 0) {
-          photoFiles.value.splice(newIndex, 1);
+    if (index < existingPhotos.value.length) {
+        const photoId = existingPhotos.value[index]?.id;
+        if (photoId) {
+            photoIdsToDelete.value.push(photoId);
         }
-      }
+        existingPhotos.value.splice(index, 1);
+    } else {
+        const newPhotoIndex = index - existingPhotos.value.length;
+        photoFiles.value.splice(newPhotoIndex, 1);
+    }
 
-      // 🔴 Actualizează lista pentru a forța Vue să vadă modificarea
-      photoPreview.value.splice(index, 1);
-      photoPreview.value = [...photoPreview.value];
+    photoPreview.value.splice(index, 1);
 
-      console.log("Updated photoPreview:", photoPreview.value);
-    };
-
-
-    watch(photoPreview, (newVal) => {
-      console.log("Updated photoPreview:", newVal);
+    console.log("After removal:", {
+        photoPreview: photoPreview.value,
+        existingPhotos: existingPhotos.value,
+        photoIdsToDelete: photoIdsToDelete.value
     });
+};
 
 
-
-    // const convertBase64ToFile = async (base64String) => {
-    //   try {
-    //     const response = await fetch(base64String);
-    //     const blob = await response.blob();
-    //     const file = new File([blob], `photo_${Date.now()}.jpg`, { type: "image/jpeg" });
-    //     return file;
-    //   } catch (error) {
-    //     console.error("Error converting base64 to file:", error);
-    //     return null;
-    //   }
-    // };
 
 
     const handleSubmit = async () => {
@@ -364,50 +338,36 @@ export default {
         const formData = new FormData();
         const isUpdate = !!props.petToEdit;
 
-        // //console.log("Form data mmm:", formData);
-
-        // formData.append("petData", JSON.stringify(petData.value));
-
-        // //console.log("Pet data aaa:", petData);
-
-        // if (photoFiles.value && photoFiles.value.length > 0) {
-        //   photoFiles.value.forEach((file) => {
-        //     formData.append("photos", file);
-        //   });
-        // }
-
-        // Create a copy of petData
+        // Pregătim datele pentru trimitere
         const petDataToSend = { ...petData.value };
-        delete petDataToSend.photoUrls; 
+        delete petDataToSend.shelterId;
+        delete petDataToSend.shelterUsername;
+        delete petDataToSend.photoUrls;
+
+        console.log("Submitting form with:", {
+          petData: petDataToSend,
+          newPhotos: photoFiles.value.length,
+          photoIdsToDelete: photoIdsToDelete.value
+        });
+
         formData.append("petData", JSON.stringify(petDataToSend));
 
-        // // Convert base64 images to files and append to formData
-        // if (photoPreview.value.length > 0) {
-        //   for (const base64Image of photoPreview.value) {
-        //     const file = await convertBase64ToFile(base64Image);
-        //     if (file) {
-        //       formData.append("photos", file);
-        //     }
-        //   }
-        // }
+        // Adăugăm pozele noi
+        photoFiles.value.forEach((file) => {
+          formData.append("photos", file);
+        });
 
-        // ✅ Trimite doar pozele noi adăugate
-        if (photoFiles.value.length > 0) {
-          photoFiles.value.forEach((file) => {
-            formData.append("photos", file);
-          });
+        // Adăugăm ID-urile pozelor de șters
+        if (photoIdsToDelete.value.length > 0) {
+          formData.append("photoIdsToDelete", JSON.stringify(photoIdsToDelete.value));
         }
 
-        // ✅ Trimite lista pozelor rămase, nu doar `deleteExistingPhotos`
-        formData.append("existingPhotos", JSON.stringify(existingPhotos.value));
-
-
         const url = isUpdate
-          ? `http://localhost:8080/pets/update/${petData.value.id}?deleteExistingPhotos=${deleteExistingPhotos.value}`
+          ? `http://localhost:8080/pets/update/${petData.value.id}`
           : "http://localhost:8080/pets/add";
 
         const response = await fetch(url, {
-          method: isUpdate ? "PUT" : "POST",
+          method: isUpdate ? "PATCH" : "POST",
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
             "shelterId": localStorage.getItem("shelterId"),
@@ -416,11 +376,11 @@ export default {
         });
 
         if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`Failed to save pet: ${errorText}`);
+          throw new Error(`Failed to save pet: ${await response.text()}`);
         }
 
         const updatedPet = await response.json();
+        console.log("Server response:", updatedPet);
 
         emit(isUpdate ? "pet-updated" : "pet-added", updatedPet);
         emit("close");
@@ -430,11 +390,12 @@ export default {
     };
 
 
+
     return {
       petData,
       photoPreview,
       handlePhotoUpload,
-      removePhoto,
+      handleRemovePhoto,
       handleSubmit,
     };
   },

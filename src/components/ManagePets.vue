@@ -103,8 +103,10 @@
 
           pets.value = petsData.map(pet => ({
             ...pet,
-            photoUrls: pet.photoUrls ? pet.photoUrls : []
+            photos: pet.photos ? pet.photos : []
           }));
+
+
 
           console.log("Pets stored in state:", pets.value);
         } catch (error) {
@@ -130,10 +132,14 @@
         if (index !== -1) {
           pets.value[index] = {
             ...updatedPet,
-            photoUrls: updatedPet.photoUrls ? updatedPet.photoUrls : []
+            photos: updatedPet.photos ? updatedPet.photos.map(photo => ({
+              id: photo.id,
+              url: photo.url.startsWith("data:image") ? photo.url : `data:image/jpeg;base64,${photo.url}`
+            })) : []
           };
         }
       };
+
 
 
 
