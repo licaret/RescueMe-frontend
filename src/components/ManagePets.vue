@@ -125,7 +125,6 @@
       const updatePetInList = (updatedPet) => {
         const index = pets.value.findIndex((p) => p.id === updatedPet.id);
         if (index !== -1) {
-          // Create a new array to ensure reactivity
           pets.value = [
             ...pets.value.slice(0, index),
             {
@@ -143,16 +142,14 @@
       };
 
 
-
-
-      onMounted(loadPets);
-
       const filteredPets = computed(() =>
         pets.value.filter((pet) =>
           pet.name.toLowerCase().includes(searchQuery.value.toLowerCase())
         )
       );
 
+
+      onMounted(loadPets);
 
       
       return { searchQuery, pets: filteredPets, showAddPetForm, handlePetAdded, removePetFromList, updatePetInList, formKey, };

@@ -131,7 +131,7 @@
 
 
 <script>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { deletePet } from "../services/pet_service"; 
 import ConfirmationModal from "@/components/ConfirmationModal.vue";
 import AddPetForm from "@/components/AddPetForm.vue";
@@ -187,7 +187,7 @@ export default {
       showStory.value = !showStory.value;
     };
 
-    const formattedSpecifications = {
+    const formattedSpecifications = computed(() => ({
       Name: props.pet.name || '',
       "Type of Animal": props.pet.species || '',
       Sex: props.pet.sex || '',
@@ -199,7 +199,7 @@ export default {
       Breed: props.pet.breed || '',
       "Urgent Adoption Needed": props.pet.urgentAdoptionNeeded !== undefined ? (props.pet.urgentAdoptionNeeded ? 'Yes' : 'No') : '',
       "Time Spent in Shelter": props.pet.timeSpentInShelter || '',
-    };
+    }));
 
     
     const handleRemovePet = async () => {

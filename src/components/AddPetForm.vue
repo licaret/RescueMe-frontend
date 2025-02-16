@@ -263,12 +263,10 @@ export default {
 
     const photoPreview = ref([]);
     const photoFiles = ref([]);
-    // const deleteExistingPhotos = ref(false);
     const existingPhotos = ref([]);
     const photoIdsToDelete = ref([]);
 
 
-    // Reparat watch function
     watch(() => props.petToEdit, (newPet) => {
       if (newPet) {
         petData.value = { ...newPet };
@@ -301,11 +299,11 @@ export default {
         const reader = new FileReader();
         reader.onload = (e) => {
             const newPhoto = {
-                id: null, // Pozele noi nu au ID inițial
+                id: null, 
                 url: e.target.result
             };
-            photoPreview.value.push(newPhoto); // ✅ Adaugă poza în preview
-            photoFiles.value.push(file); // ✅ Adaugă poza în lista de fișiere
+            photoPreview.value.push(newPhoto); 
+            photoFiles.value.push(file); 
         };
         reader.readAsDataURL(file);
     });
@@ -318,28 +316,27 @@ export default {
 
 
     const handleRemovePhoto = (index) => {
-    console.log("Removing photo at index:", index);
+      console.log("Removing photo at index:", index);
 
-    if (index < existingPhotos.value.length) {
-        const photoId = existingPhotos.value[index]?.id;
-        if (photoId) {
-            photoIdsToDelete.value.push(photoId);
-        }
-        existingPhotos.value.splice(index, 1);
-    } else {
-        const newPhotoIndex = index - existingPhotos.value.length;
-        photoFiles.value.splice(newPhotoIndex, 1);
-    }
+      if (index < existingPhotos.value.length) {
+          const photoId = existingPhotos.value[index]?.id;
+          if (photoId) {
+              photoIdsToDelete.value.push(photoId);
+          }
+          existingPhotos.value.splice(index, 1);
+      } else {
+          const newPhotoIndex = index - existingPhotos.value.length;
+          photoFiles.value.splice(newPhotoIndex, 1);
+      }
 
-    photoPreview.value.splice(index, 1);
+      photoPreview.value.splice(index, 1);
 
-    console.log("After removal:", {
-        photoPreview: photoPreview.value,
-        existingPhotos: existingPhotos.value,
-        photoIdsToDelete: photoIdsToDelete.value
-    });
-};
-
+      console.log("After removal:", {
+          photoPreview: photoPreview.value,
+          existingPhotos: existingPhotos.value,
+          photoIdsToDelete: photoIdsToDelete.value
+      });
+    };
 
 
 
@@ -348,7 +345,6 @@ export default {
         const formData = new FormData();
         const isUpdate = !!props.petToEdit;
 
-        // Pregătim datele pentru trimitere
         const petDataToSend = { ...petData.value };
         delete petDataToSend.shelterId;
         delete petDataToSend.shelterUsername;
@@ -362,12 +358,10 @@ export default {
 
         formData.append("petData", JSON.stringify(petDataToSend));
 
-        // Adăugăm pozele noi
         photoFiles.value.forEach((file) => {
           formData.append("photos", file);
         });
 
-        // Adăugăm ID-urile pozelor de șters
         if (photoIdsToDelete.value.length > 0) {
           formData.append("photoIdsToDelete", JSON.stringify(photoIdsToDelete.value));
         }
