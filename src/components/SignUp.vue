@@ -434,8 +434,10 @@ export default {
       this.selectedCity = ""; 
       const selectedCountyObj = this.counties.find(county => county.auto === this.selectedCounty);
       if (selectedCountyObj) {
+        this.selectedCountyName = selectedCountyObj.nume;  // Setează numele complet al județului
         this.cities = selectedCountyObj.localitati.map(loc => loc.nume);
       } else {
+        this.selectedCountyName = "";
         this.cities = [];
       }
     },
