@@ -296,16 +296,26 @@ export default {
 
 
     const handlePhotoUpload = (event) => {
-      const files = Array.from(event.target.files);
-      files.forEach((file) => {
+    const files = Array.from(event.target.files);
+    files.forEach((file) => {
         const reader = new FileReader();
         reader.onload = (e) => {
-          photoPreview.value.push(e.target.result);
-          photoFiles.value.push(file);
+            const newPhoto = {
+                id: null, // Pozele noi nu au ID inițial
+                url: e.target.result
+            };
+            photoPreview.value.push(newPhoto); // ✅ Adaugă poza în preview
+            photoFiles.value.push(file); // ✅ Adaugă poza în lista de fișiere
         };
         reader.readAsDataURL(file);
-      });
-    };
+    });
+
+    console.log("After upload:", {
+        photoPreview: photoPreview.value,
+        photoFiles: photoFiles.value
+    });
+};
+
 
     const handleRemovePhoto = (index) => {
     console.log("Removing photo at index:", index);

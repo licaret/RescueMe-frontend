@@ -128,17 +128,21 @@
 
 
       const updatePetInList = (updatedPet) => {
-        const index = pets.value.findIndex((p) => p.id === updatedPet.id);
-        if (index !== -1) {
-          pets.value[index] = {
-            ...updatedPet,
-            photos: updatedPet.photos ? updatedPet.photos.map(photo => ({
-              id: photo.id,
-              url: photo.url.startsWith("data:image") ? photo.url : `data:image/jpeg;base64,${photo.url}`
-            })) : []
-          };
+    const index = pets.value.findIndex((p) => p.id === updatedPet.id);
+    if (index !== -1) {
+        Object.assign(pets.value[index], updatedPet);
+
+        // 🔹 Verifică dacă există poze noi și actualizează-le
+        if (updatedPet.photos) {
+            pets.value[index].photos = updatedPet.photos.map(photo => ({
+                id: photo.id,
+                url: photo.url.startsWith("data:image") ? photo.url : `data:image/jpeg;base64,${photo.url}`
+            }));
         }
-      };
+    }
+};
+
+
 
 
 
