@@ -183,8 +183,6 @@ export default {
     };
 
 
-
-
     const toggleStory = () => {
       showStory.value = !showStory.value;
     };

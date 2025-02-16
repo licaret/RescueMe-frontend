@@ -65,7 +65,7 @@
 
 
 <script>
-  import { ref, computed,onMounted } from 'vue';
+  import { ref, computed, onMounted } from 'vue';
   import { fetchShelterPets } from "@/services/pet_service.js";
   import AddPetForm from '@/components/AddPetForm.vue';
   import PetCard from '@/components/PetCard.vue';
@@ -76,19 +76,13 @@
       PetCard,
       AddPetForm
     },
+
     setup() {
       const pets = ref([]);
       const searchQuery = ref("");
       const shelterId = localStorage.getItem("shelterId");
       const showAddPetForm = ref(false);
       const formKey = ref(0);
-
-      const handlePetAdded = async (newPet) => {   
-        // console.log("New pet added:", newPet);
-        await new Promise(resolve => setTimeout(resolve, 1000)); 
-        await loadPets(); 
-      };
-
 
       
       const loadPets = async () => {
@@ -106,8 +100,6 @@
             photos: pet.photos ? pet.photos : []
           }));
 
-
-
           console.log("Pets stored in state:", pets.value);
         } catch (error) {
           console.error("Error loading pets:", error);
@@ -115,9 +107,12 @@
       };
 
 
-
-      onMounted(loadPets);
-
+      const handlePetAdded = async (newPet) => {   
+        // console.log("New pet added:", newPet);
+        await new Promise(resolve => setTimeout(resolve, 1000)); 
+        await loadPets(); 
+      };
+      
 
 
       const removePetFromList = (petId) => {
@@ -128,24 +123,29 @@
 
 
       const updatePetInList = (updatedPet) => {
-    const index = pets.value.findIndex((p) => p.id === updatedPet.id);
-    if (index !== -1) {
-        Object.assign(pets.value[index], updatedPet);
-
-        // 🔹 Verifică dacă există poze noi și actualizează-le
-        if (updatedPet.photos) {
-            pets.value[index].photos = updatedPet.photos.map(photo => ({
+        const index = pets.value.findIndex((p) => p.id === updatedPet.id);
+        if (index !== -1) {
+          // Create a new array to ensure reactivity
+          pets.value = [
+            ...pets.value.slice(0, index),
+            {
+              ...updatedPet,
+              photos: updatedPet.photos?.map(photo => ({
                 id: photo.id,
-                url: photo.url.startsWith("data:image") ? photo.url : `data:image/jpeg;base64,${photo.url}`
-            }));
+                url: photo.url.startsWith("data:image") ? 
+                  photo.url : 
+                  `data:image/jpeg;base64,${photo.url}`
+              })) || []
+            },
+            ...pets.value.slice(index + 1)
+          ];
         }
-    }
-};
+      };
 
 
 
 
-
+      onMounted(loadPets);
 
       const filteredPets = computed(() =>
         pets.value.filter((pet) =>
