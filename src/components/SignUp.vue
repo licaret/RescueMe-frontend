@@ -275,7 +275,7 @@
                     :disabled="!selectedCounty"
                   >
                     <option value="">Select City</option>
-                    <option v-for="city in cities" :key="city" :value="city">
+                    <option v-for="city in cities" :key="city">
                       {{ city }}
                     </option>
                   </select>
@@ -332,6 +332,7 @@
 <script>
 import { registerAdopter, registerShelter, checkEmailExists, checkUsernameExists } from "@/services/user_service";
 import TermsModal from '@/components/TermsModal.vue';
+import judete from "@/assets/judete.json";
 
 
 export default {
@@ -357,7 +358,6 @@ export default {
         password: "",
       },
       selectedCounty: '',
-      selectedCountyName: '',
       selectedCity: '',
       selectedShelterType: '',
       counties: [],
@@ -376,7 +376,7 @@ export default {
   },
 
   mounted() {
-    this.fetchCounties();
+    this.counties = judete.judete;
   },
 
   methods: {
@@ -385,17 +385,13 @@ export default {
       this.showPassword = !this.showPassword;
     },
 
-    // updateCities() {
-    //   this.selectedCity = '';
-    // },
-
     navigateToLogin() {
       this.$router.push('/login'); 
     },
 
     validateEmail() {
-      this.errorMessageEmail = ""; // Resetează eroarea anterioară de "email taken"
-      this.emailError = false; // Scoate stilul de eroare dacă există
+      this.errorMessageEmail = "";
+      this.emailError = false; 
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
       if (!emailRegex.test(this.formData.email)) {
         this.wrongFormatedEmail = "Invalid email format. Please include '@' and a domain.";
@@ -434,47 +430,15 @@ export default {
       }
     },
 
-    async handleCountyChange() {
-      console.log('Selected county code:', this.selectedCounty);
-      this.selectedCity = '';
-      this.cities = [];
-      
-      
+    handleCountyChange() {
+      this.selectedCity = ""; 
       const selectedCountyObj = this.counties.find(county => county.auto === this.selectedCounty);
       if (selectedCountyObj) {
-        this.selectedCountyName = selectedCountyObj.nume;
-      }
-      
-      if (this.selectedCounty) {
-        await this.fetchCitiesByCounty(this.selectedCounty);
-      }
-    },
-
-    async fetchCitiesByCounty(countyCode) {
-      try {
-        console.log('Fetching cities for county code:', countyCode);
-        
-        const response = await fetch(`https://roloca.coldfuse.io/orase/${countyCode}`);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        console.log('Cities data received:', data);
-        
-        if (Array.isArray(data)) {
-          this.cities = data.map(city => city.nume);
-          console.log('Processed cities:', this.cities);
-        } else {
-          console.error('Received data is not an array:', data);
-          this.cities = [];
-        }
-      } catch (error) {
-        console.error('Error fetching cities:', error);
+        this.cities = selectedCountyObj.localitati.map(loc => loc.nume);
+      } else {
         this.cities = [];
       }
     },
-
 
 
     async handleSubmit() {
@@ -535,6 +499,8 @@ export default {
     },
 };
 </script>
+
+
 
 <style scoped>
   section, section * {
