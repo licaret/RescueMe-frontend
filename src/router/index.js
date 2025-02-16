@@ -7,6 +7,7 @@ import ShelterDashboardPage from '@/pages/ShelterDashboardPage.vue';
 import ForgotPasswordPage from '@/pages/ForgotPasswordPage.vue';
 import ContactUsPage from '@/pages/ContactUsPage.vue';
 import ManagePets from '@/components/ManagePets.vue';
+import PetStatsChartVue from '@/components/PetStatsChart.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -46,6 +47,10 @@ const router = createRouter({
         {
           path: 'manage-pets',
           component: ManagePets
+        },
+        {
+          path: '',
+          component: PetStatsChartVue
         },
       ]
     },

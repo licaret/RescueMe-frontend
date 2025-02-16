@@ -56,11 +56,20 @@
     <aside id="logo-sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -translate-x-full bg-white border-r border-gray-200 sm:translate-x-0 dark:bg-gray-800 dark:border-gray-700" aria-label="Sidebar">
     <div class="h-full px-3 pb-4 overflow-y-auto bg-white dark:bg-gray-800">
         <ul class="space-y-2 font-medium">
-            <li>
+            <!-- <li>
                 <a href="#" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                     <img src="../assets/dashboard.png" alt="Dashboard icon" class="w-5 h-5">
                     <span class="flex-1 ms-3 whitespace-nowrap">Dashboard</span>
                 </a>
+            </li> -->
+            <li>
+                <router-link 
+                    to="/shelter-dashboard/" 
+                    class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                >
+                    <img src="../assets/dashboard.png" alt="Dashboard icon" class="w-5 h-5">
+                    <span class="flex-1 ms-3 whitespace-nowrap">Dashboard</span>
+                </router-link>
             </li>
             <li>
                 <router-link 
@@ -221,8 +230,10 @@
 <script>
     import { ref, onMounted, onUnmounted } from "vue";
     import { useRouter } from "vue-router";
+    import PetStatsChart from "@/components/PetStatsChart.vue";
 
     export default {
+        components: { PetStatsChart },
         setup() {
             const router = useRouter();
             const shelterUsername = ref("Shelter");

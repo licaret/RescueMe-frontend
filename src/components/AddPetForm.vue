@@ -225,7 +225,7 @@
             type="submit"
             class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
           >
-            {{ petToEdit ? 'Edit Pet' : 'Add Pet' }}
+            {{ petToEdit ? 'Update Pet' : 'Add Pet' }}
           </button>
         </div>
       </form>
@@ -287,10 +287,14 @@ export default {
             status: newPet.status,
             story: newPet.story
           };
-          // ✅ Asigură-te că nu duplici pozele existente
-          existingPhotos.value = newPet.photoUrls ? [...newPet.photoUrls] : [];
-          photoPreview.value = [...existingPhotos.value];
-          photoFiles.value = []; // Resetăm fișierele noi
+          if (newPet.photoUrls && newPet.photoUrls.length > 0) {
+            existingPhotos.value = [...newPet.photoUrls]; // ✅ Reține pozele inițiale separat
+            photoPreview.value = [...newPet.photoUrls];
+          } else {
+            existingPhotos.value = [];
+            photoPreview.value = [];
+          }
+          photoFiles.value = [];
         }
       },
       { immediate: true }
@@ -312,27 +316,47 @@ export default {
 
 
     const removePhoto = (index) => {
+      console.log("Removing photo at index:", index);
+      console.log("Existing photos:", existingPhotos.value);
+      console.log("Photo preview before removal:", photoPreview.value);
+
       if (index < existingPhotos.value.length) {
-        existingPhotos.value.splice(index, 1); // ✅ Elimină doar din lista de poze existente
-        deleteExistingPhotos.value = true;  // ✅ Marchează că pozele trebuie șterse pe backend
+        // 🔴 Dacă e o poză existentă, setează un flag pentru a o șterge la salvare
+        deleteExistingPhotos.value = true;
+        existingPhotos.value.splice(index, 1);
       } else {
-        photoPreview.value.splice(index, 1); // ✅ Șterge doar fișierele noi
-        photoFiles.value.splice(index - existingPhotos.value.length, 1);
+        // 🔴 Dacă e o poză nouă, elimină din photoFiles și photoPreview
+        const newIndex = index - existingPhotos.value.length;
+        if (newIndex >= 0) {
+          photoFiles.value.splice(newIndex, 1);
+        }
       }
+
+      // 🔴 Actualizează lista pentru a forța Vue să vadă modificarea
+      photoPreview.value.splice(index, 1);
+      photoPreview.value = [...photoPreview.value];
+
+      console.log("Updated photoPreview:", photoPreview.value);
     };
 
 
-    const convertBase64ToFile = async (base64String) => {
-      try {
-        const response = await fetch(base64String);
-        const blob = await response.blob();
-        const file = new File([blob], `photo_${Date.now()}.jpg`, { type: "image/jpeg" });
-        return file;
-      } catch (error) {
-        console.error("Error converting base64 to file:", error);
-        return null;
-      }
-    };
+    watch(photoPreview, (newVal) => {
+      console.log("Updated photoPreview:", newVal);
+    });
+
+
+
+    // const convertBase64ToFile = async (base64String) => {
+    //   try {
+    //     const response = await fetch(base64String);
+    //     const blob = await response.blob();
+    //     const file = new File([blob], `photo_${Date.now()}.jpg`, { type: "image/jpeg" });
+    //     return file;
+    //   } catch (error) {
+    //     console.error("Error converting base64 to file:", error);
+    //     return null;
+    //   }
+    // };
 
 
     const handleSubmit = async () => {
@@ -366,11 +390,16 @@ export default {
         //     }
         //   }
         // }
+
+        // ✅ Trimite doar pozele noi adăugate
         if (photoFiles.value.length > 0) {
           photoFiles.value.forEach((file) => {
             formData.append("photos", file);
           });
         }
+
+        // ✅ Trimite lista pozelor rămase, nu doar `deleteExistingPhotos`
+        formData.append("existingPhotos", JSON.stringify(existingPhotos.value));
 
 
         const url = isUpdate
