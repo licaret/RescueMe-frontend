@@ -29,14 +29,27 @@
           </div>
         </div>
 
-        <!-- Filters Toggle Button -->
-        <button 
-          @click="showFilters = !showFilters"
-          class="flex items-center gap-2 px-5 py-3 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 transition"
-        >
-          <img src="../assets/filter.png" alt="Filter icon" class="w-5 h-5" />
-          <span class="font-medium">{{ showFilters ? "Hide Filters" : "Show Filters" }}</span>
-        </button>
+        <div class="flex items-center gap-4 ml-4">
+          <!-- Sort Button/Dropdown -->
+          <select 
+            v-model="sortBy" 
+            class="flex focus:outline-none font-medium items-center gap-2 px-5 py-3 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 transition cursor-pointer"
+          >
+            <option value="">Sort By</option>
+            <option value="name">Sort By: Name</option>
+            <option value="age">Sort By: Age</option>
+            <option value="timeSpentInShelter">Sort By: Time in Shelter</option>
+          </select>
+
+          <!-- Filters Toggle Button -->
+          <button 
+            @click="showFilters = !showFilters"
+            class="flex items-center gap-2 px-5 py-3 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 transition"
+          >
+            <img src="../assets/filter.png" alt="Filter icon" class="w-5 h-5" />
+            <span class="font-medium">{{ showFilters ? "Hide Filters" : "Show Filters" }}</span>
+          </button>
+        </div>
       </div>
 
       <!-- Filters Section -->
@@ -58,7 +71,7 @@
               :class="{'cursor-not-allowed bg-gray-200 text-gray-500': !filters.species}"
               :disabled="!filters.species"
             >
-              <option value="" disabled>Breed</option>
+              <option value="" disabled>All Breeds</option>
               <option v-for="breed in breedOptions" :key="breed" :value="breed">
                 {{ breed }}
               </option>
@@ -104,41 +117,48 @@
             <option value="Special Needs">Special Needs</option>
           </select>
 
-
-          <select v-model="filters.vaccinated" class="filter-input">
-            <option value="">All</option>
-            <option value="Yes">Vaccinated</option>
-            <option value="No">Not Vaccinated</option>
-          </select>
-
-          <select v-model="filters.neutered" class="filter-input">
-            <option value="">All</option>
-            <option value="Yes">Neutered</option>
-            <option value="No">Not Neutered</option>
-          </select>
-
-          <select v-model="filters.urgentAdoptionNeeded" class="filter-input">
-            <option value="">All</option>
-            <option value="Yes">Urgent</option>
-            <option value="No">Not Urgent</option>
-          </select>
-
-          <input type="number" v-model="filters.timeSpentInShelter" placeholder="Days in shelter..." class="filter-input"/>
-
-          <select v-model="filters.status" class="filter-input">
-            <option value="">All Statuses</option>
+          <!-- <select v-model="filters.status" class="filter-input">
+            <option value="">All Availabilities</option>
             <option value="AVAILABLE">Available</option>
             <option value="PENDING">Pending</option>
             <option value="ADOPTED">Adopted</option>
-          </select>
+          </select> -->
 
-          <select v-model="sortBy" class="filter-input">
-            <option value="">Sort By</option>
-            <option value="name">Name</option>
-            <option value="age">Age</option>
-            <option value="size">Size</option>
-            <option value="timeSpentInShelter">Time in Shelter</option>
-          </select>
+
+          <!-- Vaccinated -->
+          <div class="flex items-center space-x-2">
+            <input 
+              type="checkbox" 
+              id="vaccinated" 
+              v-model="filters.vaccinated" 
+              class="form-checkbox h-5 w-5 text-blue-600"
+            >
+            <label for="vaccinated" class="text-gray-700">Only Vaccinated</label>
+          </div>
+
+          <!-- Neutered -->
+          <div class="flex items-center space-x-2">
+            <input 
+              type="checkbox" 
+              id="neutered" 
+              v-model="filters.neutered" 
+              class="form-checkbox h-5 w-5 text-blue-600"
+            >
+            <label for="neutered" class="text-gray-700">Only Neutered</label>
+          </div>
+
+          <!-- Urgent Adoption Needed -->
+          <div class="flex items-center space-x-2">
+            <input 
+              type="checkbox" 
+              id="urgentAdoptionNeeded" 
+              v-model="filters.urgentAdoptionNeeded" 
+              class="h-5 w-5 border-2 border-red-600 bg-red-200 text-red-600 checked:bg-red-600 checked:border-red-600 focus:ring-red-500"
+            >
+            <label for="urgentAdoptionNeeded" class="text-red-600 font-medium">Urgent Adoption Needed</label>
+          </div>
+
+          <!-- <input type="number" v-model="filters.timeSpentInShelter" placeholder="Days in shelter..." class="filter-input"/> -->
 
           <!-- <select v-model="sortOrder" class="filter-input">
             <option value="asc">Ascending</option>
@@ -147,11 +167,12 @@
 
           <!-- Container care ocupă toată lățimea -->
           <!-- Container pentru buton -->
-          <div class="w-full flex justify-end mt-4">
+          <div class="flex items-center">
             <button 
               v-if="isAnyFilterApplied"
               @click="resetFilters"
-              class="font-bold text-red-500 text-sm hover:text-red-700 pr-2"
+              class="font-bold text-gray-700
+               text-sm hover:text-red-700 pr-2"
             >
               Clear Filters
             </button>
@@ -160,8 +181,6 @@
         </div>
       </transition>
     </div>
-
-
 
     <!-- Pets Grid -->
     <div v-if="pets.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-32">
@@ -323,8 +342,22 @@
         return pets.value
           .filter(pet => {
             return Object.keys(filters.value).every(key => {
-              if (!filters.value[key]) return true; 
+              if (!filters.value[key]) return true; // Dacă nu este filtrat, returnăm toate
 
+              // ✅ Modificare pentru checkbox-uri: Filtrează DOAR dacă sunt bifate
+              if (key === "vaccinated" && filters.value.vaccinated) {
+                return pet.vaccinated === true;
+              }
+
+              if (key === "neutered" && filters.value.neutered) {
+                return pet.neutered === true;
+              }
+
+              if (key === "urgentAdoptionNeeded" && filters.value.urgentAdoptionNeeded) {
+                return pet.urgentAdoptionNeeded === true;
+              }
+
+              // Filtrare standard pentru alte câmpuri
               if (typeof pet[key] === "boolean") {
                 return filters.value[key] === "Yes" ? pet[key] : !pet[key];
               }
@@ -356,6 +389,7 @@
             return 0;
           });
       });
+
 
 
       const fetchBreeds = async () => {
@@ -391,31 +425,6 @@
       };
 
 
-
-
-
-
-
-      // // Filter breeds based on user input
-      // const filterBreeds = () => {
-      //   console.log("Filtering breeds for input:", filters.value.breed);
-      //   if (!filters.value.breed) {
-      //     filteredBreeds.value = breedOptions.value;
-      //   } else {
-      //     filteredBreeds.value = breedOptions.value.filter(breed =>
-      //       breed.toLowerCase().includes(filters.value.breed.toLowerCase())
-      //     );
-      //   }
-      //   showDropdown.value = true; // Ensure dropdown is visible
-      //   console.log("Filtered breeds:", filteredBreeds.value);
-      // };
-
-      // // Select a breed and close dropdown
-      // const selectBreed = (breed) => {
-      //   console.log("Breed selected:", breed);
-      //   filters.value.breed = breed;
-      //   showDropdown.value = false;
-      // };
 
       watch(() => filters.value.species, async (newSpecies) => {
         console.log("Species changed to:", newSpecies);
