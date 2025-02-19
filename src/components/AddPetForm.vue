@@ -48,15 +48,21 @@
               />
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700">Age (years)</label>
-              <input
-                v-model="petData.age"
-                type="number"
-                min="0"
-                step="0.1"
-                class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-                required
-              />
+              <label class="block text-sm font-medium text-gray-700">Age</label>
+              <div class="flex gap-2">
+                <input
+                  v-model="petData.ageValue"
+                  type="number"
+                  min="0"
+                  step="1"
+                  class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+                  required
+                />
+                <select v-model="petData.ageUnit" class="mt-1 block w-28 rounded-md border border-gray-300 px-3 py-2">
+                  <option value="years">Years</option>
+                  <option value="months">Months</option>
+                </select>
+              </div>
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700">Sex</label>
@@ -95,12 +101,19 @@
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700">Time Spent in Shelter</label>
-              <input
-                v-model="petData.timeSpentInShelter"
-                type="text"
-                placeholder="e.g., 6 months, 1 year"
-                class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-              />
+              <div class="flex gap-2">
+                <input
+                  v-model="petData.shelterTimeValue"
+                  type="number"
+                  min="0"
+                  step="1"
+                  class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+                />
+                <select v-model="petData.shelterTimeUnit" class="mt-1 block w-28 rounded-md border border-gray-300 px-3 py-2">
+                  <option value="years">Years</option>
+                  <option value="months">Months</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
@@ -249,11 +262,13 @@ export default {
       name: '',
       species: '',
       breed: '',
-      age: '',
+      ageValue: "", 
+      ageUnit: "years", 
       sex: 'Male', 
       size: 'Medium', 
       status: 'AVAILABLE',
-      timeSpentInShelter: '',
+      shelterTimeValue: "", 
+      shelterTimeUnit: "years", 
       healthStatus: 'Healthy',
       vaccinated: false,
       neutered: false,
@@ -271,6 +286,7 @@ export default {
       if (newPet) {
         petData.value = { ...newPet };
 
+        
         photoFiles.value = [];
         photoIdsToDelete.value = [];
 
@@ -285,12 +301,26 @@ export default {
           photoPreview.value = [];
         }
 
+        
+        const age = newPet.age ?? 0;
+        const ageInMonths = Math.round(age * 12);
+        petData.value.ageValue = ageInMonths < 12 ? ageInMonths : Math.floor(age);
+        petData.value.ageUnit = ageInMonths < 12 ? "months" : "years";
+
+        
+        const timeInShelter = newPet.timeSpentInShelter ?? 0;
+        const shelterTimeInMonths = Math.round(timeInShelter * 12);
+        petData.value.shelterTimeValue = shelterTimeInMonths < 12 ? shelterTimeInMonths : Math.floor(timeInShelter);
+        petData.value.shelterTimeUnit = shelterTimeInMonths < 12 ? "months" : "years";
+
         console.log("State after initialization:", {
+          petData: petData.value,
           photoPreview: photoPreview.value,
           existingPhotos: existingPhotos.value
         });
       }
     }, { immediate: true });
+
 
 
     const handlePhotoUpload = (event) => {
@@ -350,6 +380,22 @@ export default {
         delete petDataToSend.shelterUsername;
         delete petDataToSend.photoUrls;
 
+        petDataToSend.age =
+          petDataToSend.ageUnit === "years"
+            ? petDataToSend.ageValue
+            : petDataToSend.ageValue / 12;
+
+        petDataToSend.timeSpentInShelter =
+          petDataToSend.shelterTimeUnit === "years"
+            ? petDataToSend.shelterTimeValue
+            : petDataToSend.shelterTimeValue / 12;
+
+        delete petDataToSend.ageValue;
+        delete petDataToSend.ageUnit;
+        delete petDataToSend.shelterTimeValue;
+        delete petDataToSend.shelterTimeUnit;
+
+
         console.log("Submitting form with:", {
           petData: petDataToSend,
           newPhotos: photoFiles.value.length,
@@ -392,7 +438,6 @@ export default {
         console.error("Error saving pet:", error);
       }
     };
-
 
 
     return {

@@ -187,19 +187,32 @@ export default {
       showStory.value = !showStory.value;
     };
 
-    const formattedSpecifications = computed(() => ({
-      Name: props.pet.name || '',
-      "Type of Animal": props.pet.species || '',
-      Sex: props.pet.sex || '',
-      Age: props.pet.age ? `${props.pet.age} years` : '',
-      Size: props.pet.size || '',
-      "Health Status": props.pet.healthStatus || '',
-      Vaccinated: props.pet.vaccinated !== undefined ? (props.pet.vaccinated ? 'Yes' : 'No') : '',
-      Neutered: props.pet.neutered !== undefined ? (props.pet.neutered ? 'Yes' : 'No') : '',
-      Breed: props.pet.breed || '',
-      "Urgent Adoption Needed": props.pet.urgentAdoptionNeeded !== undefined ? (props.pet.urgentAdoptionNeeded ? 'Yes' : 'No') : '',
-      "Time Spent in Shelter": props.pet.timeSpentInShelter || '',
-    }));
+    const formattedSpecifications = computed(() => {
+      const age = props.pet.age ?? 0; 
+      const ageInMonths = Math.round(age * 12);
+
+      const timeSpent = props.pet.timeSpentInShelter;
+    const shelterTimeInMonths = timeSpent ? Math.round(timeSpent * 12) : null;
+
+      return {
+        Name: props.pet.name || '',
+        "Type of Animal": props.pet.species || '',
+        Sex: props.pet.sex || '',
+        Age:
+          ageInMonths >= 12
+            ? `${Math.floor(age)} years`
+            : `${ageInMonths} months`,
+        Size: props.pet.size || '',
+        "Health Status": props.pet.healthStatus || '',
+        Vaccinated: props.pet.vaccinated !== undefined ? (props.pet.vaccinated ? 'Yes' : 'No') : '',
+        Neutered: props.pet.neutered !== undefined ? (props.pet.neutered ? 'Yes' : 'No') : '',
+        Breed: props.pet.breed || '',
+        "Urgent Adoption Needed": props.pet.urgentAdoptionNeeded !== undefined ? (props.pet.urgentAdoptionNeeded ? 'Yes' : 'No') : '',
+        "Time Spent in Shelter": shelterTimeInMonths !== null ? 
+          (shelterTimeInMonths >= 12 ? `${Math.floor(timeSpent)} years` : `${shelterTimeInMonths} months`) 
+          : 'Not specified',
+      };
+    });
 
     
     const handleRemovePet = async () => {

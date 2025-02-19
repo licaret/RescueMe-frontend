@@ -117,12 +117,12 @@
             <option value="Special Needs">Special Needs</option>
           </select>
 
-          <!-- <select v-model="filters.status" class="filter-input">
+          <select v-model="filters.status" class="filter-input">
             <option value="">All Availabilities</option>
             <option value="AVAILABLE">Available</option>
             <option value="PENDING">Pending</option>
             <option value="ADOPTED">Adopted</option>
-          </select> -->
+          </select>
 
 
           <!-- Vaccinated -->
@@ -165,16 +165,33 @@
             <option value="desc">Descending</option>
           </select> -->
 
-          <!-- Container care ocupă toată lățimea -->
-          <!-- Container pentru buton -->
           <div class="flex items-center">
             <button 
               v-if="isAnyFilterApplied"
               @click="resetFilters"
-              class="font-bold text-gray-700
-               text-sm hover:text-red-700 pr-2"
+              class="group relative flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg transition-all duration-200 hover:border-gray-300"
             >
-              Clear Filters
+              <!-- Clear Icon -->
+              <svg 
+                class="w-4 h-4 text-gray-500 group-hover:text-gray-700 transition-colors" 
+                xmlns="http://www.w3.org/2000/svg" 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              
+              <!-- Button Text -->
+              <span>Clear Filters</span>
+
+              <!-- Active Filters Badge -->
+              <span 
+                class="absolute -top-2 -right-2 flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full"
+              >
+                {{ Object.values(filters).filter(value => value !== '' && value !== false).length }}
+              </span>
+              
             </button>
           </div>
 
@@ -182,7 +199,8 @@
       </transition>
     </div>
 
-    <!-- Pets Grid -->
+    
+    <!-- Pets Grid Section -->
     <div v-if="pets.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-32">
       <PetCard 
         v-for="pet in pets" 
@@ -190,8 +208,30 @@
         :pet="pet" 
         @petDeleted="removePetFromList" 
         @pet-updated="updatePetInList"
-        />
+      />
     </div>
+    <!-- No Results from Filters -->
+    <div v-else-if="isAnyFilterApplied" class="text-center py-20">
+      <img src="../assets/empty-state.png" alt="No Matching Pets" class="mx-auto w-50 h-48 mb-6" />
+      <h2 class="text-2xl font-bold text-gray-800">No pets match your filters</h2>
+      <p class="text-gray-600 max-w-md mx-auto">We couldn't find any pets matching your current filters. Try adjusting your filters to see more pets.</p>
+      <button 
+        @click="resetFilters" 
+        class="mt-6 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg flex items-center gap-2 mx-auto"
+      >
+        <svg 
+          class="w-4 h-4" 
+          xmlns="http://www.w3.org/2000/svg" 
+          fill="none" 
+          viewBox="0 0 24 24" 
+          stroke="currentColor"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+        Clear All Filters
+      </button>
+    </div>
+    <!-- No Pets at All -->
     <div v-else class="text-center py-20">
       <img src="../assets/empty-state.png" alt="No Pets" class="mx-auto w-50 h-48 mb-6" />
       <h2 class="text-2xl font-bold text-gray-800">No pets available</h2>
@@ -265,8 +305,8 @@
         };
       };
 
-      const sortBy = ref(""); // Criteriul de sortare
-      const sortOrder = ref("asc"); // Ordinea de sortare (ascendentă sau descendentă)
+      const sortBy = ref(""); 
+      const sortOrder = ref("asc"); 
       const showFilters = ref(false);
       const breedOptions = ref([]);
       const filteredBreeds = ref([]);
@@ -342,9 +382,20 @@
         return pets.value
           .filter(pet => {
             return Object.keys(filters.value).every(key => {
-              if (!filters.value[key]) return true; // Dacă nu este filtrat, returnăm toate
+              if (!filters.value[key]) return true; 
 
-              // ✅ Modificare pentru checkbox-uri: Filtrează DOAR dacă sunt bifate
+              if (key === "age") {
+                return Math.round(pet.age * 12) >= Math.round(filters.value.age * 12);
+              }
+
+              if (key === "timeSpentInShelter") {
+                return (
+                  Math.round(pet.timeSpentInShelter * 12) >=
+                  Math.round(filters.value.timeSpentInShelter * 12)
+                );
+              }
+
+              
               if (key === "vaccinated" && filters.value.vaccinated) {
                 return pet.vaccinated === true;
               }
@@ -357,7 +408,6 @@
                 return pet.urgentAdoptionNeeded === true;
               }
 
-              // Filtrare standard pentru alte câmpuri
               if (typeof pet[key] === "boolean") {
                 return filters.value[key] === "Yes" ? pet[key] : !pet[key];
               }
@@ -386,6 +436,10 @@
               return (a[sortBy.value] - b[sortBy.value]) * modifier;
             }
 
+            if (sortBy.value === "age" || sortBy.value === "timeSpentInShelter") {
+              return (a[sortBy.value] - b[sortBy.value]) * modifier;
+            }
+
             return 0;
           });
       });
@@ -403,11 +457,9 @@
           console.log("Fetching breeds for species:", filters.value.species);
           const response = await fetch(`http://localhost:8080/pets/breedsBySpecies?species=${filters.value.species}`);
 
-          // Debugging: Log the full response before parsing
           const textResponse = await response.text();
           console.log("Raw API Response:", textResponse);
 
-          // Check if the response is valid JSON
           if (!response.ok) {
             throw new Error(`Failed to fetch breeds: ${response.status}`);
           }
@@ -428,7 +480,7 @@
 
       watch(() => filters.value.species, async (newSpecies) => {
         console.log("Species changed to:", newSpecies);
-        filters.value.breed = ""; // Reset breed when species changes
+        filters.value.breed = ""; 
         if (newSpecies) {
           await fetchBreeds();
         } else {
@@ -469,17 +521,15 @@
 </script>
 
 <style scoped>
-/* General filter input styling */
 .filter-input {
   @apply border border-gray-300 px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition;
 }
 
 .filter-input:focus {
-  border-color: #5973A8; /* Setează o culoare la focus */
-  box-shadow: 0 0 5px rgba(89, 115, 168, 0.5); /* Efect subtil */
+  border-color: #5973A8; 
+  box-shadow: 0 0 5px rgba(89, 115, 168, 0.5);
 }
 
-/* Smooth fade transition */
 .fade-enter-active, .fade-leave-active {
   transition: opacity 0.3s ease-in-out;
 }
