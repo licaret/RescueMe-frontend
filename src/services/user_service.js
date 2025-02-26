@@ -129,4 +129,14 @@ async function checkUsernameExists(username) {
 }
 
 
-export { registerAdopter, registerShelter, login, fetchWithAuth, checkEmailExists, checkUsernameExists  };
+async function getUserById(userId) {
+  try {
+    const response = await fetchWithAuth(`http://localhost:8080/users/${userId}`);
+    return response;
+  } catch (error) {
+    console.error("Error fetching user by ID:", error);
+    throw error;
+  }
+}
+
+export { registerAdopter, registerShelter, login, fetchWithAuth, checkEmailExists, checkUsernameExists, getUserById };
