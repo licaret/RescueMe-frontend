@@ -31,7 +31,7 @@
         <div class="flex items-start mb-8">
           <div class="mr-6">
             <img 
-              src="../assets/blank_profile_picture.webp" 
+              src="../assets/blank_profile_picture.jpg" 
               alt="Profile picture" 
               class="w-20 h-20 rounded-full object-cover border"
             />
@@ -410,7 +410,7 @@ export default {
       // Auto-hide after 5 seconds
       this.toastTimeout = setTimeout(() => {
         this.showSuccessToast = false;
-      }, 3000);
+      }, 2000);
     },
 
     discardAccountChanges() {
