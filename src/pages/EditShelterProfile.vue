@@ -1,6 +1,25 @@
 <template>
   <div class="bg-white min-h-screen p-20">
     <div class="max-w-6xl mx-auto">
+      <!-- Toast notification -->
+      <div 
+        v-if="showSuccessToast" 
+        class="fixed top-20 right-4 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded shadow-md flex items-center transition-all duration-300 ease-in-out z-50"
+      >
+        <div class="flex-shrink-0 mr-2">
+          <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+          </svg>
+        </div>
+        <div>
+          {{ successMessage }}
+        </div>
+        <button @click="showSuccessToast = false" class="ml-4 text-gray-500 hover:text-gray-800">
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
 
       <!-- Account Settings -->
       <div class="bg-white rounded-lg shadow mb-10 p-6">
@@ -12,7 +31,7 @@
         <div class="flex items-start mb-8">
           <div class="mr-6">
             <img 
-              src="https://via.placeholder.com/60" 
+              src="../assets/blank_profile_picture.webp" 
               alt="Profile picture" 
               class="w-20 h-20 rounded-full object-cover border"
             />
@@ -83,7 +102,9 @@
         
         <div>
           <button 
-            class="bg-blue-600 text-white px-4 py-2 rounded font-medium min-w-[120px]">
+            @click="saveChanges('account')"
+            class="bg-blue-600 text-white px-4 py-2 rounded font-medium min-w-[120px]"
+          >
             Save changes
           </button>
           <button
@@ -175,7 +196,10 @@
         </div>
         
         <div>
-          <button class="bg-blue-600 text-white px-4 py-2 rounded font-medium">
+          <button 
+            @click="saveChanges('general')"
+            class="bg-blue-600 text-white px-4 py-2 rounded font-medium min-w-[120px]"
+          >
             Save changes
           </button>
           <button
@@ -200,6 +224,7 @@
                 Current password
               </label>
               <input 
+                v-model="passwordData.currentPassword"
                 type="password" 
                 placeholder="Enter your current password" 
                 class="w-full border rounded p-2"
@@ -211,6 +236,7 @@
                 Your new password
               </label>
               <input 
+                v-model="passwordData.newPassword"
                 type="password" 
                 placeholder="Enter your new password" 
                 class="w-full border rounded p-2"
@@ -222,6 +248,7 @@
                 Confirm new password
               </label>
               <input 
+                v-model="passwordData.confirmPassword"
                 type="password" 
                 placeholder="Confirm new password" 
                 class="w-full border rounded p-2"
@@ -229,7 +256,10 @@
             </div>
             
             <div>
-              <button class="bg-blue-600 text-white px-4 py-2 rounded font-medium">
+              <button 
+                @click="saveChanges('password')"
+                class="bg-blue-600 text-white px-4 py-2 rounded font-medium"
+              >
                 Save changes
               </button>
             </div>
@@ -275,7 +305,7 @@
 </template>
 
 <script>
-import { getUserById } from "../services/user_service.js";
+import { getUserById, updateUser } from "../services/user_service.js";
 import judete from "@/assets/judete.json";
 
 export default {
@@ -290,6 +320,11 @@ export default {
         city: "",
         shelterType: "",
       },
+      passwordData: {
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: ""
+      },
       shelterTypes: [
         'Municipal Shelter',
         'Private Shelter',
@@ -303,8 +338,9 @@ export default {
       counties: [], 
       cities: [],
       initialShelterData: {}, 
-      accountChangesMade: false,
-      generalInfoChangesMade: false,
+      showSuccessToast: false,
+      successMessage: "",
+      toastTimeout: null
     }
   },
 
@@ -344,7 +380,6 @@ export default {
       }
     },
 
-
     fetchCounties() {
       this.counties = judete.judete; 
     },
@@ -363,6 +398,21 @@ export default {
       if (callback) callback();
     },
 
+    showToast(message) {
+      // Clear any existing timeout
+      if (this.toastTimeout) {
+        clearTimeout(this.toastTimeout);
+      }
+      
+      this.successMessage = message;
+      this.showSuccessToast = true;
+      
+      // Auto-hide after 5 seconds
+      this.toastTimeout = setTimeout(() => {
+        this.showSuccessToast = false;
+      }, 3000);
+    },
+
     discardAccountChanges() {
       const accountFields = ['username', 'email', 'phoneNumber', 'shelterType'];
       accountFields.forEach(field => {
@@ -379,8 +429,89 @@ export default {
       this.$nextTick(() => {
         this.fetchCities();
       });
+    },
+
+    async saveChanges(section) {
+      try {
+        const userId = localStorage.getItem("shelterId");
+        if (!userId) throw new Error("User ID not found in local storage");
+
+        // Handle password change separately
+        if (section === 'password') {
+          if (this.passwordData.newPassword !== this.passwordData.confirmPassword) {
+            this.showToast("New passwords don't match!");
+            return;
+          }
+          
+          if (!this.passwordData.currentPassword) {
+            this.showToast("Please enter your current password!");
+            return;
+          }
+          
+          if (!this.passwordData.newPassword) {
+            this.showToast("Please enter a new password!");
+            return;
+          }
+          
+          // Here you would typically call a different API endpoint for password change
+          // For example: await changePassword(userId, this.passwordData);
+          console.log("Password change requested");
+          
+          // Clear password fields after successful change
+          this.passwordData = {
+            currentPassword: "",
+            newPassword: "",
+            confirmPassword: ""
+          };
+          
+          this.showToast("Password updated successfully!");
+          return;
+        }
+
+        // Handle profile updates
+        const updatedFields = {};
+        
+        if (section === 'account') {
+          const accountFields = ['username', 'email', 'phoneNumber', 'shelterType'];
+          accountFields.forEach(field => {
+            if (this.shelter[field] !== this.initialShelterData[field]) {
+              updatedFields[field] = this.shelter[field];
+            }
+          });
+        } else if (section === 'general') {
+          const generalInfoFields = ['county', 'city'];
+          generalInfoFields.forEach(field => {
+            if (this.shelter[field] !== this.initialShelterData[field]) {
+              updatedFields[field] = this.shelter[field];
+            }
+          });
+        }
+
+        if (Object.keys(updatedFields).length === 0) {
+          console.log("No changes detected.");
+          return;
+        }
+
+        const updatedUser = await updateUser(userId, updatedFields);
+
+        this.shelter = { ...updatedUser };
+        this.initialShelterData = { ...updatedUser };
+
+        console.log("User updated successfully:", updatedUser);
+        
+        // Show success message based on the section updated
+        if (section === 'account') {
+          this.showToast("Account information updated successfully!");
+        } else if (section === 'general') {
+          this.showToast("General information updated successfully!");
+        }
+      } catch (error) {
+        console.error("Failed to update user:", error);
+        this.showToast(`Update failed: ${error.message || "Unknown error"}`);
+      }
     }
   },
+  
   computed: {
     accountHasChanges() {
       const accountFields = ['username', 'email', 'phoneNumber', 'shelterType'];
@@ -396,6 +527,7 @@ export default {
       );
     }
   },
+  
   watch: {
     shelter: {
       handler() {

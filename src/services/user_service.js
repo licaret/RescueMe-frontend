@@ -139,4 +139,29 @@ async function getUserById(userId) {
   }
 }
 
-export { registerAdopter, registerShelter, login, fetchWithAuth, checkEmailExists, checkUsernameExists, getUserById };
+async function updateUser(userId, updatedFields) {
+  try {
+    const token = localStorage.getItem("token"); 
+
+    const response = await fetch(`http://localhost:8080/users/${userId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify(updatedFields)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Failed to update user");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error updating user:", error);
+    throw error;
+  }
+}
+
+export { registerAdopter, registerShelter, login, fetchWithAuth, checkEmailExists, checkUsernameExists, getUserById, updateUser };
