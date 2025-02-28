@@ -164,4 +164,62 @@ async function updateUser(userId, updatedFields) {
   }
 }
 
-export { registerAdopter, registerShelter, login, fetchWithAuth, checkEmailExists, checkUsernameExists, getUserById, updateUser };
+async function fetchProfilePicture(userId) {
+  try {
+    const response = await fetch(`http://localhost:8080/users/${userId}/profilePicture?t=${Date.now()}`);
+    if (!response.ok) throw new Error("Image not found");
+
+    const blob = await response.blob();
+    if (blob.size === 0) {
+      console.warn("No image data received.");
+      return null;
+    }
+
+    return URL.createObjectURL(blob);
+  } catch (error) {
+    console.warn("No profile picture available:", error);
+    return null;
+  }
+}
+
+
+async function uploadProfilePicture(userId, file) {
+  if (!file) return;
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  try {
+    await fetch(`http://localhost:8080/users/${userId}/uploadProfilePicture`, {
+      method: "POST",
+      body: formData,
+    });
+    return await fetchProfilePicture(userId);
+  } catch (error) {
+    console.error("Error uploading profile picture:", error);
+    throw error;
+  }
+}
+
+async function deleteProfilePicture(userId) {
+  try {
+    const response = await fetch(`http://localhost:8080/users/${userId}/profilePicture`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to delete profile picture");
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Error deleting profile picture:", error);
+    throw error;
+  }
+}
+
+
+export { registerAdopter, registerShelter, login, fetchWithAuth, checkEmailExists, checkUsernameExists, getUserById, updateUser, fetchProfilePicture, uploadProfilePicture, deleteProfilePicture };

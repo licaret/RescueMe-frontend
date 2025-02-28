@@ -31,13 +31,15 @@
         <div class="flex items-start mb-8">
           <div class="mr-6">
             <img 
-              src="../assets/blank_profile_picture.jpg" 
+              :src="shelter.profilePictureUrl || blankProfilePicture" 
               alt="Profile picture" 
               class="w-20 h-20 rounded-full object-cover border"
             />
+              <input type="file" @change="handleProfilePictureUpload" class="hidden" ref="fileInput">
           </div>
           <div class="flex flex-row space-x-5 mt-6">
             <button 
+              @click="$refs.fileInput.click()"
               class="bg-blue-600 text-white px-4 py-1.5 rounded text-sm flex items-center"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -45,7 +47,10 @@
               </svg>
               Upload
             </button>
-            <button class="text-gray-600 text-sm border border-gray-300 px-4 py-1.5 rounded hover:text-gray-800">
+            <button 
+              @click="removeProfilePicture"
+              class="text-gray-600 text-sm border border-gray-300 px-4 py-1.5 rounded hover:text-gray-800"
+            >
               Remove
             </button>
           </div>
@@ -306,6 +311,7 @@
 
 <script>
 import { getUserById, updateUser } from "../services/user_service.js";
+import { fetchProfilePicture, uploadProfilePicture, deleteProfilePicture } from "@/services/user_service.js";
 import judete from "@/assets/judete.json";
 
 export default {
@@ -319,6 +325,8 @@ export default {
         county: "",
         city: "",
         shelterType: "",
+        id: localStorage.getItem("shelterId") || null,
+        profilePictureUrl: "",
       },
       passwordData: {
         currentPassword: "",
@@ -340,11 +348,24 @@ export default {
       initialShelterData: {}, 
       showSuccessToast: false,
       successMessage: "",
-      toastTimeout: null
+      toastTimeout: null,
+      blankProfilePicture: null,
     }
   },
+  async mounted() {
+    if (this.shelter.id) {
+      this.shelter.profilePictureUrl = await fetchProfilePicture(this.shelter.id);
 
+      // Reîncărcare automată după 1 secundă pentru a evita cache-ul
+      setTimeout(async () => {
+        this.shelter.profilePictureUrl = await fetchProfilePicture(this.shelter.id);
+      }, 10);
+    }
+  },
   async created() {
+    import('@/assets/blank_profile_picture.jpg').then(module => {
+      this.blankProfilePicture = module.default;
+    });
     this.fetchCounties();
     await this.fetchShelterData();
   },
@@ -436,38 +457,6 @@ export default {
         const userId = localStorage.getItem("shelterId");
         if (!userId) throw new Error("User ID not found in local storage");
 
-        // Handle password change separately
-        if (section === 'password') {
-          if (this.passwordData.newPassword !== this.passwordData.confirmPassword) {
-            this.showToast("New passwords don't match!");
-            return;
-          }
-          
-          if (!this.passwordData.currentPassword) {
-            this.showToast("Please enter your current password!");
-            return;
-          }
-          
-          if (!this.passwordData.newPassword) {
-            this.showToast("Please enter a new password!");
-            return;
-          }
-          
-          // Here you would typically call a different API endpoint for password change
-          // For example: await changePassword(userId, this.passwordData);
-          console.log("Password change requested");
-          
-          // Clear password fields after successful change
-          this.passwordData = {
-            currentPassword: "",
-            newPassword: "",
-            confirmPassword: ""
-          };
-          
-          this.showToast("Password updated successfully!");
-          return;
-        }
-
         // Handle profile updates
         const updatedFields = {};
         
@@ -493,9 +482,21 @@ export default {
         }
 
         const updatedUser = await updateUser(userId, updatedFields);
-
-        this.shelter = { ...updatedUser };
-        this.initialShelterData = { ...updatedUser };
+        
+        // Save the current profile picture URL
+        const currentProfilePictureUrl = this.shelter.profilePictureUrl;
+        
+        // Update only the fields that were changed
+        Object.keys(updatedUser).forEach(key => {
+          this.shelter[key] = updatedUser[key];
+          this.initialShelterData[key] = updatedUser[key];
+        });
+        
+        // Restore the profile picture URL if it wasn't included in the response
+        if (!updatedUser.profilePictureUrl && currentProfilePictureUrl) {
+          this.shelter.profilePictureUrl = currentProfilePictureUrl;
+          this.initialShelterData.profilePictureUrl = currentProfilePictureUrl;
+        }
 
         console.log("User updated successfully:", updatedUser);
         
@@ -509,9 +510,42 @@ export default {
         console.error("Failed to update user:", error);
         this.showToast(`Update failed: ${error.message || "Unknown error"}`);
       }
+    },
+
+    async handleProfilePictureUpload(event) {
+      const file = event.target.files[0];
+      if (!file || !this.shelter.id) return;
+
+      try {
+        await uploadProfilePicture(this.shelter.id, file);
+
+        // Așteaptă 500ms înainte de a reîncărca poza
+        setTimeout(async () => {
+          this.shelter.profilePictureUrl = await fetchProfilePicture(this.shelter.id);
+          this.$forceUpdate();
+
+          this.showToast("Profile photo updated successfully!");
+        }, 500);
+      } catch (error) {
+        console.error("Failed to upload profile picture:", error);
+      }
+    },
+
+    async removeProfilePicture() {
+      if (!this.shelter.id) return;
+
+      try {
+        await deleteProfilePicture(this.shelter.id);
+        this.shelter.profilePictureUrl = this.blankProfilePicture;
+        this.showToast("Profile picture removed successfully!");
+      } catch (error) {
+        console.error("Failed to delete profile picture:", error);
+        this.showToast("Failed to remove profile picture");
+      }
     }
+
   },
-  
+
   computed: {
     accountHasChanges() {
       const accountFields = ['username', 'email', 'phoneNumber', 'shelterType'];
