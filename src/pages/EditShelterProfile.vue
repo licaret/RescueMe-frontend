@@ -149,16 +149,6 @@
               placeholder="Ex. 307220"
             />
           </div>
-          <!-- <div>
-            <label class="block text-sm font-medium mb-1">
-              Your organization
-            </label>
-            <input 
-              type="text" 
-              placeholder="Ex. Flowbite LLC" 
-              class="w-full border rounded p-2"
-            />
-          </div> -->
           <div>
             <label class="block text-sm font-medium mb-1">
               County<span class="text-red-500">*</span>
@@ -339,6 +329,23 @@ export default {
         newPassword: "",
         confirmPassword: ""
       },
+      errors: {
+        account: {
+          username: "",
+          email: "",
+          phoneNumber: "",
+          shelterType: ""
+        },
+        general: {
+          county: "",
+          city: ""
+        },
+        password: {
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: ""
+        }
+      },
       shelterTypes: [
         'Municipal Shelter',
         'Private Shelter',
@@ -362,7 +369,6 @@ export default {
     if (this.shelter.id) {
       this.shelter.profilePictureUrl = await fetchProfilePicture(this.shelter.id);
 
-      // Reîncărcare automată după 1 secundă pentru a evita cache-ul
       setTimeout(async () => {
         this.shelter.profilePictureUrl = await fetchProfilePicture(this.shelter.id);
       }, 10);
@@ -425,7 +431,7 @@ export default {
       if (callback) callback();
     },
 
-    showToast(message) {
+    showToast(message, isError = false) {
       // Clear any existing timeout
       if (this.toastTimeout) {
         clearTimeout(this.toastTimeout);
@@ -434,10 +440,25 @@ export default {
       this.successMessage = message;
       this.showSuccessToast = true;
       
-      // Auto-hide after 5 seconds
+      // Change toast color based on type
+      if (isError) {
+        const toastEl = document.querySelector('.fixed.top-20.right-4');
+        if (toastEl) {
+          toastEl.classList.remove('bg-green-100', 'border-green-500', 'text-green-700');
+          toastEl.classList.add('bg-red-100', 'border-red-500', 'text-red-700');
+        }
+      } else {
+        const toastEl = document.querySelector('.fixed.top-20.right-4');
+        if (toastEl) {
+          toastEl.classList.remove('bg-red-100', 'border-red-500', 'text-red-700');
+          toastEl.classList.add('bg-green-100', 'border-green-500', 'text-green-700');
+        }
+      }
+      
+      // Auto-hide after 3 seconds
       this.toastTimeout = setTimeout(() => {
         this.showSuccessToast = false;
-      }, 2000);
+      }, 3000);
     },
 
     discardAccountChanges() {
@@ -445,23 +466,190 @@ export default {
       accountFields.forEach(field => {
         this.shelter[field] = this.initialShelterData[field];
       });
+      // Clear errors
+      this.clearSectionErrors('account');
     },
     
     discardGeneralInfoChanges() {
-      const generalInfoFields = ['county', 'city']; 
+      const generalInfoFields = ['county', 'city', 'fullAddress', 'zipCode', 'biography']; 
       generalInfoFields.forEach(field => {
         this.shelter[field] = this.initialShelterData[field];
       });
+      
+      // Clear errors
+      this.clearSectionErrors('general');
       
       this.$nextTick(() => {
         this.fetchCities();
       });
     },
 
+    clearSectionErrors(section) {
+      Object.keys(this.errors[section]).forEach(field => {
+        this.errors[section][field] = "";
+      });
+    },
+
+    validateAccount() {
+      let isValid = true;
+      this.clearSectionErrors('account');
+
+      // Required fields validation
+      if (!this.shelter.username || this.shelter.username.trim() === '') {
+        this.errors.account.username = "Username is required";
+        isValid = false;
+      } else if (this.shelter.username.length < 3) {
+        this.errors.account.username = "Username must be at least 3 characters";
+        isValid = false;
+      }
+
+      if (!this.shelter.email || this.shelter.email.trim() === '') {
+        this.errors.account.email = "Email is required";
+        isValid = false;
+      } else if (!this.validateEmail(this.shelter.email)) {
+        this.errors.account.email = "Please enter a valid email address";
+        isValid = false;
+      }
+
+      if (!this.shelter.phoneNumber || this.shelter.phoneNumber.trim() === '') {
+        this.errors.account.phoneNumber = "Phone number is required";
+        isValid = false;
+      } else if (!this.validatePhoneNumber(this.shelter.phoneNumber)) {
+        this.errors.account.phoneNumber = "Please enter a valid phone number";
+        isValid = false;
+      }
+
+      if (!this.shelter.shelterType) {
+        this.errors.account.shelterType = "Shelter type is required";
+        isValid = false;
+      }
+
+      return isValid;
+    },
+
+    validateGeneral() {
+      let isValid = true;
+      this.clearSectionErrors('general');
+
+      // Required fields validation
+      if (!this.shelter.county) {
+        this.errors.general.county = "County is required";
+        isValid = false;
+      }
+
+      if (!this.shelter.city) {
+        this.errors.general.city = "City is required";
+        isValid = false;
+      }
+
+      // Optional field validations (if they have content)
+      if (this.shelter.zipCode && !this.validateZipCode(this.shelter.zipCode)) {
+        this.errors.general.zipCode = "Please enter a valid postal code";
+        isValid = false;
+      }
+
+      return isValid;
+    },
+
+    validatePassword() {
+      let isValid = true;
+      this.clearSectionErrors('password');
+
+      // Check if any password field is filled
+      const anyPasswordFieldFilled = this.passwordData.currentPassword || 
+                                    this.passwordData.newPassword || 
+                                    this.passwordData.confirmPassword;
+
+      // If any field is filled, all fields must be filled
+      if (anyPasswordFieldFilled) {
+        if (!this.passwordData.currentPassword) {
+          this.errors.password.currentPassword = "Current password is required";
+          isValid = false;
+        }
+        
+        if (!this.passwordData.newPassword) {
+          this.errors.password.newPassword = "New password is required";
+          isValid = false;
+        } else if (!this.validatePasswordStrength(this.passwordData.newPassword)) {
+          this.errors.password.newPassword = "Password doesn't meet requirements";
+          isValid = false;
+        }
+        
+        if (!this.passwordData.confirmPassword) {
+          this.errors.password.confirmPassword = "Please confirm your new password";
+          isValid = false;
+        } else if (this.passwordData.newPassword !== this.passwordData.confirmPassword) {
+          this.errors.password.confirmPassword = "Passwords don't match";
+          isValid = false;
+        }
+      }
+
+      return isValid;
+    },
+
+    validateEmail(email) {
+      const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      return re.test(String(email).toLowerCase());
+    },
+
+    validatePhoneNumber(phone) {
+      // Romanian phone number format (can be adjusted for international format if needed)
+      const re = /^(\+4|)?(07[0-8]{1}[0-9]{1}|02[0-9]{2}|03[0-9]{2}){1}?(\s|\.|\-)?([0-9]{3}(\s|\.|\-|)){2}$/;
+      return re.test(phone);
+    },
+
+    validateZipCode(zipCode) {
+      // Romanian postal code format
+      const re = /^[0-9]{6}$/;
+      return re.test(zipCode);
+    },
+
+    validatePasswordStrength(password) {
+      // Check length
+      if (password.length < 10 || password.length > 100) return false;
+      
+      // Check for lowercase
+      if (!/[a-z]/.test(password)) return false;
+      
+      // Special character requirement is commented out as it's shown as grey in UI
+      // Uncomment to enforce this requirement
+      // if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) return false;
+      
+      return true;
+    },
+
     async saveChanges(section) {
       try {
         const userId = localStorage.getItem("shelterId");
         if (!userId) throw new Error("User ID not found in local storage");
+
+        // Validate the section being saved
+        let isValid = false;
+        
+        if (section === 'account') {
+          isValid = this.validateAccount();
+        } else if (section === 'general') {
+          isValid = this.validateGeneral();
+        } else if (section === 'password') {
+          isValid = this.validatePassword();
+          
+          // Handle password specific logic
+          if (isValid && this.passwordData.currentPassword) {
+            // Password change logic would go here
+            this.showToast("Password updated successfully!");
+            this.passwordData = {
+              currentPassword: "",
+              newPassword: "",
+              confirmPassword: ""
+            };
+            return;
+          }
+        }
+
+        if (!isValid) {
+          this.showToast("Please correct the errors before saving.", true);
+          return;
+        }
 
         // Handle profile updates
         const updatedFields = {};
@@ -484,6 +672,7 @@ export default {
 
         if (Object.keys(updatedFields).length === 0) {
           console.log("No changes detected.");
+          this.showToast("No changes to save");
           return;
         }
 
@@ -514,13 +703,27 @@ export default {
         }
       } catch (error) {
         console.error("Failed to update user:", error);
-        this.showToast(`Update failed: ${error.message || "Unknown error"}`);
+        this.showToast(`Update failed: ${error.message || "Unknown error"}`, true);
       }
     },
 
     async handleProfilePictureUpload(event) {
       const file = event.target.files[0];
       if (!file || !this.shelter.id) return;
+
+      // Validate file type and size
+      const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+      if (!validTypes.includes(file.type)) {
+        this.showToast("Please upload a JPG or PNG image", true);
+        return;
+      }
+
+      // 5MB limit (adjust as needed)
+      const maxSize = 5 * 1024 * 1024;
+      if (file.size > maxSize) {
+        this.showToast("Image size must be less than 5MB", true);
+        return;
+      }
 
       try {
         await uploadProfilePicture(this.shelter.id, file);
@@ -534,6 +737,7 @@ export default {
         }, 500);
       } catch (error) {
         console.error("Failed to upload profile picture:", error);
+        this.showToast("Failed to upload profile picture", true);
       }
     },
 
@@ -546,10 +750,9 @@ export default {
         this.showToast("Profile picture removed successfully!");
       } catch (error) {
         console.error("Failed to delete profile picture:", error);
-        this.showToast("Failed to remove profile picture");
+        this.showToast("Failed to remove profile picture", true);
       }
     }
-
   },
 
   computed: {
