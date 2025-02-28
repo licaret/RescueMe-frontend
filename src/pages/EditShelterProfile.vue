@@ -132,9 +132,10 @@
               Full address
             </label>
             <input 
-              type="text" 
-              placeholder="Ex. B-dul 21 Decembrie 1989, Nr. 110" 
+              v-model="shelter.fullAddress"
+              type="text"
               class="w-full border rounded p-2"
+              placeholder="Ex. B-dul 21 Decembrie 1989, Nr. 110"
             />
           </div>
           <div>
@@ -142,9 +143,10 @@
               ZIP/Postal code
             </label>
             <input 
-              type="text" 
-              placeholder="Ex. 307220" 
+              v-model="shelter.zipCode"
+              type="text"
               class="w-full border rounded p-2"
+              placeholder="Ex. 307220"
             />
           </div>
           <!-- <div>
@@ -194,6 +196,7 @@
             Biography
           </label>
           <textarea 
+            v-model="shelter.biography"
             placeholder="Hello, ShelterHappy here..." 
             rows="5"
             class="w-full border rounded p-2"
@@ -325,6 +328,9 @@ export default {
         county: "",
         city: "",
         shelterType: "",
+        fullAddress: "",   
+        zipCode: "",      
+        biography: "",
         id: localStorage.getItem("shelterId") || null,
         profilePictureUrl: "",
       },
@@ -468,7 +474,7 @@ export default {
             }
           });
         } else if (section === 'general') {
-          const generalInfoFields = ['county', 'city'];
+          const generalInfoFields = ['county', 'city', 'fullAddress', 'zipCode', 'biography'];
           generalInfoFields.forEach(field => {
             if (this.shelter[field] !== this.initialShelterData[field]) {
               updatedFields[field] = this.shelter[field];
@@ -555,7 +561,7 @@ export default {
     },
     
     generalInfoHasChanges() {
-      const generalInfoFields = ['county', 'city']; 
+      const generalInfoFields = ['county', 'city', 'fullAddress', 'zipCode', 'biography']; 
       return generalInfoFields.some(field => 
         this.shelter[field] !== this.initialShelterData[field]
       );
