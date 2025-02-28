@@ -37,7 +37,7 @@ const router = createRouter({
       path: '/home',
       name: 'HomePage',
       component: HomePage, 
-      // meta: { requiresAuth: true },
+      meta: { requiresAuth: true },
     },
     {
       path: '/shelter-dashboard',
