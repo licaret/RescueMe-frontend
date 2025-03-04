@@ -9,6 +9,7 @@ import ContactUsPage from '@/pages/ContactUsPage.vue';
 import ManagePets from '@/components/ManagePets.vue';
 import PetStatsChartVue from '@/components/PetStatsChart.vue';
 import EditShelterProfileVue from '@/pages/EditShelterProfile.vue';
+import AvailablePetsPage from '@/pages/AvailablePetsPage.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -38,6 +39,12 @@ const router = createRouter({
       name: 'HomePage',
       component: HomePage, 
       meta: { requiresAuth: true },
+    },
+    {
+      path: '/available-pets',
+      name: 'AvailablePetsPage',
+      component: AvailablePetsPage, 
+      // meta: { requiresAuth: true },
     },
     {
       path: '/shelter-dashboard',
