@@ -221,5 +221,63 @@ async function deleteProfilePicture(userId) {
   }
 }
 
+async function requestPasswordReset(email) {
+  try {
+    const response = await fetch("http://localhost:8080/api/v1/auth/request-reset", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email }),
+    });
 
-export { registerAdopter, registerShelter, login, fetchWithAuth, checkEmailExists, checkUsernameExists, getUserById, updateUser, fetchProfilePicture, uploadProfilePicture, deleteProfilePicture };
+    // Verifică dacă serverul a returnat JSON valid
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      throw new Error("Server returned an invalid response.");
+    }
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to send reset link");
+    }
+
+    return { success: true, message: data.message };
+  } catch (error) {
+    console.error("Error sending reset link:", error);
+    return { success: false, message: error.message };
+  }
+}
+
+async function resetPassword(token, newPassword) {
+  console.log("Service called with token:", token, "and password:", newPassword);
+  const response = await fetch(`http://localhost:8080/api/v1/auth/reset-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token, newPassword }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to reset password");
+  }
+
+  return await response.json();
+}
+
+
+export { 
+  registerAdopter, 
+  registerShelter, 
+  login, 
+  fetchWithAuth, 
+  checkEmailExists, 
+  checkUsernameExists, 
+  getUserById, 
+  updateUser, 
+  fetchProfilePicture, 
+  uploadProfilePicture, 
+  deleteProfilePicture,
+  requestPasswordReset,
+  resetPassword
+ };

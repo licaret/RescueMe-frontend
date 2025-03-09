@@ -4,7 +4,8 @@ import SignUpPage from '@/pages/SignUpPage.vue';
 import LoginPage from '@/pages/LoginPage.vue';
 import HomePage from '@/pages/HomePage.vue';
 import ShelterDashboardPage from '@/pages/ShelterDashboardPage.vue';
-import ForgotPasswordPage from '@/pages/ForgotPasswordPage.vue';
+import RequestResetPasswordPage from '@/pages/RequestResetPasswordPage.vue';
+import ResetPasswordPage from '@/pages/ResetPasswordPage.vue';
 import ContactUsPage from '@/pages/ContactUsPage.vue';
 import ManagePets from '@/components/ManagePets.vue';
 import PetStatsChartVue from '@/components/PetStatsChart.vue';
@@ -30,9 +31,14 @@ const router = createRouter({
       component: LoginPage, 
     },
     {
-      path: '/forgot-password',
-      name: 'ForgotPasswordPage',
-      component: ForgotPasswordPage, 
+      path: '/request-reset-password',
+      name: 'RequestResetPasswordPage',
+      component: RequestResetPasswordPage, 
+    },
+    {
+      path: '/reset-password',
+      name: 'ResetPasswordPage',
+      component: ResetPasswordPage, 
     },
     {
       path: '/home',
@@ -91,7 +97,7 @@ router.beforeEach((to, from, next) => {
   }
 
 
-  // daca ajung la landing page sa nu mai potd a back din browser
+  // daca ajung la landing page sa nu mai pot da back din browser
   if (to.path === '/') {
     window.history.replaceState(null, null, '/');
   }
