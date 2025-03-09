@@ -246,7 +246,10 @@
 
             const handleLogout = () => {
                 localStorage.removeItem("token");
+                localStorage.removeItem("Username");
+                localStorage.removeItem("Id");
                 localStorage.removeItem("shelterUsername");
+                localStorage.removeItem("shelterId");
 
                 window.removeEventListener("popstate", blockBackButton);
 

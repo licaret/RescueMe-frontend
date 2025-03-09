@@ -265,6 +265,45 @@ async function resetPassword(token, newPassword) {
   return await response.json();
 }
 
+async function changePassword(userId, currentPassword, newPassword) {
+  try {
+    const response = await fetch(`http://localhost:8080/users/${userId}/change-password`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify({
+        currentPassword: currentPassword,
+        newPassword: newPassword,
+      }),
+    });
+
+    if (!response.ok) {
+      // Verifică dacă răspunsul conține JSON
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to change password");
+      } else {
+        throw new Error(`Server responded with status: ${response.status}`);
+      }
+    }
+
+    // Verifică dacă există conținut pentru a fi parsat ca JSON
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+      return await response.json();
+    } else {
+      // Dacă nu e JSON, returnează doar statutul de succes
+      return { success: true };
+    }
+  } catch (error) {
+    console.error("Error changing password:", error);
+    throw error;
+  }
+}
+
 
 export { 
   registerAdopter, 
@@ -279,5 +318,6 @@ export {
   uploadProfilePicture, 
   deleteProfilePicture,
   requestPasswordReset,
-  resetPassword
+  resetPassword,
+  changePassword
  };

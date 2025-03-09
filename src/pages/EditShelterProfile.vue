@@ -211,57 +211,110 @@
       </div>
       
       <!-- Password Settings -->
-      <div class="bg-white rounded-lg shadow p-6">
-        <h2 class="text-xl font-bold mb-6">Password</h2>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- Left Column: Password Fields -->
-          <div>
-            <div class="mb-6">
-              <label class="block text-sm font-medium mb-1">
-                Current password
-              </label>
+    <div class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-xl font-bold mb-6">Password</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Left Column: Password Fields -->
+        <div>
+          <div class="mb-6 relative">
+            <label class="block text-sm font-medium mb-1">
+              Current password
+            </label>
+            <div class="relative">
               <input 
                 v-model="passwordData.currentPassword"
-                type="password" 
+                :type="passwordVisibility.current ? 'text' : 'password'"
                 placeholder="Enter your current password" 
-                class="w-full border rounded p-2"
+                class="w-full border rounded p-2 pr-10"
               />
-            </div>
-            
-            <div class="mb-6">
-              <label class="block text-sm font-medium mb-1">
-                Your new password
-              </label>
-              <input 
-                v-model="passwordData.newPassword"
-                type="password" 
-                placeholder="Enter your new password" 
-                class="w-full border rounded p-2"
-              />
-            </div>
-            
-            <div class="mb-6">
-              <label class="block text-sm font-medium mb-1">
-                Confirm new password
-              </label>
-              <input 
-                v-model="passwordData.confirmPassword"
-                type="password" 
-                placeholder="Confirm new password" 
-                class="w-full border rounded p-2"
-              />
-            </div>
-            
-            <div>
               <button 
-                @click="saveChanges('password')"
-                class="bg-blue-600 text-white px-4 py-2 rounded font-medium"
+                type="button"
+                @click="passwordVisibility.current = !passwordVisibility.current"
+                class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-600 hover:text-gray-800"
               >
-                Save changes
+                <svg v-if="passwordVisibility.current" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                  <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+                </svg>
+                <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" clip-rule="evenodd" />
+                  <path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303z" />
+                </svg>
               </button>
             </div>
+            <p v-if="errors.password.currentPassword" class="text-red-500 text-sm mt-1">{{ errors.password.currentPassword }}</p>
           </div>
+          
+          <div class="mb-6 relative">
+            <label class="block text-sm font-medium mb-1">
+              Your new password
+            </label>
+            <div class="relative">
+              <input 
+                v-model="passwordData.newPassword"
+                @input="checkPasswordRequirements"
+                :type="passwordVisibility.new ? 'text' : 'password'"
+                placeholder="Enter your new password" 
+                class="w-full border rounded p-2 pr-10"
+              />
+              <button 
+                type="button"
+                @click="passwordVisibility.new = !passwordVisibility.new"
+                class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-600 hover:text-gray-800"
+              >
+                <svg v-if="passwordVisibility.new" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                  <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+                </svg>
+                <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" clip-rule="evenodd" />
+                  <path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303z" />
+                </svg>
+              </button>
+            </div>
+            <p v-if="errors.password.newPassword" class="text-red-500 text-sm mt-1">{{ errors.password.newPassword }}</p>
+          </div>
+          
+          <div class="mb-6 relative">
+            <label class="block text-sm font-medium mb-1">
+              Confirm new password
+            </label>
+            <div class="relative">
+              <input 
+                v-model="passwordData.confirmPassword"
+                @input="checkPasswordMatch"
+                :type="passwordVisibility.confirm ? 'text' : 'password'"
+                placeholder="Confirm new password" 
+                class="w-full border rounded p-2 pr-10"
+              />
+              <button 
+                type="button"
+                @click="passwordVisibility.confirm = !passwordVisibility.confirm"
+                class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-600 hover:text-gray-800"
+              >
+                <svg v-if="passwordVisibility.confirm" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                  <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+                </svg>
+                <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" clip-rule="evenodd" />
+                  <path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303z" />
+                </svg>
+              </button>
+            </div>
+            <p v-if="errors.password.confirmPassword" class="text-red-500 text-sm mt-1">{{ errors.password.confirmPassword }}</p>
+          </div>
+          
+          <div>
+            <button 
+              @click="saveChanges('password')"
+              class="bg-blue-600 text-white px-4 py-2 rounded font-medium"
+            >
+              Save changes
+            </button>
+          </div>
+        </div>
           
           <!-- Right Column: Password Requirements -->
           <div>
@@ -269,27 +322,31 @@
               <h3 class="text-sm font-medium mb-2">Password requirements:</h3>
               <p class="text-sm text-gray-600 mb-2">Ensure that these requirements are met:</p>
               <ul class="text-sm">
-                <li class="flex items-center mb-1 text-green-600">
+                <li class="flex items-center mb-1" :class="passwordRequirements.length ? 'text-green-600' : 'text-gray-500'">
                   <svg class="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    <path v-if="passwordRequirements.length" fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    <path v-else fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
                   </svg>
                   At least 10 characters (and up to 100 characters)
                 </li>
-                <li class="flex items-center mb-1 text-green-600">
+                <li class="flex items-center mb-1" :class="passwordRequirements.lowercase ? 'text-green-600' : 'text-gray-500'">
                   <svg class="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    <path v-if="passwordRequirements.lowercase" fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    <path v-else fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
                   </svg>
                   At least one lowercase character
                 </li>
-                <li class="flex items-center mb-1 text-gray-500">
+                <li class="flex items-center mb-1" :class="passwordRequirements.special ? 'text-green-600' : 'text-gray-500'">
                   <svg class="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
+                    <path v-if="passwordRequirements.special" fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    <path v-else fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
                   </svg>
                   Inclusion of at least one special character, e.g., ! @ # ?
                 </li>
-                <li class="flex items-center mb-1 text-green-600">
+                <li class="flex items-center mb-1" :class="passwordRequirements.different ? 'text-green-600' : 'text-gray-500'">
                   <svg class="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    <path v-if="passwordRequirements.different" fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    <path v-else fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
                   </svg>
                   Significantly different from your previous passwords
                 </li>
@@ -305,6 +362,7 @@
 <script>
 import { getUserById, updateUser } from "../services/user_service.js";
 import { fetchProfilePicture, uploadProfilePicture, deleteProfilePicture } from "@/services/user_service.js";
+import { changePassword } from "@/services/user_service.js";
 import judete from "@/assets/judete.json";
 
 export default {
@@ -328,6 +386,17 @@ export default {
         currentPassword: "",
         newPassword: "",
         confirmPassword: ""
+      },
+      passwordRequirements: {
+        length: false,
+        lowercase: false,
+        special: false,
+        different: true 
+      },
+      passwordVisibility: {
+        current: false,
+        new: false,
+        confirm: false
       },
       errors: {
         account: {
@@ -551,41 +620,68 @@ export default {
       return isValid;
     },
 
-    validatePassword() {
-      let isValid = true;
-      this.clearSectionErrors('password');
+    checkPasswordRequirements() {
+      const password = this.passwordData.newPassword;
+      
+      // Check length requirement
+      this.passwordRequirements.length = password.length >= 10 && password.length <= 100;
+      
+      // Check lowercase requirement
+      this.passwordRequirements.lowercase = /[a-z]/.test(password);
+      
+      // Check special character requirement
+      this.passwordRequirements.special = /[!@#?]/.test(password);
+      
+      // Clear previous error message
+      this.errors.password.newPassword = "";
+    },
 
-      // Check if any password field is filled
-      const anyPasswordFieldFilled = this.passwordData.currentPassword || 
-                                    this.passwordData.newPassword || 
-                                    this.passwordData.confirmPassword;
-
-      // If any field is filled, all fields must be filled
-      if (anyPasswordFieldFilled) {
-        if (!this.passwordData.currentPassword) {
-          this.errors.password.currentPassword = "Current password is required";
-          isValid = false;
-        }
-        
-        if (!this.passwordData.newPassword) {
-          this.errors.password.newPassword = "New password is required";
-          isValid = false;
-        } else if (!this.validatePasswordStrength(this.passwordData.newPassword)) {
-          this.errors.password.newPassword = "Password doesn't meet requirements";
-          isValid = false;
-        }
-        
-        if (!this.passwordData.confirmPassword) {
-          this.errors.password.confirmPassword = "Please confirm your new password";
-          isValid = false;
-        } else if (this.passwordData.newPassword !== this.passwordData.confirmPassword) {
-          this.errors.password.confirmPassword = "Passwords don't match";
-          isValid = false;
+    checkPasswordMatch() {
+      if (this.passwordData.newPassword && this.passwordData.confirmPassword) {
+        if (this.passwordData.newPassword !== this.passwordData.confirmPassword) {
+          this.errors.password.confirmPassword = "Passwords do not match";
+        } else {
+          this.errors.password.confirmPassword = "";
         }
       }
-
-      return isValid;
     },
+
+    validatePassword() {
+      this.clearSectionErrors("password");
+
+      if (!this.passwordData.currentPassword) {
+        this.errors.password.currentPassword = "Current password is required";
+        return false;
+      }
+
+      if (!this.passwordData.newPassword) {
+        this.errors.password.newPassword = "New password is required";
+        return false;
+      }
+
+      if (this.passwordData.newPassword.length < 10 || this.passwordData.newPassword.length > 100) {
+        this.errors.password.newPassword = "Password must be between 10 and 100 characters";
+        return false;
+      }
+
+      if (!/[a-z]/.test(this.passwordData.newPassword)) {
+        this.errors.password.newPassword = "Password must contain at least one lowercase letter";
+        return false;
+      }
+
+      if (!/[!@#?]/.test(this.passwordData.newPassword)) {
+        this.errors.password.newPassword = "Password must contain at least one special character (! @ # ?)";
+        return false;
+      }
+
+      if (this.passwordData.newPassword !== this.passwordData.confirmPassword) {
+        this.errors.password.confirmPassword = "Passwords do not match";
+        return false;
+      }
+
+      return true;
+    },
+
 
     validateEmail(email) {
       const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -633,16 +729,32 @@ export default {
         } else if (section === 'password') {
           isValid = this.validatePassword();
           
-          // Handle password specific logic
           if (isValid && this.passwordData.currentPassword) {
-            // Password change logic would go here
-            this.showToast("Password updated successfully!");
-            this.passwordData = {
-              currentPassword: "",
-              newPassword: "",
-              confirmPassword: ""
-            };
-            return;
+            try {
+              await changePassword(userId, this.passwordData.currentPassword, this.passwordData.newPassword);
+              this.showToast("Password updated successfully!");
+              
+              // Clear password fields
+              this.passwordData = {
+                currentPassword: "",
+                newPassword: "",
+                confirmPassword: ""
+              };
+              return;
+            }catch (error) {
+              // Extragem mesajul de eroare primit din backend
+              const errorMessage = error.message;
+
+              if (errorMessage.includes("Current password is incorrect")) {
+                this.errors.password.currentPassword = "Current password is incorrect";
+              } else if (errorMessage.includes("New password must be different")) {
+                this.errors.password.newPassword = "New password must be different from the current one";
+              } else if (errorMessage.includes("Password does not meet")) {
+                this.errors.password.newPassword = "Password must be at least 10 characters, contain one lowercase letter, and one special character (!@#?)";
+              } else {
+                this.showToast("Failed to change password: " + errorMessage, true);
+              }
+            }
           }
         }
 

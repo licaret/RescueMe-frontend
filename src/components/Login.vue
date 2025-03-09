@@ -141,8 +141,8 @@ export default {
 
         const data = await response.json();
         localStorage.setItem("token", data.token);
-        localStorage.setItem("shelterId", data.id); 
-        localStorage.setItem("shelterUsername", data.username);
+        localStorage.setItem("Id", data.id); 
+        localStorage.setItem("Username", data.username);
 
         if (data.role === "SHELTER") {
           localStorage.setItem("shelterUsername", data.username);
