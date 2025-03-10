@@ -1,5 +1,6 @@
 <template>
   <Navbar></Navbar>
+  <!-- Hero Section -->
   <section class="relative min-h-screen bg-gradient-to-b from-white via-white to-black">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row items-center justify-between py-12 sm:py-16 lg:py-0">
       <!-- Image Container -->
@@ -21,20 +22,481 @@
       </div>
     </div>
   </section>
+
+ <!-- Quick Stats Section - New section with original colors -->
+ <section class="py-10 bg-gray-100 border-y border-gray-200">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+        <div class="bg-white p-4 rounded-2xl shadow-md">
+          <p class="text-4xl font-bold text-red-700 mb-2">350+</p>
+          <p class="text-gray-800">Animals Rescued</p>
+        </div>
+        <div class="bg-white p-4 rounded-2xl shadow-md">
+          <p class="text-4xl font-bold text-red-700 mb-2">200+</p>
+          <p class="text-gray-800">Successful Adoptions</p>
+        </div>
+        <div class="bg-white p-4 rounded-2xl shadow-md">
+          <p class="text-4xl font-bold text-red-700 mb-2">50+</p>
+          <p class="text-gray-800">Volunteers</p>
+        </div>
+        <div class="bg-white p-4 rounded-2xl shadow-md">
+          <p class="text-4xl font-bold text-red-700 mb-2">10</p>
+          <p class="text-gray-800">Years of Service</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Mission Statement - Made more rounded -->
+  <section class="py-16 bg-white">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-4xl mx-auto text-center bg-gray-50 p-8 rounded-3xl shadow-lg">
+        <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">Our Mission</h2>
+        <p class="text-lg sm:text-xl text-gray-700 mb-8">
+          We rescue, rehabilitate, and provide a chance for a happy life to abandoned animals. 
+          Every animal deserves love, respect, and a permanent home.
+        </p>
+        <div class="flex justify-center">
+          <router-link to="/adopt" class="px-8 py-3 bg-red-600 text-white font-semibold rounded-full hover:bg-red-700 transition-colors duration-300 shadow-lg">
+            Adopt Now
+          </router-link>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Animals - More rounded cards -->
+  <section class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl sm:text-4xl font-bold text-center text-gray-900 mb-12">Animals Looking for a Home</h2>
+      
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Animal Card 1 -->
+        <div class="bg-white rounded-3xl overflow-hidden shadow-lg transition-transform duration-300 hover:shadow-xl hover:-translate-y-1">
+          <div class="relative">
+            <img src="../assets/dog1.jpg" alt="Max" class="w-full h-64 object-cover">
+            <div class="absolute top-4 right-4 bg-red-600 text-white text-sm font-bold px-3 py-1 rounded-full">
+              Looking for Home
+            </div>
+          </div>
+          <div class="p-6">
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Max</h3>
+            <p class="text-gray-600 mb-4">Golden Retriever • 2 ani • Mascul</p>
+            <p class="text-gray-700 mb-4">Prietenos, energic și iubitor, Max caută o familie activă care să îi ofere dragoste și spațiu pentru a alerga.</p>
+            <router-link to="/animals/max" class="inline-block px-4 py-2 bg-red-600 text-white font-semibold rounded-full hover:bg-red-700 transition-colors duration-300 shadow-md">
+              Cunoscu-l pe Max
+            </router-link>
+          </div>
+        </div>
+
+        <!-- Animal Card 2 -->
+        <div class="bg-white rounded-3xl overflow-hidden shadow-lg transition-transform duration-300 hover:shadow-xl hover:-translate-y-1">
+          <div class="relative">
+            <img src="../assets/cat1.jpg" alt="Luna" class="w-full h-64 object-cover">
+            <div class="absolute top-4 right-4 bg-red-600 text-white text-sm font-bold px-3 py-1 rounded-full">
+              Looking for Home
+            </div>
+          </div>
+          <div class="p-6">
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Luna</h3>
+            <p class="text-gray-600 mb-4">Domestic Shorthair • 1 an • Femelă</p>
+            <p class="text-gray-700 mb-4">Blândă și jucăușă, Luna adoră să se cuibărească în brațele tale și să primească afecțiune.</p>
+            <router-link to="/animals/luna" class="inline-block px-4 py-2 bg-red-600 text-white font-semibold rounded-full hover:bg-red-700 transition-colors duration-300 shadow-md">
+              Cunoscu-o pe Luna
+            </router-link>
+          </div>
+        </div>
+
+        <!-- Animal Card 3 -->
+        <div class="bg-white rounded-3xl overflow-hidden shadow-lg transition-transform duration-300 hover:shadow-xl hover:-translate-y-1">
+          <div class="relative">
+            <img src="../assets/dog2.jpg" alt="Rex" class="w-full h-64 object-cover">
+            <div class="absolute top-4 right-4 bg-red-600 text-white text-sm font-bold px-3 py-1 rounded-full">
+              Looking for Home
+            </div>
+          </div>
+          <div class="p-6">
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Rex</h3>
+            <p class="text-gray-600 mb-4">Husky Mix • 3 ani • Mascul</p>
+            <p class="text-gray-700 mb-4">Loial și protector, Rex este un companion perfect care așteaptă să își găsească familia pentru totdeauna.</p>
+            <router-link to="/animals/rex" class="inline-block px-4 py-2 bg-red-600 text-white font-semibold rounded-full hover:bg-red-700 transition-colors duration-300 shadow-md">
+              Cunoscu-l pe Rex
+            </router-link>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-12 text-center">
+        <router-link to="/animals" class="inline-block px-8 py-3 bg-transparent border-2 border-red-600 text-red-600 font-semibold rounded-full hover:bg-red-600 hover:text-white transition-colors duration-300 shadow-md">
+          Vezi toate animalele
+        </router-link>
+      </div>
+    </div>
+  </section>
+
+  <!-- Adoption Process - New section with original colors -->
+  <section class="py-16 bg-white">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl sm:text-4xl font-bold text-center text-gray-900 mb-12">Adoption Process</h2>
+      
+      <div class="relative">
+        <!-- Connection line -->
+        <div class="hidden md:block absolute top-1/2 left-0 right-0 h-1 bg-gray-300 -translate-y-1/2 z-0"></div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 relative z-10">
+          <!-- Step 1 -->
+          <div class="bg-white rounded-3xl p-6 shadow-lg text-center">
+            <div class="w-16 h-16 mx-auto bg-red-600 text-white rounded-full flex items-center justify-center mb-4 text-xl font-bold">1</div>
+            <h3 class="text-xl font-bold text-gray-900 mb-3">Browse</h3>
+            <p class="text-gray-700">Look through our available animals and find your perfect match.</p>
+          </div>
+          
+          <!-- Step 2 -->
+          <div class="bg-white rounded-3xl p-6 shadow-lg text-center">
+            <div class="w-16 h-16 mx-auto bg-red-600 text-white rounded-full flex items-center justify-center mb-4 text-xl font-bold">2</div>
+            <h3 class="text-xl font-bold text-gray-900 mb-3">Meet</h3>
+            <p class="text-gray-700">Visit our shelter to meet the animal and see if you connect.</p>
+          </div>
+          
+          <!-- Step 3 -->
+          <div class="bg-white rounded-3xl p-6 shadow-lg text-center">
+            <div class="w-16 h-16 mx-auto bg-red-600 text-white rounded-full flex items-center justify-center mb-4 text-xl font-bold">3</div>
+            <h3 class="text-xl font-bold text-gray-900 mb-3">Apply</h3>
+            <p class="text-gray-700">Complete our adoption application and home verification process.</p>
+          </div>
+          
+          <!-- Step 4 -->
+          <div class="bg-white rounded-3xl p-6 shadow-lg text-center">
+            <div class="w-16 h-16 mx-auto bg-red-600 text-white rounded-full flex items-center justify-center mb-4 text-xl font-bold">4</div>
+            <h3 class="text-xl font-bold text-gray-900 mb-3">Welcome Home</h3>
+            <p class="text-gray-700">Take your new family member home and begin your journey together.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Success Stories - More rounded profiles -->
+  <section class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl sm:text-4xl font-bold text-center text-gray-900 mb-12">Successful Stories</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+        <!-- Story 1 -->
+        <div class="flex flex-col md:flex-row items-center md:items-start gap-6 bg-white p-6 rounded-3xl shadow-md">
+          <div class="w-40 h-40 rounded-full overflow-hidden flex-shrink-0 border-4 border-gray-200">
+            <img src="../assets/successfulstory1.jpeg" alt="Bella și familia ei" class="w-full h-full object-cover">
+          </div>
+          <div>
+            <h3 class="text-2xl font-bold text-gray-900 mb-2">Bella and Maria</h3>
+            <p class="text-gray-700 mb-4">
+              "Adopting Bella was the best decision I have ever made. She has brought so much joy into my life, and we share a special bond I never thought possible. Thank you for bringing us together!"
+            </p>
+            <p class="text-gray-600 italic">- Maria P., adopted in July 2024</p>
+          </div>
+        </div>
+
+        <!-- Story 2 -->
+        <div class="flex flex-col md:flex-row items-center md:items-start gap-6 bg-white p-6 rounded-3xl shadow-md">
+          <div class="w-40 h-40 rounded-full overflow-hidden flex-shrink-0 border-4 border-gray-200">
+            <img src="../assets/successfulstory2.jpg" alt="Oscar și familia lui" class="w-full h-full object-cover">
+          </div>
+          <div>
+            <h3 class="text-2xl font-bold text-gray-900 mb-2">Oscar and the Popescu Family</h3>
+            <p class="text-gray-700 mb-4">
+              "Oscar was a very shy dog when we adopted him, but with patience and love, he transformed. Now he is an indispensable member of our family and makes every day brighter."
+            </p>
+            <p class="text-gray-600 italic">- The Popescu Family, adopted in September 2024</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-12 text-center">
+        <router-link to="/success-stories" class="inline-block px-8 py-3 bg-transparent border-2 border-red-600 text-red-600 font-semibold rounded-full hover:bg-red-600 hover:text-white transition-colors duration-300 shadow-md">
+          Read more stories
+        </router-link>
+      </div>
+    </div>
+  </section>
+
+  <!-- How to Help - More rounded cards -->
+  <section class="py-16 text-black" style="background-color: rgba(0, 0, 0, 0.05);">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl sm:text-4xl font-bold text-center mb-12">How You Can Help</h2>
+      
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <!-- Option 1 -->
+        <div class="text-center bg-white p-6 rounded-3xl shadow-md">
+          <div class="bg-red-600 w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4 text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold mb-2">Adopt</h3>
+          <p class="text-gray-700">Give an animal a permanent home and a life full of love and care.</p>
+        </div>
+        
+        <!-- Option 2 -->
+        <div class="text-center bg-white p-6 rounded-3xl shadow-md">
+          <div class="bg-red-600 w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4 text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold mb-2">Donate</h3>
+          <p class="text-gray-700">Support shelters through donations that help care for the animals.</p>
+        </div>
+        
+        <!-- Option 3 -->
+        <div class="text-center bg-white p-6 rounded-3xl shadow-md">
+          <div class="bg-red-600 w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4 text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold mb-2">Volunteer</h3>
+          <p class="text-gray-700">Dedicate your time and help animals in need of care and attention.</p>
+        </div>
+        
+        <!-- Option 4 -->
+        <div class="text-center bg-white p-6 rounded-3xl shadow-md">
+          <div class="bg-red-600 w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4 text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold mb-2">Spread the Message</h3>
+          <p class="text-gray-700">Help us increase visibility by sharing our stories with your friends and family.</p>
+        </div>
+      </div>
+
+      <div class="mt-12 text-center">
+        <router-link to="/help" class="inline-block px-8 py-3 bg-red-600 text-white font-semibold rounded-full hover:bg-red-700 transition-colors duration-300 shadow-md">
+          Discover how to get involved
+        </router-link>
+      </div>
+    </div>
+  </section>
+
+  <!-- Events Calendar - New section with original colors -->
+  <section class="py-16 bg-white">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl sm:text-4xl font-bold text-center text-gray-900 mb-12">Upcoming Events</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Event 1 -->
+        <div class="bg-white rounded-3xl overflow-hidden shadow-md border border-gray-100">
+          <div class="p-4 bg-red-600 text-white">
+            <p class="text-2xl font-bold">15</p>
+            <p class="text-sm">March 2025</p>
+          </div>
+          <div class="p-6">
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Adoption Day</h3>
+            <p class="text-gray-700 mb-4">Meet our animals and find your perfect companion. Special adoption fees and giveaways.</p>
+            <div class="flex items-center text-gray-600 mb-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>10:00 AM - 4:00 PM</span>
+            </div>
+            <div class="flex items-center text-gray-600">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <span>Main Shelter Location</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Event 2 -->
+        <div class="bg-white rounded-3xl overflow-hidden shadow-md border border-gray-100">
+          <div class="p-4 bg-red-600 text-white">
+            <p class="text-2xl font-bold">22</p>
+            <p class="text-sm">March 2025</p>
+          </div>
+          <div class="p-6">
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Volunteer Training</h3>
+            <p class="text-gray-700 mb-4">Learn how to become a volunteer and help our shelter animals. No experience necessary.</p>
+            <div class="flex items-center text-gray-600 mb-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>2:00 PM - 5:00 PM</span>
+            </div>
+            <div class="flex items-center text-gray-600">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <span>Community Center</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Event 3 -->
+        <div class="bg-white rounded-3xl overflow-hidden shadow-md border border-gray-100">
+          <div class="p-4 bg-red-600 text-white">
+            <p class="text-2xl font-bold">29</p>
+            <p class="text-sm">March 2025</p>
+          </div>
+          <div class="p-6">
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Fundraising Gala</h3>
+            <p class="text-gray-700 mb-4">Join us for an elegant evening of fun and fundraising to support our shelter's mission.</p>
+            <div class="flex items-center text-gray-600 mb-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>7:00 PM - 10:00 PM</span>
+            </div>
+            <div class="flex items-center text-gray-600">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <span>Grand Hotel Ballroom</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mt-12 text-center">
+        <router-link to="/events" class="inline-block px-8 py-3 bg-transparent border-2 border-red-600 text-red-600 font-semibold rounded-full hover:bg-red-600 hover:text-white transition-colors duration-300 shadow-md">
+          View all events
+        </router-link>
+      </div>
+    </div>
+  </section>
+
+  <!-- Emergency Banner - New section -->
+  <section class="py-4 bg-red-600 text-white">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row items-center justify-between">
+        <div class="flex items-center mb-4 md:mb-0">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <p class="font-bold">Emergency: We urgently need foster homes for 5 puppies rescued yesterday!</p>
+        </div>
+        <router-link to="/emergency-foster" class="px-4 py-2 bg-white text-red-600 font-semibold rounded-full hover:bg-gray-100 transition-colors duration-300">
+          Learn More
+        </router-link>
+      </div>
+    </div>
+  </section>
+
+  <!-- Newsletter - More rounded form -->
+  <section class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-3xl mx-auto text-center bg-white p-8 rounded-3xl shadow-lg">
+        <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">Stay Updated</h2>
+        <p class="text-lg text-gray-700 mb-8">
+          Sign up to receive updates on animals available for adoption and success stories.
+        </p>
+        
+        <form @submit.prevent="subscribeNewsletter" class="flex flex-col sm:flex-row gap-4">
+          <input 
+            type="email" 
+            v-model="email" 
+            placeholder="Your Email Address" 
+            class="flex-1 px-4 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent"
+            required
+          >
+          <button 
+            type="submit" 
+            class="px-6 py-3 bg-red-600 text-white font-semibold rounded-full hover:bg-red-700 transition-colors duration-300 shadow-md"
+          >
+            Subscribe
+          </button>
+        </form>
+        
+        <p class="mt-4 text-sm text-gray-600">
+          By subscribing, you agree to receive emails from us. You can unsubscribe at any time.
+        </p>
+      </div>
+    </div>
+  </section>
+  
+  <Footer></Footer>
 </template>
 
 <script>
 import Navbar from "@/components/Navbar.vue";
+import Footer from "@/components/Footer.vue";
 export default {
   name: 'HomePage',
   components: {
     Navbar, 
+    Footer
   },
+  data() {
+    return {
+      email: ''
+    }
+  },
+  methods: {
+    subscribeNewsletter() {
+      alert('Thank you for subscribing!');
+      this.email = '';
+    }
+  }
 }
 </script>
 
 <style>
 h1, img {
   user-select: none;
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Animation for elements on page load */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+section {
+  animation: fadeIn 0.8s ease-out forwards;
+}
+
+/* Hover effects for cards */
+.hover-scale {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-scale:hover {
+  transform: scale(1.03);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Custom button effects */
+button, a.inline-block {
+  transition: all 0.3s ease;
+}
+
+button:hover, a.inline-block:hover {
+  transform: translateY(-2px);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d1d1d1;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #c1c1c1;
 }
 </style>

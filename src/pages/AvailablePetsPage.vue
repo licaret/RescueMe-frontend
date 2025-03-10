@@ -1,9 +1,14 @@
 <template>
-    <Navbar></Navbar>
-    <div class="p-14 mt-20 space-y-20">
+  <Navbar></Navbar>
+  <div class="p-14 mt-20 space-y-20">
 
-      <!-- Search and Filter Section -->
-      <div class="bg-white p-4 max-w-[76rem] mx-auto rounded-xl border border-gray-300 shadow-lg">
+    <!-- Error Message Display -->
+    <div v-if="errorMessage" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative max-w-[76rem] mx-auto mb-6">
+      <span class="block sm:inline">{{ errorMessage }}</span>
+    </div>
+
+    <!-- Search and Filter Section -->
+    <div class="bg-white p-4 max-w-[76rem] mx-auto rounded-xl border border-gray-300 shadow-lg">
 
       <!-- Top Row: Search & Toggle Filters -->
       <div class="flex justify-between items-center mb-6">
@@ -78,14 +83,11 @@
             </div>
           </div>
 
-
           <select v-model="filters.sex" class="filter-input">
             <option value="">All Genders</option>
             <option value="Male">Male</option>
             <option value="Female">Female</option>
           </select>
-
-          <!-- <input type="number" v-model="filters.age" placeholder="Filter by age..." class="filter-input"/> -->
 
           <select v-model="filters.size" class="filter-input">
             <option value="">All Sizes</option>
@@ -114,7 +116,6 @@
             <option value="PENDING">Pending</option>
             <option value="ADOPTED">Adopted</option>
           </select>
-
 
           <!-- Vaccinated -->
           <div class="flex items-center space-x-2">
@@ -149,13 +150,6 @@
             <label for="urgentAdoptionNeeded" class="text-red-600 font-medium">Urgent Adoption Needed</label>
           </div>
 
-          <!-- <input type="number" v-model="filters.timeSpentInShelter" placeholder="Days in shelter..." class="filter-input"/> -->
-
-          <!-- <select v-model="sortOrder" class="filter-input">
-            <option value="asc">Ascending</option>
-            <option value="desc">Descending</option>
-          </select> -->
-
           <div class="flex items-center">
             <button 
               v-if="isAnyFilterApplied"
@@ -182,398 +176,504 @@
               >
                 {{ Object.values(filters).filter(value => value !== '' && value !== false).length }}
               </span>
-              
             </button>
           </div>
-
         </div>
       </transition>
     </div>
-  
-      
-  
-      <!-- Shelters Section -->
-      <div v-for="shelter in sheltersWithPets" :key="shelter.id" class="mb-12">
-        <!-- Shelter Header -->
-        <div class="bg-white rounded-xl border border-gray-300 shadow-lg overflow-hidden mb-6">
-          <div class="flex flex-col md:flex-row">
-            <!-- Shelter Image -->
-            <div class="w-full md:w-1/4 h-48 md:h-auto">
-              <img :src="shelter.imageUrl" :alt="shelter.name" class="w-full h-full object-cover" />
-            </div>
-            <!-- Shelter Info -->
-            <div class="w-full md:w-3/4 p-6 flex flex-col justify-between">
-              <div>
-                <h2 class="text-2xl font-bold text-gray-800">{{ shelter.name }}</h2>
-                <p class="text-gray-600">{{ shelter.location }}</p>
-                <p class="text-gray-700 mt-4">{{ shelter.description }}</p>
-              </div>
-              <div class="flex justify-end mt-4">
-                <button class="px-4 py-2 text-red-600 font-medium hover:text-red-800 transition-colors">
-                  View Shelter Profile →
-                </button>
+    
+    <!-- Loading Indicator -->
+    <div v-if="loading" class="text-center py-10">
+      <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-red-600"></div>
+      <p class="mt-2 text-gray-600">Loading shelters...</p>
+    </div>
+    
+
+    <div v-else v-for="shelter in sheltersWithPets" :key="shelter.id" class="mb-16 mx-24 p-6 bg-gray-100 border border-gray-200 rounded-2xl shadow-sm">
+      <!-- Shelter Header (Redesigned) -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-md overflow-hidden mb-8">
+        <div class="flex items-center p-6">
+          <!-- Shelter Image (Left side) -->
+          <div class="mr-8">
+            <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-white shadow-lg">
+              <img 
+                v-if="shelter.profilePicture"
+                :src="'data:image/jpeg;base64,' + shelter.profilePicture" 
+                :alt="shelter.username"
+                class="w-full h-full object-cover" 
+              />
+              <div v-else class="w-full h-full bg-gray-100 flex items-center justify-center">
+                <span class="text-gray-400">No Image</span>
               </div>
             </div>
           </div>
-        </div>
-  
-        <!-- Shelter's Pets Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div v-for="pet in shelter.pets" :key="pet.id" class="mb-8">
-            <!-- Using modified version of your PetCard component -->
-            <div class="border border-gray-200 rounded-lg hover:shadow-lg transition-shadow flex flex-col justify-between relative h-full">
-              <!-- Card Header -->
-              <div class="p-4">
-                <div class="flex justify-between items-start">
-                  <div>
-                    <h3 class="text-xl font-bold">{{ pet.name || '' }}</h3>
-                    <p class="text-sm text-gray-500">{{ pet.breed || '' }}</p>
-                  </div>
-                  <span :class="`px-3 py-1 rounded-full text-sm font-semibold ${
-                    pet.status === 'AVAILABLE' 
-                      ? 'bg-green-100 text-green-800'
-                      : pet.status === 'PENDING' 
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : 'bg-red-100 text-red-800' 
-                  }`">
-                    {{ pet.status || '' }}
-                  </span>
-                </div>
+          
+          <!-- Shelter Info (Middle) -->
+          <div class="flex-1">
+            <div class="flex items-center mb-1">
+              <h2 class="text-2xl font-bold text-gray-800">{{ shelter.username }}</h2>
+              <span class="ml-3 px-3 py-0.5 text-xs font-semibold text-white bg-red-600 rounded-full">{{ shelter.shelterType }}</span>
+            </div>
+            
+            <div class="flex items-center text-gray-600 mb-3">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <span>{{ shelter.city }}, {{ shelter.county || "N/A" }}</span>
+            </div>
+            
+            <div class="flex items-center gap-4 mb-4">
+              <div class="flex items-center">
+                <span class="font-semibold mr-2">{{ shelter.pets ? shelter.pets.length : 0 }}</span>
+                <span class="text-gray-600">Pets</span>
               </div>
-  
-              <!-- Pet Image -->
-              <div class="p-4 pt-0 relative">
-                <div class="flex items-center justify-center">
-                  <img
-                    v-if="pet.photos && pet.photos.length > 0"
-                    :src="pet.photos[0]?.url"
-                    alt="Pet Photo"
-                    class="w-full h-48 object-cover rounded-lg"
-                  />
-                  <p v-else class="text-gray-500">No photo available</p>
-                </div>
-              </div>
-  
-              <!-- Pet Details -->
-              <div class="p-4 pt-0">
-                <div class="flex flex-wrap gap-2">
-                  <div class="border border-gray-300 rounded-full px-3 py-1 text-sm bg-gray-50">
-                    <span class="font-semibold">Age:</span> {{ formatAge(pet.age) }}
-                  </div>
-                  <div class="border border-gray-300 rounded-full px-3 py-1 text-sm bg-gray-50">
-                    <span class="font-semibold">Sex:</span> {{ pet.sex }}
-                  </div>
-                  <div class="border border-gray-300 rounded-full px-3 py-1 text-sm bg-gray-50">
-                    <span class="font-semibold">Size:</span> {{ pet.size }}
-                  </div>
-                  <div v-if="pet.urgentAdoptionNeeded" class="border border-red-600 rounded-full px-3 py-1 text-sm bg-red-50 text-red-600 font-bold">
-                    Urgent Adoption Needed
-                  </div>
-                </div>
-              </div>
-  
-              <!-- Adopt Button -->
-              <div class="p-4 pt-0 text-center">
-                <button class="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
-                  ADOPT NOW
-                </button>
+              <div class="flex items-center">
+                <span class="font-semibold mr-2">{{ shelter.pets ? shelter.pets.filter(pet => pet.status === 'AVAILABLE').length : 0 }}</span>
+                <span class="text-gray-600">Available</span>
               </div>
             </div>
+            
+            <div class="border-l-4 border-red-500 pl-3 italic text-gray-700">
+              {{ shelter.biography || "This Shelter doesn't have a description yet." }}
+            </div>
+            
+            <div class="flex items-center mt-4 gap-3">
+              <button class="flex items-center text-blue-600 hover:text-blue-700 font-medium">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                </svg>
+                Contact
+              </button>
+              <button class="flex items-center text-blue-600 hover:text-blue-700 font-medium">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                </svg>
+                Message Shelter
+              </button>
+              <button class="flex items-center text-blue-600 hover:text-blue-700 font-medium">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                </svg>
+                Share
+              </button>
+            </div>
+          </div>
+          
+          <!-- View Profile Button (Right side) -->
+          <div class="ml-4">
+            <router-link 
+              :to="`/shelter/${shelter.username}`"
+              class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors flex items-center">
+              View Profile
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </router-link>
           </div>
         </div>
       </div>
-  
-      <!-- No Results State -->
-      <div v-if="sheltersWithPets.length === 0" class="text-center py-20">
-        <img src="../assets/empty-state.png" alt="No Pets" class="mx-auto w-50 h-48 mb-6" />
-        <h2 class="text-2xl font-bold text-gray-800">No pets match your search</h2>
-        <p class="text-gray-600 max-w-md mx-auto">We couldn't find any pets matching your current filters. Try adjusting your filters to see more pets.</p>
-        <button 
-          @click="resetFilters" 
-          class="mt-6 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg flex items-center gap-2 mx-auto"
-        >
-          <svg 
-            class="w-4 h-4" 
-            xmlns="http://www.w3.org/2000/svg" 
-            fill="none" 
-            viewBox="0 0 24 24" 
-            stroke="currentColor"
-          >
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-          Clear All Filters
-        </button>
+
+      
+      <!-- Shelter's Pets Grid -->
+      <div v-if="shelter.pets.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-32">
+        <PetCard 
+          v-for="pet in shelter.pets" 
+          :key="pet.id" 
+          :pet="pet"
+          userType="public"
+          :favorited="isFavorited(pet.id)"
+          @favorite="toggleFavorite"
+          @adopt="adoptPet"
+        />
+      </div>
+
+      <!-- No Pets Message -->
+      <div v-else class="text-center text-gray-500 py-6">
+        <p>No pets available in this shelter.</p>
       </div>
     </div>
-  </template>
-  
-  <script>
-  import { ref, computed, onMounted } from 'vue';
-  import Navbar from "@/components/Navbar.vue";
 
-  export default {
-    name: 'AvailablePets',
-    components: {
-        Navbar, 
-    },
-    setup() {
-      const shelters = ref([]);
-      const loading = ref(true);
-      const showFilters = ref(false);
-      
-      const filters = ref({
+    <!-- No Results State -->
+    <div v-if="!loading && sheltersWithPets.length === 0" class="text-center py-20">
+      <img src="../assets/empty-state.png" alt="No Pets" class="mx-auto w-50 h-48 mb-6" />
+      <h2 class="text-2xl font-bold text-gray-800">No pets match your search</h2>
+      <p class="text-gray-600 max-w-md mx-auto">We couldn't find any pets matching your current filters. Try adjusting your filters to see more pets.</p>
+      <button 
+        @click="resetFilters" 
+        class="mt-6 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg flex items-center gap-2 mx-auto"
+      >
+        <svg 
+          class="w-4 h-4" 
+          xmlns="http://www.w3.org/2000/svg" 
+          fill="none" 
+          viewBox="0 0 24 24" 
+          stroke="currentColor"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+        Clear All Filters
+      </button>
+    </div>
+  </div>
+</template>
+
+<script>
+import { ref, computed, onMounted, reactive } from 'vue';
+import Navbar from "@/components/Navbar.vue";
+import PetCard from "@/components/PetCard.vue";
+
+export default {
+  name: 'AvailablePets',
+  components: {
+    Navbar, 
+    PetCard
+  },
+  setup() {
+    const shelters = ref([]);
+    const loading = ref(true);
+    const errorMessage = ref('');
+    const showFilters = ref(false);
+    const favorites = ref([]);
+    const sortBy = ref("");
+    const photoIndices = reactive({});
+    const storyVisibility = reactive({});
+    
+    const filters = ref({
+      name: "",
+      species: "",
+      breed: "",
+      sex: "",
+      size: "",
+      healthStatus: "",
+      vaccinated: false,
+      neutered: false,
+      urgentAdoptionNeeded: false,
+      status: "", // Default to only showing available pets
+    });
+
+    const resetFilters = () => {
+      filters.value = {
         name: "",
         species: "",
+        breed: "",
         sex: "",
         size: "",
         healthStatus: "",
-        vaccinated: "",
-        neutered: "",
-        urgentAdoptionNeeded: "",
-        status: "AVAILABLE", // Default to only showing available pets
-      });
-  
-      const resetFilters = () => {
-        filters.value = {
-          name: "",
-          species: "",
-          sex: "",
-          size: "",
-          healthStatus: "",
-          vaccinated: "",
-          neutered: "",
-          urgentAdoptionNeeded: "",
-          status: "AVAILABLE",
-        };
+        vaccinated: false,
+        neutered: false,
+        urgentAdoptionNeeded: false,
+        status: "AVAILABLE",
       };
-  
-      const isAnyFilterApplied = computed(() => {
-        return Object.values(filters.value).some(value => {
-          if (value === "AVAILABLE" && filters.value.status === "AVAILABLE") {
-            return false; // Don't count the default "AVAILABLE" status as a filter
-          }
-          return value !== "" && value !== false;
-        });
-      });
-  
-      const formatAge = (age) => {
-        if (!age && age !== 0) return 'Unknown';
-        
-        const ageInMonths = Math.round(age * 12);
-        if (ageInMonths >= 12) {
-          return `${Math.floor(age)} ${Math.floor(age) === 1 ? 'year' : 'years'}`;
-        } else {
-          return `${ageInMonths} ${ageInMonths === 1 ? 'month' : 'months'}`;
+    };
+
+    const isAnyFilterApplied = computed(() => {
+      return Object.values(filters.value).some(value => {
+        if (value === "AVAILABLE" && filters.value.status === "AVAILABLE") {
+          return false; // Don't count the default "AVAILABLE" status as a filter
         }
-      };
-  
-      // Filter pets based on criteria
-      const filterPet = (pet) => {
-        return Object.keys(filters.value).every(key => {
-          if (!filters.value[key]) return true;
-  
-          if (key === "vaccinated" && filters.value.vaccinated) {
-            return pet.vaccinated === true;
-          }
-  
-          if (key === "neutered" && filters.value.neutered) {
-            return pet.neutered === true;
-          }
-  
-          if (key === "urgentAdoptionNeeded" && filters.value.urgentAdoptionNeeded) {
-            return pet.urgentAdoptionNeeded === true;
-          }
-  
-          if (key === "name") {
-            return pet.name?.toLowerCase().includes(filters.value.name.toLowerCase());
-          }
-  
-          return pet[key]?.toString().toLowerCase() === filters.value[key].toLowerCase();
-        });
-      };
-  
-      const sheltersWithPets = computed(() => {
-        return shelters.value
-          .map(shelter => {
-            // Apply filters to each shelter's pets
-            const filteredPets = shelter.pets.filter(filterPet);
-            
-            // Return a new shelter object with only the filtered pets
-            return {
-              ...shelter,
-              pets: filteredPets
-            };
-          })
-          // Only include shelters that have pets matching the filters
-          .filter(shelter => shelter.pets.length > 0);
+        return value !== "" && value !== false;
       });
-  
-      // Load shelter and pet data
-      const loadData = async () => {
-        try {
-          // This would normally be an API call
-          shelters.value = [
-            {
-              id: 1,
-              name: "Snuggles & Whiskers Home",
-              location: "Baia Mare, Maramureș",
-              description: "We're dedicated to finding loving homes for dogs and cats of all ages and breeds. Our shelter provides temporary care and rehabilitation for abandoned and rescued animals.",
-              imageUrl: "/api/placeholder/800/400", // Replace with actual image path
-              pets: [
-                {
-                  id: 101,
-                  name: "Banjo",
-                  breed: "French Bulldog",
-                  species: "Dog",
-                  sex: "Male",
-                  age: 3,
-                  size: "Small",
-                  status: "AVAILABLE",
-                  healthStatus: "Healthy",
-                  vaccinated: true,
-                  neutered: true,
-                  urgentAdoptionNeeded: false,
-                  photos: [{ url: "/api/placeholder/400/400" }],
-                  story: "Banjo is a sweet and gentle soul who is looking for a kind, loving, and experienced home where he can thrive and feel secure."
-                },
-                {
-                  id: 102,
-                  name: "Luna",
-                  breed: "Siamese Mix",
-                  species: "Cat",
-                  sex: "Female",
-                  age: 1.5,
-                  size: "Medium",
-                  status: "AVAILABLE",
-                  healthStatus: "Healthy",
-                  vaccinated: true,
-                  neutered: true,
-                  urgentAdoptionNeeded: false,
-                  photos: [{ url: "/api/placeholder/400/400" }],
-                  story: "Luna is a playful and affectionate cat who loves to cuddle and play with toys."
-                },
-                {
-                  id: 103,
-                  name: "Max",
-                  breed: "Golden Retriever",
-                  species: "Dog",
-                  sex: "Male",
-                  age: 5,
-                  size: "Large",
-                  status: "AVAILABLE",
-                  healthStatus: "Healthy",
-                  vaccinated: true,
-                  neutered: true,
-                  urgentAdoptionNeeded: false,
-                  photos: [{ url: "/api/placeholder/400/400" }],
-                  story: "Max is a gentle giant who loves to play fetch and go for long walks."
-                },
-                {
-                  id: 104,
-                  name: "Whiskers",
-                  breed: "Tabby",
-                  species: "Cat",
-                  sex: "Male",
-                  age: 2,
-                  size: "Small",
-                  status: "AVAILABLE",
-                  healthStatus: "Healthy",
-                  vaccinated: true,
-                  neutered: false,
-                  urgentAdoptionNeeded: true,
-                  photos: [{ url: "/api/placeholder/400/400" }],
-                  story: "Whiskers was found abandoned and needs a loving home urgently."
-                }
-              ]
-            },
-            {
-              id: 2,
-              name: "Paws & Claws Rescue",
-              location: "Cluj-Napoca, Cluj",
-              description: "Our mission is to rescue, rehabilitate, and rehome abandoned and abused animals. We focus on providing medical care and finding the perfect forever homes.",
-              imageUrl: "/api/placeholder/800/400", // Replace with actual image path
-              pets: [
-                {
-                  id: 201,
-                  name: "Rocky",
-                  breed: "Pitbull Mix",
-                  species: "Dog",
-                  sex: "Male",
-                  age: 4,
-                  size: "Large",
-                  status: "AVAILABLE",
-                  healthStatus: "Healthy",
-                  vaccinated: true,
-                  neutered: true,
-                  urgentAdoptionNeeded: false,
-                  photos: [{ url: "/api/placeholder/400/400" }],
-                  story: "Rocky is a gentle soul who loves people and other dogs. He's looking for an active family."
-                },
-                {
-                  id: 202,
-                  name: "Mittens",
-                  breed: "Calico",
-                  species: "Cat",
-                  sex: "Female",
-                  age: 3,
-                  size: "Small",
-                  status: "AVAILABLE",
-                  healthStatus: "Healthy",
-                  vaccinated: true,
-                  neutered: true,
-                  urgentAdoptionNeeded: false,
-                  photos: [{ url: "/api/placeholder/400/400" }],
-                  story: "Mittens is a sweet lap cat who loves to be petted and cuddled."
-                },
-                {
-                  id: 203,
-                  name: "Buddy",
-                  breed: "Labrador Retriever",
-                  species: "Dog",
-                  sex: "Male",
-                  age: 2,
-                  size: "Large",
-                  status: "AVAILABLE",
-                  healthStatus: "Minor Issues",
-                  vaccinated: true,
-                  neutered: false,
-                  urgentAdoptionNeeded: true,
-                  photos: [{ url: "/api/placeholder/400/400" }],
-                  story: "Buddy was rescued from a bad situation and needs a patient, loving home to help him overcome his past."
-                }
-              ]
+    });
+
+    const formatAge = (age) => {
+      if (!age && age !== 0) return 'Unknown';
+      
+      const ageInMonths = Math.round(age * 12);
+      if (ageInMonths >= 12) {
+        return `${Math.floor(age)} ${Math.floor(age) === 1 ? 'year' : 'years'}`;
+      } else {
+        return `${ageInMonths} ${ageInMonths === 1 ? 'month' : 'months'}`;
+      }
+    };
+
+    // Filter pets based on criteria
+    const filterPet = (pet) => {
+      if (!pet) return false;
+      
+      return Object.keys(filters.value).every(key => {
+        if (!filters.value[key]) return true;
+
+        if (key === "vaccinated" && filters.value.vaccinated) {
+          return pet.vaccinated === true;
+        }
+
+        if (key === "neutered" && filters.value.neutered) {
+          return pet.neutered === true;
+        }
+
+        if (key === "urgentAdoptionNeeded" && filters.value.urgentAdoptionNeeded) {
+          return pet.urgentAdoptionNeeded === true;
+        }
+
+        if (key === "name") {
+          return (pet.name || "").toLowerCase().includes(filters.value.name.toLowerCase());
+        }
+
+        if (key === "breed" && filters.value.breed) {
+          return (pet.breed || "").toLowerCase() === filters.value.breed.toLowerCase();
+        }
+
+        if (key === "species" && filters.value.species) {
+          // Infer species from breed if not directly available
+          if (!pet.species) {
+            const breed = pet.breed ? pet.breed.toLowerCase() : "";
+            if (breed.includes("retriever") || breed.includes("shepherd")) {
+              return filters.value.species.toLowerCase() === "dog";
             }
-          ];
-        } catch (error) {
-          console.error("Error loading data:", error);
-        } finally {
-          loading.value = false;
+            if (breed.includes("siamese") || breed.includes("tabby")) {
+              return filters.value.species.toLowerCase() === "cat";
+            }
+            return false;
+          }
+          return pet.species.toLowerCase() === filters.value.species.toLowerCase();
         }
-      };
-  
-      onMounted(loadData);
-  
-      return {
-        shelters,
-        sheltersWithPets,
-        loading,
-        filters,
-        showFilters,
-        resetFilters,
-        isAnyFilterApplied,
-        formatAge
-      };
-    }
-  };
-  </script>
-  
-  <style scoped>
-  .filter-input {
-    @apply border border-gray-300 px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition;
+
+        if (pet[key] === undefined) return false;
+        return pet[key].toString().toLowerCase() === filters.value[key].toLowerCase();
+      });
+    };
+
+    // Apply sorting to filtered pets
+    const sortPets = (pets) => {
+      if (!sortBy.value) return pets;
+      
+      return [...pets].sort((a, b) => {
+        if (sortBy.value === 'name') {
+          return (a.name || "").localeCompare(b.name || "");
+        } else if (sortBy.value === 'age') {
+          return (a.age || 0) - (b.age || 0);
+        } else if (sortBy.value === 'timeSpentInShelter') {
+          return (a.timeSpentInShelter || 0) - (b.timeSpentInShelter || 0);
+        }
+        return 0;
+      });
+    };
+
+    // Improved sheltersWithPets computed property
+    const sheltersWithPets = computed(() => {
+      return shelters.value
+        .map(shelter => {
+          // Filter the pets based on all criteria
+          const filteredPets = (shelter.pets || [])
+            .filter(pet => filterPet(pet))
+            .map(pet => ({
+              // Add missing fields with default values if they don't exist
+              ...pet,
+              species: pet.species || (pet.breed?.toLowerCase().includes('retriever') || pet.breed?.toLowerCase().includes('shepherd') ? 'Dog' : 'Unknown'),
+              sex: pet.sex || 'Unknown',
+              size: pet.size || 'Medium',
+              status: pet.status || 'AVAILABLE',
+              name: pet.name || pet.breed || 'Unnamed Pet',
+              story: pet.story || `I'm a ${pet.breed || 'lovely pet'} looking for a forever home!`,
+              photos: pet.photos || [],
+              timeSpentInShelter: pet.timeSpentInShelter || 0,
+            }));
+          
+          // Apply sorting if needed
+          const sortedPets = sortPets(filteredPets);
+          
+          return {
+            ...shelter,
+            pets: sortedPets
+          };
+        })
+        .filter(shelter => shelter.pets.length > 0); // Only show shelters with matching pets
+    });
+
+    // Breed options based on selected species
+    const breedOptions = computed(() => {
+      if (!filters.value.species) return [];
+      
+      // Infer species from breed if species is not directly available in data
+      const breedsBySpecies = shelters.value
+        .flatMap(shelter => shelter.pets || [])
+        .filter(pet => {
+          if (!pet) return false;
+          if (pet.species) return pet.species === filters.value.species;
+          
+          // Infer species from breed name
+          const breed = pet.breed ? pet.breed.toLowerCase() : "";
+          if (filters.value.species.toLowerCase() === "dog") {
+            return breed.includes("retriever") || breed.includes("shepherd") || breed.includes("terrier");
+          }
+          if (filters.value.species.toLowerCase() === "cat") {
+            return breed.includes("siamese") || breed.includes("tabby") || breed.includes("persian");
+          }
+          return false;
+        })
+        .map(pet => pet.breed);
+      
+      return [...new Set(breedsBySpecies)].filter(Boolean);
+    });
+
+    // Photo carousel navigation
+    const getPetPhotoIndex = (petId) => {
+      return photoIndices[petId] || 0;
+    };
+
+    const prevImage = (pet) => {
+      if (!pet.photos || pet.photos.length <= 1) return;
+      const currentIndex = photoIndices[pet.id] || 0;
+      photoIndices[pet.id] = (currentIndex - 1 + pet.photos.length) % pet.photos.length;
+    };
+
+    const nextImage = (pet) => {
+      if (!pet.photos || pet.photos.length <= 1) return;
+      const currentIndex = photoIndices[pet.id] || 0;
+      photoIndices[pet.id] = (currentIndex + 1) % pet.photos.length;
+    };
+
+    // Story visibility functions
+    const showStory = (petId) => {
+      storyVisibility[petId] = true;
+    };
+
+    const hideStory = (petId) => {
+      storyVisibility[petId] = false;
+    };
+
+    // Favorites functionality
+    const toggleFavorite = (petId) => {
+      const index = favorites.value.indexOf(petId);
+      
+      if (index === -1) {
+        favorites.value.push(petId);
+        // Save to localStorage
+        localStorage.setItem('favoritePets', JSON.stringify(favorites.value));
+      } else {
+        favorites.value.splice(index, 1);
+        localStorage.setItem('favoritePets', JSON.stringify(favorites.value));
+      }
+    };
+
+    const isFavorited = (petId) => {
+      return favorites.value.includes(petId);
+    };
+
+    // Adoption functionality
+    const adoptPet = (petId) => {
+      // Find the pet to get its name
+      let petName = "this pet";
+      let foundPet = null;
+      
+      shelters.value.forEach(shelter => {
+        if (!shelter.pets) return;
+        const pet = shelter.pets.find(pet => pet && pet.id === petId);
+        if (pet) {
+          foundPet = pet;
+          petName = pet.name || pet.breed || "this pet";
+        }
+      });
+      
+      // Navigate to adoption form or start adoption process
+      alert(`Starting adoption process for ${petName}!`);
+      // In a real app, you might change the pet's status to PENDING
+      // or navigate to an adoption form page
+    };
+
+    const loadData = async () => {
+      try {
+        loading.value = true;
+        errorMessage.value = '';
+        
+        // Fetch shelters from backend
+        const response = await fetch("http://localhost:8080/users/shelters");
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch shelters: ${response.status} ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        shelters.value = data;
+
+        // Initialize photo indices and story visibility for each pet
+        shelters.value.forEach(shelter => {
+          if (shelter.pets) {
+            shelter.pets.forEach(pet => {
+              if (!pet) return;
+              
+              photoIndices[pet.id] = 0;
+              storyVisibility[pet.id] = false;
+              
+              // Make sure each pet has the minimum required fields
+              pet.photos = pet.photos || [];
+              pet.story = pet.story || "";
+              pet.status = pet.status || "AVAILABLE";
+            });
+          }
+        });
+
+        // Load favorites from localStorage
+        const savedFavorites = localStorage.getItem('favoritePets');
+        if (savedFavorites) {
+          favorites.value = JSON.parse(savedFavorites);
+        }
+
+      } catch (error) {
+        console.error("Error loading data:", error);
+        // Add user-visible error state
+        errorMessage.value = "Could not load shelter data. Please try again later.";
+      } finally {
+        loading.value = false;
+      }
+    };
+
+    onMounted(() => {
+      loadData();
+      
+      // Load favorites from localStorage
+      const savedFavorites = localStorage.getItem('favoritePets');
+      if (savedFavorites) {
+        try {
+          favorites.value = JSON.parse(savedFavorites);
+        } catch (error) {
+          console.error('Error loading favorites from localStorage:', error);
+          favorites.value = [];
+        }
+      }
+    });
+
+    return {
+      shelters,
+      sheltersWithPets,
+      loading,
+      errorMessage,
+      filters,
+      showFilters,
+      resetFilters,
+      isAnyFilterApplied,
+      formatAge,
+      breedOptions,
+      prevImage,
+      nextImage,
+      getPetPhotoIndex,
+      showStory,
+      hideStory,
+      storyVisibility,
+      toggleFavorite,
+      isFavorited,
+      adoptPet,
+      sortBy
+    };
   }
-  
-  .filter-input:focus {
-    border-color: #5973A8; 
-    box-shadow: 0 0 5px rgba(89, 115, 168, 0.5);
-  }
-  </style>
+};
+</script>
+
+<style scoped>
+.filter-input {
+  @apply border border-gray-300 px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition;
+}
+
+.filter-input:focus {
+  border-color: #5973A8; 
+  box-shadow: 0 0 5px rgba(89, 115, 168, 0.5);
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.3s ease-in-out;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
+</style>

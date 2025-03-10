@@ -143,6 +143,7 @@ export default {
         localStorage.setItem("token", data.token);
         localStorage.setItem("Id", data.id); 
         localStorage.setItem("Username", data.username);
+        localStorage.setItem("Role", data.role);
 
         if (data.role === "SHELTER") {
           localStorage.setItem("shelterUsername", data.username);

@@ -11,6 +11,7 @@ import ManagePets from '@/components/ManagePets.vue';
 import PetStatsChartVue from '@/components/PetStatsChart.vue';
 import EditShelterProfileVue from '@/pages/EditShelterProfile.vue';
 import AvailablePetsPage from '@/pages/AvailablePetsPage.vue';
+import ShelterProfilePage from '@/pages/ShelterProfilePage.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -50,6 +51,12 @@ const router = createRouter({
       path: '/available-pets',
       name: 'AvailablePetsPage',
       component: AvailablePetsPage, 
+      // meta: { requiresAuth: true },
+    },
+    {
+      path: '/shelter/:username',
+      name: 'ShelterProfilePage',
+      component: ShelterProfilePage, 
       // meta: { requiresAuth: true },
     },
     {
