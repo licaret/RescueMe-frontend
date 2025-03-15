@@ -83,7 +83,7 @@
               </div>
               <div>
                 <p class="text-gray-800 font-medium">Email</p>
-                <p class="text-gray-600">rescueme@yahoo.com</p>
+                <p class="text-gray-600">rescueme.care@gmail.com</p>
               </div>
             </div>
             
@@ -156,14 +156,17 @@
         </div>
       </div>
     </div>
+    <Footer></Footer>
   </template>
   
   <script>
   import IntroNavbar from '@/components/IntroNavbar.vue';
+  import Footer from '@/components/Footer.vue';
 
   export default {
     components: {
-        IntroNavbar
+        IntroNavbar,
+        Footer
     },
     data() {
       return {

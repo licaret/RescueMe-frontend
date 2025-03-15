@@ -7,6 +7,7 @@ import ShelterDashboardPage from '@/pages/ShelterDashboardPage.vue';
 import RequestResetPasswordPage from '@/pages/RequestResetPasswordPage.vue';
 import ResetPasswordPage from '@/pages/ResetPasswordPage.vue';
 import ContactUsPage from '@/pages/ContactUsPage.vue';
+import AboutUsPage from '@/pages/AboutUsPage.vue';
 import ManagePets from '@/components/ManagePets.vue';
 import PetStatsChartVue from '@/components/PetStatsChart.vue';
 import EditShelterProfileVue from '@/pages/EditShelterProfile.vue';
@@ -83,6 +84,12 @@ const router = createRouter({
       path: '/contact',
       name: 'ContactUsPage',
       component: ContactUsPage, 
+      // meta: { requiresAuth: true },
+    },
+    {
+      path: '/about-us',
+      name: 'AboutUsPage',
+      component: AboutUsPage, 
       // meta: { requiresAuth: true },
     },
   ],
