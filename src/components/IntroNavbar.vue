@@ -1,7 +1,7 @@
 <template>
   <nav class="bg-white border-gray-200 dark:bg-gray-900">
     <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-8">
-      <a href="#" class="flex items-center">
+      <a @click="navigateToLandingPage" style="cursor: pointer;" class="flex items-center">
         <span class="self-center text-2xl font-medium whitespace-nowrap">
           <span class="text-gray-700 ">RESCUE</span>
           <span class="text-red-600 font-bold">ME</span>
@@ -19,7 +19,7 @@
             <a @click="navigateToContact" style="cursor: pointer;" class="block py-4 px-6 text-gray-800 text-lg rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-red-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">CONTACT</a>
           </li>
           <li>
-            <a @click="navigateToLogin" style="cursor: pointer;" class="block py-4 px-6 text-red-600 text-lg rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-red-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">LOGIN</a>
+            <a @click="navigateToLogin" style="cursor: pointer;" class="block py-4 px-6 text-gray-800 text-lg rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-red-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">LOGIN</a>
           </li>
         </ul>
       </div>
@@ -30,6 +30,9 @@
 <script>
 export default{
   methods: {
+    navigateToLandingPage(){
+      this.$router.push("/");
+    },
     navigateToLogin(){
       this.$router.push("/login");
     },

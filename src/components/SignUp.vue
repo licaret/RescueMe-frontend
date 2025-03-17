@@ -1,5 +1,23 @@
 <template>
   <section class="bg-white dark:bg-gray-900">
+    <div 
+      v-if="showSuccessToast" 
+      class="fixed top-20 right-4 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded shadow-md flex items-center transition-all duration-300 ease-in-out z-50"
+    >
+      <div class="flex-shrink-0 mr-2">
+        <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+        </svg>
+      </div>
+      <div>
+        {{ successMessage }}
+      </div>
+      <button @click="showSuccessToast = false" class="ml-4 text-gray-500 hover:text-gray-800">
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
     <div class="min-h-screen flex flex-col items-center px-6 py-8 pb-16 mx-auto lg:py-0 lg:pb-16">
       <div class="w-full pt-8">
         <div class="flex justify-center space-x-4 mb-6">
@@ -371,7 +389,10 @@ export default {
         'Veterinary Clinic with Shelter',
         'Specialized Shelter (specific breeds/species)',
         'Emergency/Temporary Shelter'
-      ]
+      ],
+      showSuccessToast: false,
+      successMessage: "",
+      toastTimeout: null,
     };
   },
 
@@ -434,7 +455,7 @@ export default {
       this.selectedCity = ""; 
       const selectedCountyObj = this.counties.find(county => county.auto === this.selectedCounty);
       if (selectedCountyObj) {
-        this.selectedCountyName = selectedCountyObj.nume;  // Setează numele complet al județului
+        this.selectedCountyName = selectedCountyObj.nume;  
         this.cities = selectedCountyObj.localitati.map(loc => loc.nume);
       } else {
         this.selectedCountyName = "";
@@ -442,6 +463,18 @@ export default {
       }
     },
 
+    showToast(message) {
+      if (this.toastTimeout) {
+        clearTimeout(this.toastTimeout);
+      }
+      
+      this.successMessage = message;
+      this.showSuccessToast = true;
+      
+      this.toastTimeout = setTimeout(() => {
+        this.showSuccessToast = false;
+      }, 3000);
+    },
 
     async handleSubmit() {
       this.emailError = false;
@@ -479,7 +512,10 @@ export default {
             phoneNumber: this.formData.phoneNumber,
             password: this.formData.password,
           });
-            this.$router.push('/home');
+            this.showToast("Account created successfully! Redirecting to login...");
+            setTimeout(() => {
+              this.$router.push('/login');
+            }, 3000);
         } else {
           const response = await registerShelter({
             username: this.formData.username,
@@ -490,15 +526,17 @@ export default {
             city: this.selectedCity,
             shelterType: this.selectedShelterType,
           });
-            this.$router.push('/shelter-dashboard'); 
+          this.showToast("Account created successfully! Redirecting to login...");
+          setTimeout(() => {
+            this.$router.push('/login');
+          }, 3000);
         }
       } catch (error) {
         console.error('Submit error:', error);
         this.errorMessageEmail = "An unexpected error occurred. Please try again later.";
       }
-    }
-
     },
+    }
 };
 </script>
 
