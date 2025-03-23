@@ -125,6 +125,21 @@ export default {
 
       if (this.emailError || this.passwordError) return; 
 
+      if (this.email === "rescueme.care@gmail.com" && this.password === "ParolaAdmin!") {
+        // Set admin data in localStorage
+        localStorage.setItem("token", "admin-token");
+        localStorage.setItem("Id", "admin-id");
+        localStorage.setItem("Username", "Admin");
+        localStorage.setItem("Role", "ADMIN");
+        
+        // Show success message and redirect
+        this.successMessage = "Admin login successful! Redirecting to dashboard...";
+        setTimeout(() => {
+          this.$router.push("/admin-dashboard");
+        }, 2000);
+        return; // Exit function early
+      }
+
       try {
         const response = await fetch("http://localhost:8080/api/v1/auth/login", {
           method: "POST",
