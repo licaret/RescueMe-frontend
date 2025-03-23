@@ -1,0 +1,1379 @@
+<template>
+  <div class="bg-white min-h-screen py-10">
+    <div class="max-w-4xl mx-auto px-4">
+      <!-- Toast notification -->
+      <div 
+        v-if="isToastVisible && successMessage" 
+        class="fixed top-20 right-4 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded shadow-md flex items-center transition-all duration-300 ease-in-out z-50"
+      >
+        <div class="flex-shrink-0 mr-2">
+          <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+          </svg>
+        </div>
+        <div>
+          {{ successMessage }}
+        </div>
+        <button @click="isToastVisible = false" class="ml-4 text-gray-500 hover:text-gray-800">
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Error toast notification -->
+      <div 
+        v-if="isToastVisible && errorMessage" 
+        class="fixed top-20 right-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded shadow-md flex items-center transition-all duration-300 ease-in-out z-50"
+      >
+        <div class="flex-shrink-0 mr-2">
+          <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+          </svg>
+        </div>
+        <div>
+          {{ errorMessage }}
+        </div>
+        <button @click="isToastVisible = false" class="ml-4 text-gray-500 hover:text-gray-800">
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Success view (displayed after successful submission) -->
+      <div v-if="profileSubmitted" class="text-center mt-10">
+        <div class="p-10 bg-white rounded-lg shadow-md">
+          <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-6">
+            <svg class="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <h1 class="text-2xl font-bold text-gray-800 mb-4">Profile Submitted Successfully!</h1>
+          <p class="text-gray-600 mb-6">
+            Thank you for completing your shelter profile. Your information has been submitted for administrator review.
+            You'll receive an email once your account is approved. Our team will try to review your application within 24 hours.
+          </p>
+          
+          <!-- Status indicator -->
+          <div class="bg-blue-50 border-l-4 border-blue-500 text-blue-700 p-4 rounded-lg mb-8 inline-block">
+            <div class="flex items-center">
+              <div class="flex-shrink-0 mr-2">
+                <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              <div>
+                <span class="font-medium">Current status: </span>
+                <span class="font-bold">Pending Approval</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Next steps section -->
+          <div class="bg-gray-50 p-6 rounded-lg mb-8">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4">What happens next?</h2>
+            <div class="flex flex-col md:flex-row justify-between gap-4">
+              <div class="flex-1 p-4 bg-white rounded shadow-sm">
+                <div class="flex items-center mb-3">
+                  <div class="bg-blue-100 rounded-full h-8 w-8 flex items-center justify-center mr-3">
+                    <span class="text-blue-600 font-bold">1</span>
+                  </div>
+                  <h3 class="font-medium">Admin Review</h3>
+                </div>
+                <p class="text-gray-600 text-sm">Our team will review your shelter profile within 24 hours</p>
+              </div>
+              <div class="flex-1 p-4 bg-white rounded shadow-sm">
+                <div class="flex items-center mb-3">
+                  <div class="bg-blue-100 rounded-full h-8 w-8 flex items-center justify-center mr-3">
+                    <span class="text-blue-600 font-bold">2</span>
+                  </div>
+                  <h3 class="font-medium">Email Notification</h3>
+                </div>
+                <p class="text-gray-600 text-sm">You'll receive an email when your account is approved</p>
+              </div>
+              <div class="flex-1 p-4 bg-white rounded shadow-sm">
+                <div class="flex items-center mb-3">
+                  <div class="bg-blue-100 rounded-full h-8 w-8 flex items-center justify-center mr-3">
+                    <span class="text-blue-600 font-bold">3</span>
+                  </div>
+                  <h3 class="font-medium">Start Using RescueMe</h3>
+                </div>
+                <p class="text-gray-600 text-sm">Once approved, you can log in and start managing your shelter profile</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Email reminder with corrected mailto link -->
+          <p class="text-gray-600 mb-6">
+            If you have any questions or issues, please contact us at 
+            <a href="mailto:rescueme.care@gmail.com?subject=Account%20Approval%20Request" class="text-blue-600 hover:underline">rescueme.care@gmail.com</a>
+          </p>
+          
+          <!-- Return to home button -->
+          <button @click="goBack"  class="inline-block px-6 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors">
+            Return to Home
+          </button>
+        </div>
+      </div>
+
+      <!-- Form view (hidden after submission) -->
+      <div v-else>
+        <!-- Status banner -->
+        <div class="bg-blue-50 border-l-4 border-blue-500 text-blue-700 p-4 rounded-lg mb-8">
+          <div class="flex items-start">
+            <div class="flex-shrink-0 mt-0.5">
+              <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9a1 1 0 00-1-1z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium">Your account status: <span class="font-bold">{{ getStatusText() }}</span></h3>
+              <div class="mt-2 text-sm">
+                <p>Complete your shelter profile to expedite the approval process. An administrator will review the information you provide and approve your account as soon as possible.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-center mb-8">
+          <h1 class="text-2xl font-bold text-gray-800 mb-2">Complete Your Shelter Profile</h1>
+          <p class="text-gray-600">Please provide additional information about your shelter to help with the approval process and to assist potential adopters.</p>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6 mb-8">
+          <h2 class="text-xl font-bold mb-6">Profile Picture</h2>
+          
+          <div class="flex items-start mb-8">
+            <div class="mr-6">
+              <img 
+                :src="profilePictureUrl || blankProfilePicture" 
+                alt="Profile picture" 
+                class="w-24 h-24 rounded-full object-cover border"
+              />
+            </div>
+            <div class="flex flex-col space-y-2">
+              <p class="text-sm text-gray-600 mb-2">Upload a profile picture for your shelter. This will be visible to potential adopters.</p>
+              <div class="flex space-x-4">
+                <input type="file" @change="handleProfilePictureUpload" class="hidden" ref="fileInput" accept="image/*">
+                <button 
+                  @click="$refs.fileInput.click()"
+                  class="bg-blue-600 text-white px-4 py-2 rounded text-sm flex items-center"
+                  :disabled="isUploadingProfilePicture"
+                >
+                  <span v-if="isUploadingProfilePicture" class="flex items-center">
+                    <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Uploading...
+                  </span>
+                  <span v-else class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    </svg>
+                    Upload Image
+                  </span>
+                </button>
+                <button 
+                  @click="removeProfilePicture"
+                  class="text-gray-600 text-sm border border-gray-300 px-4 py-1.5 rounded hover:text-gray-800"
+                  :disabled="!profilePictureUrl || isDeletingProfilePicture"
+                >
+                  <span v-if="isDeletingProfilePicture">Removing...</span>
+                  <span v-else>Remove</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Account Information -->
+        <div class="bg-white rounded-lg shadow p-6 mb-8">
+          <h2 class="text-xl font-bold mb-6">Account Information</h2>
+          <p class="text-gray-500 text-sm mb-4">This information was transferred from your registration page. You can review and update if necessary.</p>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div>
+              <label class="block text-sm font-medium mb-1">
+                Username <span class="text-red-500">*</span>
+              </label>
+              <input 
+                v-model="shelterData.username"
+                @input="validateUsername"
+                type="text"
+                class="w-full border rounded p-2"
+                placeholder="Your shelter's username"
+                required
+              />
+              <p v-if="errors.username" class="text-red-500 text-sm mt-1">{{ errors.username }}</p>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium mb-1">
+                Email Address <span class="text-red-500">*</span>
+              </label>
+              <input 
+                v-model="shelterData.email"
+                @input="validateEmail"
+                type="email"
+                class="w-full border rounded p-2"
+                placeholder="email@example.com"
+                required
+              />
+              <p v-if="errors.email" class="text-red-500 text-sm mt-1">{{ errors.email }}</p>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium mb-1">
+                Phone Number <span class="text-red-500">*</span>
+              </label>
+              <input 
+                v-model="shelterData.phoneNumber"
+                type="tel"
+                class="w-full border rounded p-2"
+                placeholder="+40 xxx xxx xxx"
+                required
+              />
+              <p v-if="errors.phoneNumber" class="text-red-500 text-sm mt-1">{{ errors.phoneNumber }}</p>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium mb-1">
+                Shelter Type <span class="text-red-500">*</span>
+              </label>
+              <select 
+                v-model="shelterData.shelterType" 
+                class="w-full border rounded p-2"
+                required
+              >
+                <option value="">Select Shelter Type</option>
+                <option v-for="type in shelterTypes" :key="type" :value="type">
+                  {{ type }}
+                </option>
+              </select>
+              <p v-if="errors.shelterType" class="text-red-500 text-sm mt-1">{{ errors.shelterType }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6 mb-8">
+          <h2 class="text-xl font-bold mb-6">Shelter Details</h2>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div>
+              <label class="block text-sm font-medium mb-1">
+                County <span class="text-red-500">*</span>
+              </label>
+              <select 
+                v-model="shelterData.county" 
+                @change="handleCountyChange"
+                class="w-full border rounded p-2"
+                required
+              >
+                <option value="">Select County</option>
+                <option v-for="county in counties" :key="county.auto" :value="county.auto">
+                  {{ county.nume }}
+                </option>
+              </select>
+              <p v-if="errors.county" class="text-red-500 text-sm mt-1">{{ errors.county }}</p>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium mb-1">
+                City <span class="text-red-500">*</span>
+              </label>
+              <select 
+                v-model="shelterData.city" 
+                class="w-full border rounded p-2"
+                :disabled="!shelterData.county"
+                required
+              >
+                <option value="">Select City</option>
+                <option v-for="city in cities" :key="city">
+                  {{ city }}
+                </option>
+              </select>
+              <p v-if="errors.city" class="text-red-500 text-sm mt-1">{{ errors.city }}</p>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div>
+              <label class="block text-sm font-medium mb-1">
+                Full Address <span class="text-red-500">*</span>
+              </label>
+              <input 
+                v-model="shelterData.fullAddress"
+                type="text"
+                class="w-full border rounded p-2"
+                placeholder="Street, Building No., Apartment, etc."
+                required
+              />
+              <p v-if="errors.fullAddress" class="text-red-500 text-sm mt-1">{{ errors.fullAddress }}</p>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium mb-1">
+                ZIP/Postal Code <span class="text-red-500">*</span>
+              </label>
+              <input 
+                v-model="shelterData.zipCode"
+                type="text"
+                class="w-full border rounded p-2"
+                placeholder="e.g., 307220"
+                required
+              />
+              <p v-if="errors.zipCode" class="text-red-500 text-sm mt-1">{{ errors.zipCode }}</p>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium mb-1">
+                Year Founded <span class="text-red-500">*</span>
+              </label>
+              <input 
+                v-model="shelterData.yearFounded"
+                type="number"
+                class="w-full border rounded p-2"
+                placeholder="e.g., 2010"
+                min="1970"
+                :max="new Date().getFullYear()"
+                required
+              />
+              <p v-if="errors.yearFounded" class="text-red-500 text-sm mt-1">{{ errors.yearFounded }}</p>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium mb-1">
+                Hours of Operation <span class="text-red-500">*</span>
+              </label>
+              <input 
+                v-model="shelterData.hoursOfOperation"
+                type="text"
+                class="w-full border rounded p-2"
+                placeholder="e.g., Mon-Fri: 9AM-5PM, Sat: 10AM-2PM"
+                required
+              />
+              <p v-if="errors.hoursOfOperation" class="text-red-500 text-sm mt-1">{{ errors.hoursOfOperation }}</p>
+            </div>
+          </div>
+          
+          <div class="mb-6">
+            <label class="block text-sm font-medium mb-1">
+              Our Mission <span class="text-red-500">*</span>
+            </label>
+            <textarea 
+              v-model="shelterData.mission"
+              placeholder="Describe your shelter's mission and goals..." 
+              rows="5"
+              class="w-full border rounded p-2"
+              required
+            ></textarea>
+            <p v-if="errors.mission" class="text-red-500 text-sm mt-1">{{ errors.mission }}</p>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6 mb-8">
+          <h2 class="text-xl font-bold mb-4">Required Documents</h2>
+          <p class="text-gray-600 mb-6">Please upload the following documents to verify your shelter. These are required for administrator approval.</p>
+          
+          <div class="space-y-6">
+            <!-- Tax Certificate -->
+            <div class="border-b pb-4">
+              <div class="flex items-start mb-2">
+                <div class="flex-1">
+                  <h3 class="font-medium">Tax Registration Certificate (CUI) <span class="text-red-500">*</span></h3>
+                  <p class="text-sm text-gray-500">To prove the legal existence of your shelter</p>
+                </div>
+                <div class="flex items-center">
+                  <input 
+                    type="file" 
+                    @change="handleDocumentUpload('taxCertificate', $event)" 
+                    class="hidden" 
+                    ref="taxCertificateInput" 
+                    accept=".pdf,.jpg,.jpeg,.png"
+                  >
+                  <button 
+                    @click="$refs.taxCertificateInput.click()"
+                    class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded text-sm flex items-center"
+                    :disabled="isUploading.taxCertificate"
+                  >
+                    <span v-if="isUploading.taxCertificate" class="flex items-center">
+                      <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Uploading...
+                    </span>
+                    <span v-else>Upload</span>
+                  </button>
+                </div>
+              </div>
+              
+              <!-- Document uploaded indicator with preview and delete options -->
+              <div v-if="documentStatus.taxCertificate" class="mt-2 bg-green-50 p-3 rounded-md">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center text-sm text-green-600">
+                    <svg class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    </svg>
+                    <span>Document uploaded successfully</span>
+                  </div>
+                  <div class="flex space-x-2">
+                    <a 
+                      :href="getDocumentUrl(getCurrentShelterId(), 'taxCertificate')" 
+                      target="_blank" 
+                      class="text-blue-600 hover:text-blue-800 text-xs font-medium px-2 py-1 bg-blue-50 rounded"
+                    >
+                      View
+                    </a>
+                    <button 
+                      @click="handleDocumentDelete('taxCertificate')"
+                      class="text-red-600 hover:text-red-800 text-xs font-medium px-2 py-1 bg-red-50 rounded"
+                      :disabled="isDeleting.taxCertificate"
+                    >
+                      <span v-if="isDeleting.taxCertificate">Deleting...</span>
+                      <span v-else>Delete</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              <p v-if="errors.taxCertificate" class="text-red-500 text-sm mt-1">{{ errors.taxCertificate }}</p>
+            </div>
+            
+            <!-- Veterinary Authorization -->
+            <div class="border-b pb-4">
+              <div class="flex items-start mb-2">
+                <div class="flex-1">
+                  <h3 class="font-medium">Veterinary Sanitary Authorization <span class="text-red-500">*</span></h3>
+                  <p class="text-sm text-gray-500">Issued by DSVSA to ensure your shelter operates legally</p>
+                </div>
+                <div class="flex items-center">
+                  <input 
+                    type="file" 
+                    @change="handleDocumentUpload('vetAuthorization', $event)" 
+                    class="hidden" 
+                    ref="vetAuthorizationInput" 
+                    accept=".pdf,.jpg,.jpeg,.png"
+                  >
+                  <button 
+                    @click="$refs.vetAuthorizationInput.click()"
+                    class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded text-sm flex items-center"
+                    :disabled="isUploading.vetAuthorization"
+                  >
+                    <span v-if="isUploading.vetAuthorization" class="flex items-center">
+                      <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Uploading...
+                    </span>
+                    <span v-else>Upload</span>
+                  </button>
+                </div>
+              </div>
+              
+              <!-- Document uploaded indicator with preview and delete options -->
+              <div v-if="documentStatus.vetAuthorization" class="mt-2 bg-green-50 p-3 rounded-md">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center text-sm text-green-600">
+                    <svg class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    </svg>
+                    <span>Document uploaded successfully</span>
+                  </div>
+                  <div class="flex space-x-2">
+                    <a 
+                      :href="getDocumentUrl(getCurrentShelterId(), 'vetAuthorization')" 
+                      target="_blank" 
+                      class="text-blue-600 hover:text-blue-800 text-xs font-medium px-2 py-1 bg-blue-50 rounded"
+                    >
+                      View
+                    </a>
+                    <button 
+                      @click="handleDocumentDelete('vetAuthorization')"
+                      class="text-red-600 hover:text-red-800 text-xs font-medium px-2 py-1 bg-red-50 rounded"
+                      :disabled="isDeleting.vetAuthorization"
+                    >
+                      <span v-if="isDeleting.vetAuthorization">Deleting...</span>
+                      <span v-else>Delete</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              <p v-if="errors.vetAuthorization" class="text-red-500 text-sm mt-1">{{ errors.vetAuthorization }}</p>
+            </div>
+            
+            <!-- Veterinarian Contract -->
+            <div class="border-b pb-4">
+              <div class="flex items-start mb-2">
+                <div class="flex-1">
+                  <h3 class="font-medium">Veterinarian Collaboration Contract <span class="text-red-500">*</span></h3>
+                  <p class="text-sm text-gray-500">To confirm animals receive adequate care</p>
+                </div>
+                <div class="flex items-center">
+                  <input 
+                    type="file" 
+                    @change="handleDocumentUpload('vetContract', $event)" 
+                    class="hidden" 
+                    ref="vetContractInput" 
+                    accept=".pdf,.jpg,.jpeg,.png"
+                  >
+                  <button 
+                    @click="$refs.vetContractInput.click()"
+                    class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded text-sm flex items-center"
+                    :disabled="isUploading.vetContract"
+                  >
+                    <span v-if="isUploading.vetContract" class="flex items-center">
+                      <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Uploading...
+                    </span>
+                    <span v-else>Upload</span>
+                  </button>
+                </div>
+              </div>
+              
+              <!-- Document uploaded indicator with preview and delete options -->
+              <div v-if="documentStatus.vetContract" class="mt-2 bg-green-50 p-3 rounded-md">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center text-sm text-green-600">
+                    <svg class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    </svg>
+                    <span>Document uploaded successfully</span>
+                  </div>
+                  <div class="flex space-x-2">
+                    <a 
+                      :href="getDocumentUrl(getCurrentShelterId(), 'vetContract')" 
+                      target="_blank"
+                      class="text-blue-600 hover:text-blue-800 text-xs font-medium px-2 py-1 bg-blue-50 rounded"
+                    >
+                      View
+                    </a>
+                    <button 
+                      @click="handleDocumentDelete('vetContract')"
+                      class="text-red-600 hover:text-red-800 text-xs font-medium px-2 py-1 bg-red-50 rounded"
+                      :disabled="isDeleting.vetContract"
+                    >
+                      <span v-if="isDeleting.vetContract">Deleting...</span>
+                      <span v-else>Delete</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              <p v-if="errors.vetContract" class="text-red-500 text-sm mt-1">{{ errors.vetContract }}</p>
+            </div>
+            
+            <!-- ID Card -->
+            <div>
+              <div class="flex items-start mb-2">
+                <div class="flex-1">
+                  <h3 class="font-medium">ID Card of Legal Representative <span class="text-red-500">*</span></h3>
+                  <p class="text-sm text-gray-500">For verification of the person registering the shelter</p>
+                </div>
+                <div class="flex items-center">
+                  <input 
+                    type="file" 
+                    @change="handleDocumentUpload('idCard', $event)" 
+                    class="hidden" 
+                    ref="idCardInput" 
+                    accept=".pdf,.jpg,.jpeg,.png"
+                  >
+                  <button 
+                    @click="$refs.idCardInput.click()"
+                    class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded text-sm flex items-center"
+                    :disabled="isUploading.idCard"
+                  >
+                    <span v-if="isUploading.idCard" class="flex items-center">
+                      <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Uploading...
+                    </span>
+                    <span v-else>Upload</span>
+                  </button>
+                </div>
+              </div>
+              
+              <!-- Document uploaded indicator with preview and delete options -->
+              <div v-if="documentStatus.idCard" class="mt-2 bg-green-50 p-3 rounded-md">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center text-sm text-green-600">
+                    <svg class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    </svg>
+                    <span>Document uploaded successfully</span>
+                  </div>
+                  <div class="flex space-x-2">
+                    <a 
+                      :href="getDocumentUrl(getCurrentShelterId(), 'idCard')" 
+                      target="_blank" 
+                      class="text-blue-600 hover:text-blue-800 text-xs font-medium px-2 py-1 bg-blue-50 rounded"
+                    >
+                      View
+                    </a>
+                    <button 
+                      @click="handleDocumentDelete('idCard')"
+                      class="text-red-600 hover:text-red-800 text-xs font-medium px-2 py-1 bg-red-50 rounded"
+                      :disabled="isDeleting.idCard"
+                    >
+                      <span v-if="isDeleting.idCard">Deleting...</span>
+                      <span v-else>Delete</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              <p v-if="errors.idCard" class="text-red-500 text-sm mt-1">{{ errors.idCard }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-between items-center mb-10">
+          <button 
+            @click="goBack" 
+            class="text-gray-600 hover:text-gray-800 px-4 py-2"
+          >
+            Back
+          </button>
+          <div>
+            <button 
+              @click="saveAsDraft" 
+              class="bg-white text-gray-700 border border-gray-300 px-4 py-2 rounded font-medium mr-3"
+              :disabled="isSubmitting"
+            >
+              <span v-if="isSubmitting">Saving...</span>
+              <span v-else>Save as Draft</span>
+            </button>
+            <button 
+              @click="completeProfile" 
+              class="bg-blue-600 text-white px-6 py-2 rounded font-medium"
+              :disabled="isSubmitting"
+            >
+              <span v-if="isSubmitting">Submitting...</span>
+              <span v-else>Submit for Approval</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import { getShelterProfile, saveShelterProfileDraft, submitShelterProfile, uploadDocument, deleteDocument, getDocumentUrl } from "@/services/shelter_profile_service";
+import { uploadProfilePicture, deleteProfilePicture, fetchProfilePicture } from "@/services/user_service";
+import judete from "@/assets/judete.json";
+import blankPicture from "@/assets/blank_profile_picture.jpg";
+
+export default {
+  name: 'ShelterProfileCompletion',
+  data() {
+    return {
+      isToastVisible: false,
+      successMessage: '',
+      errorMessage: '',
+      profileSubmitted: false, // Flag to track if profile has been submitted
+      blankProfilePicture: blankPicture, // Default blank profile picture
+      profilePictureUrl: "", // Will be empty by default
+      isSubmitting: false,
+      isUploadingProfilePicture: false,
+      isDeletingProfilePicture: false,
+      county: '',
+      city: '',
+      shelterData: {
+        username: '',
+        email: '',
+        phoneNumber: '',
+        shelterType: '',
+        selectedCounty: '',
+        selectedCity: '',
+        fullAddress: '',
+        zipCode: '',
+        yearFounded: null,
+        hoursOfOperation: '',
+        mission: '',
+        status: 'NEW',
+        profilePicture: null // Added specifically to track profile picture status
+      },
+      
+      // Document status
+      documentStatus: {
+        taxCertificate: false,
+        vetAuthorization: false,
+        vetContract: false,
+        idCard: false
+      },
+      
+      // Loading states for document operations
+      isUploading: {
+        taxCertificate: false,
+        vetAuthorization: false,
+        vetContract: false,
+        idCard: false
+      },
+      isDeleting: {
+        taxCertificate: false,
+        vetAuthorization: false,
+        vetContract: false,
+        idCard: false
+      },
+      
+      // Form validation
+      errors: {},
+      
+      // Dropdown options
+      shelterTypes: [
+        'Municipal Shelter',
+        'Private Shelter',
+        'Rescue Organization',
+        'Foster-based Rescue',
+        'Sanctuary',
+        'Veterinary Clinic with Shelter',
+        'Specialized Shelter (specific breeds/species)',
+        'Emergency/Temporary Shelter'
+      ],
+      counties: [], // To be populated from API
+      cities: [] // To be populated based on selected county
+    }
+  },
+  
+  // async mounted() {
+  //   // First load the counties data
+  //   this.loadCounties();
+    
+  //   // Then load the shelter profile data
+  //   await this.loadShelterProfile();
+    
+  //   // Store the selected city temporarily
+  //   const selectedCity = this.shelterData.city;
+    
+  //   // Populate the cities dropdown based on selected county
+  //   if (this.shelterData.county) {
+  //     // This will reset the city selection temporarily
+  //     this.handleCountyChange();
+      
+  //     // Restore the selected city if it exists
+  //     if (selectedCity && this.cities.includes(selectedCity)) {
+  //       this.shelterData.city = selectedCity;
+  //     }
+  //   }
+    
+  //   await this.tryLoadProfilePicture();
+    
+  //   // Check if profile is already submitted and pending approval
+  //   if (this.shelterData.status === 'PENDING_APPROVAL') {
+  //     this.profileSubmitted = true;
+  //   }
+  // },
+
+  async mounted() {
+    try {
+      const shelterId = this.getCurrentShelterId();
+      
+      if (!shelterId) {
+        this.showToast('Error: Shelter ID not found. Please login again.', 'error');
+        setTimeout(() => {
+          this.$router.push('/login');
+        }, 3000);
+        return;
+      }
+
+      // First load shelter profile to check status first
+      const profileData = await getShelterProfile(shelterId);
+      
+      // Update status immediately 
+      this.shelterData.status = profileData.status || 'NEW';
+      
+      // If status is PENDING_APPROVAL, show success view immediately
+      if (this.shelterData.status === 'PENDING_APPROVAL') {
+        console.log('Profile is in PENDING_APPROVAL status, showing success view');
+        this.profileSubmitted = true;
+        return; // Skip loading other data
+      }
+      
+      // Only proceed with full data loading for other statuses
+      
+      // Load counties data
+      this.loadCounties();
+      
+      // Update shelter data with the retrieved profile
+      this.shelterData = {
+        username: profileData.username || '',
+        email: profileData.email || '',
+        phoneNumber: profileData.phoneNumber || '',
+        shelterType: profileData.shelterType || '',
+        county: profileData.county || '',
+        city: profileData.city || '',
+        fullAddress: profileData.fullAddress || '',
+        zipCode: profileData.zipCode || '',
+        yearFounded: profileData.yearFounded || null,
+        hoursOfOperation: profileData.hoursOfOperation || '',
+        mission: profileData.mission || '',
+        status: profileData.status || 'NEW',
+        profilePicture: profileData.profilePicture || null
+      };
+      
+      // Update document status
+      if (profileData.documents) {
+        this.documentStatus = profileData.documents;
+      }
+      
+      // Store the selected city temporarily
+      const selectedCity = this.shelterData.city;
+      
+      // Populate the cities dropdown based on selected county
+      if (this.shelterData.county) {
+        // This will reset the city selection temporarily
+        this.handleCountyChange();
+        
+        // Restore the selected city if it exists
+        if (selectedCity && this.cities.includes(selectedCity)) {
+          this.shelterData.city = selectedCity;
+        }
+      }
+      
+      await this.tryLoadProfilePicture();
+      
+    } catch (error) {
+      console.error('Error in mounted:', error);
+      this.showToast('Failed to load shelter profile. Please try again.', 'error');
+    }
+  },
+  
+  methods: {
+    getStatusText() {
+      const statusMap = {
+        'NEW': 'Pending Completion',
+        'DRAFT': 'Draft',
+        'PENDING_APPROVAL': 'Pending Approval',
+        'APPROVED': 'Approved',
+        'REJECTED': 'Rejected'
+      };
+      
+      return statusMap[this.shelterData.status] || 'Pending Completion';
+    },
+    
+    async loadShelterProfile() {
+      try {
+        const shelterId = this.getCurrentShelterId();
+        
+        if (!shelterId) {
+          this.showToast('Error: Shelter ID not found. Please login again.');
+          setTimeout(() => {
+            this.$router.push('/login');
+          }, 3000);
+          return;
+        }
+        
+        const profileData = await getShelterProfile(shelterId);
+        
+        // Update shelter data with the retrieved profile
+        this.shelterData = {
+          username: profileData.username || '',
+          email: profileData.email || '',
+          phoneNumber: profileData.phoneNumber || '',
+          shelterType: profileData.shelterType || '',
+          county: profileData.county || '',
+          city: profileData.city || '',
+          fullAddress: profileData.fullAddress || '',
+          zipCode: profileData.zipCode || '',
+          yearFounded: profileData.yearFounded || null,
+          hoursOfOperation: profileData.hoursOfOperation || '',
+          mission: profileData.mission || '',
+          status: profileData.status || 'NEW',
+          profilePicture: profileData.profilePicture || null
+        };
+        
+        // Update document status
+        if (profileData.documents) {
+          this.documentStatus = profileData.documents;
+        }
+        
+        // If county is set, load the cities for that county
+        if (this.shelterData.county) {
+          this.handleCountyChange();
+        }
+      } catch (error) {
+        console.error('Error loading shelter profile:', error);
+        this.showToast('Failed to load shelter profile. Please try again.');
+      }
+    },
+    
+    async tryLoadProfilePicture() {
+      try {
+        const shelterId = this.getCurrentShelterId();
+        if (!shelterId) return;
+        
+        // Call the fetch profile picture function
+        const imageUrl = await fetchProfilePicture(shelterId);
+        
+        // Debug the returned URL
+        console.log('Fetched profile picture URL:', imageUrl);
+        
+        if (imageUrl) {
+          this.profilePictureUrl = imageUrl;
+        }
+      } catch (error) {
+        console.error('Error loading profile picture:', error);
+        this.profilePictureUrl = "";
+      }
+    },
+    
+    async loadCounties() {
+      this.counties = judete.judete;
+    },
+
+    handleCountyChange() {
+      // Save the current city value
+      const currentCity = this.shelterData.city;
+      
+      // Find the selected county object
+      const selectedCountyObj = this.counties.find(county => county.auto === this.shelterData.county);
+      
+      if (selectedCountyObj) {
+        this.shelterData.countyName = selectedCountyObj.nume;
+        
+        // Populate the cities dropdown
+        this.cities = selectedCountyObj.localitati.map(loc => loc.nume);
+        
+        // Only reset the city if it's not in the new list of cities
+        if (currentCity && this.cities.includes(currentCity)) {
+          // Keep the current city if it's valid for this county
+          this.shelterData.city = currentCity;
+        } else {
+          // Reset the city if it's not valid for this county
+          this.shelterData.city = "";
+        }
+      } else {
+        this.shelterData.countyName = "";
+        this.cities = [];
+        this.shelterData.city = "";
+      }
+    },
+  
+    validateUsername() {
+      if (!this.shelterData.username) {
+        this.errors.username = 'Username is required';
+      } else if (this.shelterData.username.length < 3) {
+        this.errors.username = 'Username must be at least 3 characters long';
+      } else {
+        delete this.errors.username;
+      }
+    },
+    
+    validateEmail() {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!this.shelterData.email) {
+        this.errors.email = 'Email is required';
+      } else if (!emailRegex.test(this.shelterData.email)) {
+        this.errors.email = 'Please enter a valid email address';
+      } else {
+        delete this.errors.email;
+      }
+    },
+    
+    async handleProfilePictureUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      try {
+        // Validate file type
+        const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        if (!validImageTypes.includes(file.type)) {
+          this.errors.profilePicture = 'Please upload a valid image file (JPEG, PNG, GIF, WEBP)';
+          return;
+        }
+        
+        // Validate file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          this.errors.profilePicture = 'Image file size must be less than 5MB';
+          return;
+        }
+        
+        const shelterId = this.getCurrentShelterId();
+        if (!shelterId) {
+          this.showToast('Error: Shelter ID not found');
+          return;
+        }
+        
+        // Set uploading state
+        this.isUploadingProfilePicture = true;
+        
+        // Upload profile picture
+        const imageUrl = await uploadProfilePicture(shelterId, file);
+        if (imageUrl) {
+          this.profilePictureUrl = imageUrl;
+          this.shelterData.profilePicture = true; // Set flag that picture exists
+          this.showToast('Profile picture uploaded successfully');
+        }
+      } catch (error) {
+        console.error('Error uploading profile picture:', error);
+        this.showToast('Failed to upload profile picture');
+      } finally {
+        this.isUploadingProfilePicture = false;
+      }
+    },
+    
+    async removeProfilePicture() {
+      try {
+        const shelterId = this.getCurrentShelterId();
+        if (!shelterId) {
+          this.showToast('Error: Shelter ID not found');
+          return;
+        }
+        
+        // Set deleting state
+        this.isDeletingProfilePicture = true;
+        
+        // Call service to delete profile picture
+        await deleteProfilePicture(shelterId);
+        
+        // Reset profile picture
+        this.profilePictureUrl = "";
+        this.shelterData.profilePicture = null; // Set flag that no picture exists
+        
+        this.showToast('Profile picture removed');
+      } catch (error) {
+        console.error('Error removing profile picture:', error);
+        this.showToast('Failed to remove profile picture');
+      } finally {
+        this.isDeletingProfilePicture = false;
+      }
+    },
+
+    async handleDocumentUpload(documentType, event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      try {
+        // Validate file type
+        const validDocTypes = ['application/pdf', 'image/jpeg', 'image/png'];
+        if (!validDocTypes.includes(file.type)) {
+          this.errors[documentType] = 'Please upload a valid document file (PDF, JPEG, PNG)';
+          return;
+        }
+        
+        // Validate file size (max 2MB)
+        if (file.size > 2 * 1024 * 1024) { // 2MB
+          this.errors[documentType] = 'Document file size must be less than 2MB';
+          return;
+        }
+        
+        const shelterId = this.getCurrentShelterId();
+        if (!shelterId) {
+          this.showToast('Error: Shelter ID not found', 'error');
+          return;
+        }
+        
+        // Set uploading state
+        this.isUploading[documentType] = true;
+        
+        // Upload document
+        await uploadDocument(shelterId, documentType, file);
+        
+        // Update document status
+        this.documentStatus[documentType] = true;
+        
+        // Clear any previous error
+        delete this.errors[documentType];
+        
+        this.showToast(`${this.getDocumentTypeName(documentType)} uploaded successfully`);
+      } catch (error) {
+        console.error(`Error uploading ${documentType} document:`, error);
+        this.errors[documentType] = 'Failed to upload document. Please try again.';
+        this.showToast(`Failed to upload ${this.getDocumentTypeName(documentType)}`, 'error');
+      } finally {
+        // Reset uploading state
+        this.isUploading[documentType] = false;
+      }
+    },
+    
+    async handleDocumentDelete(documentType) {
+      try {
+        const shelterId = this.getCurrentShelterId();
+        if (!shelterId) {
+          this.showToast('Error: Shelter ID not found');
+          return;
+        }
+        
+        // Set deleting state
+        this.isDeleting[documentType] = true;
+        
+        // Delete document
+        await deleteDocument(shelterId, documentType);
+        
+        // Update document status
+        this.documentStatus[documentType] = false;
+        
+        this.showToast(`${this.getDocumentTypeName(documentType)} deleted successfully`);
+      } catch (error) {
+        console.error(`Error deleting ${documentType} document:`, error);
+        this.showToast(`Failed to delete ${this.getDocumentTypeName(documentType)}`);
+      } finally {
+        // Reset deleting state
+        this.isDeleting[documentType] = false;
+      }
+    },
+    
+    validateForm(validateDocuments = true) {
+      let isValid = true;
+      this.errors = {};
+      
+      // Validate shelter data
+      if (!this.shelterData.username) {
+        this.errors.username = 'Username is required';
+        isValid = false;
+      } else if (this.shelterData.username.length < 3) {
+        this.errors.username = 'Username must be at least 3 characters long';
+        isValid = false;
+      }
+      
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!this.shelterData.email) {
+        this.errors.email = 'Email is required';
+        isValid = false;
+      } else if (!emailRegex.test(this.shelterData.email)) {
+        this.errors.email = 'Please enter a valid email address';
+        isValid = false;
+      }
+      
+      if (!this.shelterData.phoneNumber) {
+        this.errors.phoneNumber = 'Phone number is required';
+        isValid = false;
+      }
+      
+      if (!this.shelterData.shelterType) {
+        this.errors.shelterType = 'Shelter type is required';
+        isValid = false;
+      }
+      
+      if (!this.shelterData.county) {
+        this.errors.county = 'County is required';
+        isValid = false;
+      }
+      
+      if (!this.shelterData.city) {
+        this.errors.city = 'City is required';
+        isValid = false;
+      }
+      
+      if (!this.shelterData.fullAddress) {
+        this.errors.fullAddress = 'Full address is required';
+        isValid = false;
+      }
+      
+      if (!this.shelterData.zipCode) {
+        this.errors.zipCode = 'ZIP/Postal code is required';
+        isValid = false;
+      }
+      
+      if (!this.shelterData.yearFounded) {
+        this.errors.yearFounded = 'Year founded is required';
+        isValid = false;
+      } else if (this.shelterData.yearFounded < 1970 || this.shelterData.yearFounded > new Date().getFullYear()) {
+        this.errors.yearFounded = `Year must be between 1970 and ${new Date().getFullYear()}`;
+        isValid = false;
+      }
+      
+      if (!this.shelterData.hoursOfOperation) {
+        this.errors.hoursOfOperation = 'Hours of operation are required';
+        isValid = false;
+      }
+      
+      if (!this.shelterData.mission) {
+        this.errors.mission = 'Mission statement is required';
+        isValid = false;
+      } else if (this.shelterData.mission.length < 50) {
+        this.errors.mission = 'Mission statement should be at least 50 characters long';
+        isValid = false;
+      }
+      
+      // Profile picture is NOT required, so we don't validate it
+      
+      // Only validate documents for submission, not for draft
+      if (validateDocuments) {
+        // Validate documents
+        if (!this.documentStatus.taxCertificate) {
+          this.errors.taxCertificate = 'Tax certificate is required';
+          isValid = false;
+        }
+        
+        if (!this.documentStatus.vetAuthorization) {
+          this.errors.vetAuthorization = 'Veterinary authorization is required';
+          isValid = false;
+        }
+        
+        if (!this.documentStatus.vetContract) {
+          this.errors.vetContract = 'Veterinarian contract is required';
+          isValid = false;
+        }
+        
+        if (!this.documentStatus.idCard) {
+          this.errors.idCard = 'ID card of legal representative is required';
+          isValid = false;
+        }
+      }
+      
+      return isValid;
+    },
+    
+    async saveAsDraft() {
+      // Skip document validation for draft
+      if (!this.validateForm(false)) {
+        // Scroll to the first error
+        const firstErrorElement = document.querySelector('.text-red-500');
+        if (firstErrorElement) {
+          firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        return;
+      }
+      
+      this.isSubmitting = true;
+      
+      try {
+        const shelterId = this.getCurrentShelterId();
+        if (!shelterId) {
+          this.showToast('Error: Shelter ID not found');
+          this.isSubmitting = false;
+          return;
+        }
+        
+        // Prepare data for saving
+        const dataToSave = { ...this.shelterData };
+        
+        // Save the profile data to backend
+        await saveShelterProfileDraft(shelterId, dataToSave);
+        
+        // Update local status
+        this.shelterData.status = 'DRAFT';
+        
+        this.showToast('Profile saved as draft');
+      } catch (error) {
+        console.error('Error saving profile draft:', error);
+        this.showToast('Failed to save profile draft');
+      } finally {
+        this.isSubmitting = false;
+      }
+    },
+    
+    async completeProfile() {
+      // Full validation including documents for submission
+      if (!this.validateForm(true)) {
+        // Scroll to the first error
+        const firstErrorElement = document.querySelector('.text-red-500');
+        if (firstErrorElement) {
+          firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        return;
+      }
+      
+      this.isSubmitting = true;
+      
+      try {
+        const shelterId = this.getCurrentShelterId();
+        if (!shelterId) {
+          this.showToast('Error: Shelter ID not found');
+          this.isSubmitting = false;
+          return;
+        }
+        
+        // Prepare data for submission
+        const dataToSubmit = { ...this.shelterData };
+        
+        // Submit the profile data to backend
+        await submitShelterProfile(shelterId, dataToSubmit);
+        
+        // Update local status
+        this.shelterData.status = 'PENDING_APPROVAL';
+        
+        // Show success view
+        this.profileSubmitted = true;
+        
+        // Show success message
+        this.showToast('Profile successfully submitted for approval!');
+        
+        // Scroll to top to see the success message
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (error) {
+        console.error('Error submitting profile:', error);
+        this.showToast('Failed to submit profile. ' + (error.message || ''));
+      } finally {
+        this.isSubmitting = false;
+      }
+    },
+    
+    showToast(message, type = 'success') {
+      if (type === 'success') {
+        this.successMessage = message;
+        this.errorMessage = ''; // Clear any error message
+        this.isToastVisible = true;
+        
+        // Clear the toast after 3 seconds
+        setTimeout(() => {
+          this.isToastVisible = false;
+        }, 3000);
+      } else {
+        this.errorMessage = message;
+        this.successMessage = ''; // Clear any success message
+        this.isToastVisible = true;
+        
+        // Clear the toast after 3 seconds
+        setTimeout(() => {
+          this.isToastVisible = false;
+        }, 3000);
+      }
+    },
+    
+    getCurrentShelterId() {
+      return localStorage.getItem('shelterId') || localStorage.getItem('Id');
+    },
+    
+    getDocumentTypeName(documentType) {
+      const names = {
+        'taxCertificate': 'Tax Certificate',
+        'vetAuthorization': 'Veterinary Authorization',
+        'vetContract': 'Veterinarian Contract',
+        'idCard': 'ID Card'
+      };
+      
+      return names[documentType] || documentType;
+    },
+    
+    // Make getDocumentUrl available in the template
+    getDocumentUrl,
+    
+    goToDashboard() {
+      // Check if router exists
+      if (this.$router) {
+        this.$router.push('/shelter/dashboard');
+      } else {
+        // Fallback
+        window.location.href = '/shelter/dashboard';
+      }
+    },
+    
+    goBack() {
+        this.$router.push('/');
+        localStorage.clear();
+    }
+  }
+}
+</script>
+
+<style scoped>
+/* Optional custom styles can be added here */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
+</style>

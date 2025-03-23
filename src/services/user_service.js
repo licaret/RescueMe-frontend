@@ -25,6 +25,7 @@ async function registerAdopter(adopterData) {
   }
 }
 
+
 async function registerShelter(shelterData) {
   try {
     const response = await fetch(`${API_URL}/register/shelter`, {
@@ -43,12 +44,20 @@ async function registerShelter(shelterData) {
       throw new Error(errorData.message || "Failed to register shelter");
     }
 
-    return await response.json();
+    const data = await response.json();
+
+    if (data.Id) {
+      localStorage.setItem("Id", data.Id);
+    }
+
+    return data;
   } catch (error) {
     console.error("Error registering shelter:", error);
     throw error;
   }
 }
+
+
 
 async function login(email, password) {
   try {
@@ -65,12 +74,33 @@ async function login(email, password) {
       throw new Error(errorData.message || "Login failed");
     }
 
-    return await response.json();
+    const data = await response.json();
+    
+    // Store basic authentication data
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("Id", data.id);
+    localStorage.setItem("Username", data.username);
+    localStorage.setItem("Role", data.role);
+    
+    // Check if this is a shelter and needs profile completion
+    if (data.role === "SHELTER") {
+      localStorage.setItem("shelterId", data.id);
+      
+      // Check if the shelter profile is completed by looking for specific fields
+      if (!data.fullAddress || !data.yearFounded || !data.hoursOfOperation || !data.mission) {
+        localStorage.setItem("firstLogin", "true");
+      } else {
+        localStorage.removeItem("firstLogin");
+      }
+    }
+
+    return data;
   } catch (error) {
     console.error("Error logging in:", error);
     throw error;
   }
 }
+
 
 async function fetchWithAuth(endpoint, options = {}) {
   const token = localStorage.getItem("token");
@@ -139,6 +169,7 @@ async function getUserById(userId) {
   }
 }
 
+
 async function updateUser(userId, updatedFields) {
   try {
     const token = localStorage.getItem("token"); 
@@ -163,6 +194,7 @@ async function updateUser(userId, updatedFields) {
     throw error;
   }
 }
+
 
 async function fetchProfilePicture(userId) {
   try {
@@ -201,6 +233,7 @@ async function uploadProfilePicture(userId, file) {
   }
 }
 
+
 async function deleteProfilePicture(userId) {
   try {
     const response = await fetch(`http://localhost:8080/users/${userId}/profilePicture`, {
@@ -220,6 +253,7 @@ async function deleteProfilePicture(userId) {
     throw error;
   }
 }
+
 
 async function requestPasswordReset(email) {
   try {
@@ -250,6 +284,7 @@ async function requestPasswordReset(email) {
   }
 }
 
+
 async function resetPassword(token, newPassword) {
   console.log("Service called with token:", token, "and password:", newPassword);
   const response = await fetch(`http://localhost:8080/api/v1/auth/reset-password`, {
@@ -264,6 +299,7 @@ async function resetPassword(token, newPassword) {
 
   return await response.json();
 }
+
 
 async function changePassword(userId, currentPassword, newPassword) {
   try {
@@ -304,6 +340,39 @@ async function changePassword(userId, currentPassword, newPassword) {
   }
 }
 
+/**
+ * Uploads a document for a shelter
+ * @param {string} shelterId - The ID of the shelter
+ * @param {string} documentType - The type of document (taxCertificate, vetAuthorization, vetContract, idCard)
+ * @param {File} file - The file to upload
+ * @returns {Promise<Object>} - Response from the server
+ */
+const uploadShelterDocument = async (shelterId, documentType, file) => {
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('documentType', documentType);
+    
+    const response = await fetch(`${API_BASE_URL}/shelters/${shelterId}/documents`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
+      body: formData
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to upload document');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error(`Error uploading ${documentType} document:`, error);
+    throw error;
+  }
+}
+
 
 export { 
   registerAdopter, 
@@ -319,5 +388,6 @@ export {
   deleteProfilePicture,
   requestPasswordReset,
   resetPassword,
-  changePassword
+  changePassword,
+  uploadShelterDocument
  };
