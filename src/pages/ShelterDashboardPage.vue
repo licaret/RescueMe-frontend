@@ -245,13 +245,14 @@
             };
 
             const handleLogout = () => {
-                localStorage.removeItem("token");
-                localStorage.removeItem("Username");
-                localStorage.removeItem("Id");
-                localStorage.removeItem("shelterUsername");
-                localStorage.removeItem("shelterId");
+                // localStorage.removeItem("token");
+                // localStorage.removeItem("Username");
+                // localStorage.removeItem("Id");
+                // localStorage.removeItem("shelterUsername");
+                // localStorage.removeItem("shelterId");
+                localStorage.clear();
 
-                window.removeEventListener("popstate", blockBackButton);
+                // window.removeEventListener("popstate", blockBackButton);
 
                 router.push("/login");
             };

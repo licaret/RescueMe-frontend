@@ -837,34 +837,36 @@
               <!-- Mission Section -->
               <div class="py-4">
                 <h4 class="text-lg font-medium text-gray-900 mb-2">Mission Statement</h4>
-                <p class="text-gray-700">{{ selectedShelter.mission }}</p>
-              </div>
+                <p class="text-gray-700 whitespace-normal overflow-auto max-h-60 p-4 bg-gray-50 rounded-md">
+                    {{ selectedShelter.mission }}
+                </p>
+            </div>
               
               <!-- Documents Section -->
-              <div class="py-4">
-                <h4 class="text-lg font-medium text-gray-900 mb-2">Verification Documents</h4>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div v-for="(value, key) in selectedShelter.documents" :key="key" class="bg-gray-50 p-3 rounded-md">
-                    <div class="flex justify-between items-center">
-                      <div>
-                        <p class="font-medium text-gray-700">{{ getDocumentTypeName(key) }}</p>
-                        <p class="text-sm text-gray-500">
-                          {{ value ? 'Document uploaded' : 'No document' }}
-                        </p>
-                      </div>
-                      <div v-if="value">
-                        <a 
-                          :href="getDocumentUrl(selectedShelter.id, key)" 
-                          target="_blank" 
-                          class="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                        >
-                          View
-                        </a>
-                      </div>
+            <div class="py-4">
+            <h4 class="text-lg font-medium text-gray-900 mb-2">Verification Documents</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div v-for="(value, key) in selectedShelter.documents" :key="key" class="bg-gray-50 p-3 rounded-md">
+                <div class="flex justify-between items-center">
+                    <div>
+                    <p class="font-medium text-gray-700">{{ getDocumentTypeName(key) }}</p>
+                    <p class="text-sm text-gray-500">
+                        {{ value ? 'Document uploaded' : 'No document' }}
+                    </p>
                     </div>
-                  </div>
+                    <div v-if="value">
+                    <button 
+                        @click="viewShelterDocument(selectedShelter.id, key)" 
+                        class="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                    >
+                        View
+                    </button>
+                    </div>
                 </div>
-              </div>
+                </div>
+            </div>
+            </div>
+
             </div>
           </div>
           <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
@@ -1163,14 +1165,16 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, watch } from 'vue';
-import {getTotalShelterCount, getPendingShelterCount, getTotalUserCount, getTotalAnimalCount} from '@/services/admin_dashboard_service.js';
+import { ref, computed, onMounted, watch} from 'vue';
+import { useRouter } from 'vue-router';
+import {getTotalShelterCount, getPendingShelterCount, getTotalUserCount, getTotalAnimalCount, getPendingShelters, getShelterDetails} from '@/services/admin_dashboard_service.js';
+import blankProfilePicture from '@/assets/blank_profile_picture.jpg';
 
 export default {
   name: 'AdminDashboard',
   
   setup() {
-    // Data
+    const router = useRouter()
     const activeTab = ref('pending');
     const isLoading = ref(true);
     const isLoadingUsers = ref(false);
@@ -1181,8 +1185,8 @@ export default {
     const toastMessage = ref('');
     const isSubmitted = ref(false);
     const successMessage = ref('');
-    const defaultShelterImage = '/images/default-shelter.png';
-    const defaultUserImage = '/images/default-user.png';
+    const defaultShelterImage = ref(blankProfilePicture);
+    const defaultUserImage = ref(blankProfilePicture);
     
     // Dashboard Statistics
     const stats = ref({
@@ -1336,6 +1340,14 @@ export default {
       return pages;
     });
     
+    const viewShelterDocument = (shelterId, documentType) => {
+        // Create the document URL
+        const documentUrl = `http://localhost:8080/api/v1/shelters/${shelterId}/documents/${documentType}`;
+        
+        // Open document in a new tab
+        window.open(documentUrl, '_blank');
+    };
+
     // Functions
     const fetchDashboardData = async () => {
         try {
@@ -1353,16 +1365,23 @@ export default {
             stats.value.totalUsers = totalUsers;
             stats.value.totalAnimals = totalAnimals;
             
+            // Fetch actual pending shelters
+            const pendingSheltersData = await getPendingShelters();
+            pendingShelters.value = pendingSheltersData.map(shelter => ({
+            id: shelter.id,
+            username: shelter.username,
+            email: shelter.email,
+            phoneNumber: shelter.phoneNumber,
+            shelterType: shelter.shelterType,
+            county: shelter.county,
+            city: shelter.city,
+            fullAddress: shelter.fullAddress,
+            createdAt: shelter.submittedAt || new Date().toISOString(),
+            profilePicture: shelter.profilePicture ? `data:image/jpeg;base64,${shelter.profilePicture}` : null
+            }));
+            
             // Pentru restul datelor, poți continua să utilizezi mock data temporar
             const dashboardResponse = await mockFetchDashboardData();
-            
-            // // Păstrează doar datele care nu au fost înlocuite cu date reale
-            // stats.value = {
-            // ...stats.value,
-            // totalAnimals: dashboardResponse.stats.totalAnimals
-            // };
-            
-            pendingShelters.value = dashboardResponse.pendingShelters;
             approvedShelters.value = dashboardResponse.approvedShelters;
             
             isLoading.value = false;
@@ -1389,21 +1408,8 @@ export default {
       }
     };
     
-    const viewShelterDetails = async (shelterId) => {
-      try {
-        showShelterModal.value = true;
-        isLoadingShelterDetails.value = true;
-        
-        // In a real implementation, fetch from API
-        const shelter = await mockFetchShelterDetails(shelterId);
-        selectedShelter.value = shelter;
-        
-        isLoadingShelterDetails.value = false;
-      } catch (error) {
-        console.error('Error fetching shelter details:', error);
-        isLoadingShelterDetails.value = false;
-        showToastMessage('Failed to load shelter details. Please try again later.');
-      }
+    const viewShelterDetails = (shelterId) => {
+        fetchShelterDetails(shelterId);
     };
     
     const viewUserDetails = async (userId) => {
@@ -1468,46 +1474,74 @@ export default {
     
     const performShelterAction = async (shelterId, action) => {
       try {
-        // In a real implementation, call API to perform action
-        const actionResult = await mockPerformShelterAction(shelterId, action);
-        
-        if (showShelterModal.value) {
-          showShelterModal.value = false;
-        }
-        
-        if (showConfirmationModal.value) {
-          showConfirmationModal.value = false;
-        }
-        
-        // Update local data based on action
-        if (action === 'approve' || action === 'reject') {
-          pendingShelters.value = pendingShelters.value.filter(shelter => shelter.id !== shelterId);
-          stats.value.pendingApprovals = pendingShelters.value.length;
+          // Call the real API endpoint
+          let response;
           
           if (action === 'approve') {
-            // Add to approved shelters
-            const approvedShelter = {...actionResult, status: 'APPROVED', approvedAt: new Date()};
-            approvedShelters.value.push(approvedShelter);
-            stats.value.totalShelters++;
-            
-            successMessage.value = 'Shelter has been approved successfully. An email notification has been sent.';
-          } else {
-            successMessage.value = 'Shelter application has been rejected. An email notification has been sent.';
+              response = await fetch(`http://localhost:8080/api/v1/admin/shelters/${shelterId}/approve`, {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json'
+                  },
+                  // Make sure to send an empty object if no body is needed
+                  body: JSON.stringify({})
+              });
+          } else if (action === 'reject') {
+              response = await fetch(`http://localhost:8080/api/v1/admin/shelters/${shelterId}/reject`, {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({})
+              });
+          } else if (action === 'suspend') {
+              response = await fetch(`http://localhost:8080/api/v1/admin/shelters/${shelterId}/suspend`, {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({})
+              });
           }
-        } else if (action === 'suspend') {
-          const shelterIndex = approvedShelters.value.findIndex(shelter => shelter.id === shelterId);
-          if (shelterIndex !== -1) {
-            approvedShelters.value[shelterIndex].status = 'SUSPENDED';
-            successMessage.value = 'Shelter has been suspended successfully. An email notification has been sent.';
+          
+          if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
           }
-        }
-        
-        isSubmitted.value = true;
+          
+          const responseData = await response.json();
+          
+          // Close modals
+          if (showShelterModal.value) {
+              showShelterModal.value = false;
+          }
+          
+          if (showConfirmationModal.value) {
+              showConfirmationModal.value = false;
+          }
+          
+          // Update local data and UI
+          if (action === 'approve' || action === 'reject') {
+              pendingShelters.value = pendingShelters.value.filter(s => s.id !== shelterId);
+              stats.value.pendingApprovals = pendingShelters.value.length;
+              
+              if (action === 'approve') {
+                  successMessage.value = 'Shelter has been approved successfully.';
+                  
+                  // Refresh the dashboard data to show the newly approved shelter
+                  fetchDashboardData();
+              } else {
+                  successMessage.value = 'Shelter application has been rejected.';
+              }
+          } else if (action === 'suspend') {
+              successMessage.value = 'Shelter has been suspended successfully.';
+          }
+          
+          isSubmitted.value = true;
       } catch (error) {
-        console.error(`Error ${action}ing shelter:`, error);
-        showToastMessage(`Failed to ${action} shelter. Please try again.`);
+          console.error(`Error ${action}ing shelter:`, error);
+          showToastMessage(`Failed to ${action} shelter. Please try again.`);
       }
-    };
+  };
     
     const suspendUser = (userId, fromModal = false) => {
       if (fromModal) {
@@ -1677,14 +1711,15 @@ export default {
     };
     
     const getDocumentUrl = (shelterId, documentType) => {
-      // In a real implementation, this would return actual document URL
-      return `#/documents/${shelterId}/${documentType}`;
+        // Generate the actual API URL for the document
+        return `/api/v1/shelters/${shelterId}/documents/${documentType}`;
     };
     
     const logout = () => {
       // In a real implementation, call API to logout
       // Then redirect to login page
-      window.location.href = '/login';
+      localStorage.clear();
+      router.push("/");
     };
     
     // Reset pagination when filters change
@@ -1809,35 +1844,109 @@ export default {
         }, 1000);
       });
     };
-    
-    const mockFetchShelterDetails = (shelterId) => {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          // Find the shelter in pending or approved lists
-          const pendingShelter = pendingShelters.value.find(s => s.id === shelterId);
-          const approvedShelter = approvedShelters.value.find(s => s.id === shelterId);
-          const shelter = pendingShelter || approvedShelter;
-          
-          if (shelter) {
-            resolve({
-              ...shelter,
-              // Add additional details
-              yearFounded: 2020,
-              hoursOfOperation: 'Mon-Fri: 9AM-5PM, Sat: 10AM-2PM',
-              mission: 'Our mission is to rescue, rehabilitate, and rehome abandoned and abused animals in our community. We strive to provide a safe and loving environment for all animals in our care, while also promoting responsible pet ownership through education and outreach programs.',
-              documents: {
-                taxCertificate: true,
-                vetAuthorization: true,
-                vetContract: true,
-                idCard: true
-              }
-            });
-          } else {
-            resolve(null);
-          }
-        }, 800);
-      });
+
+    // Function to format long text with line breaks
+    const formatLongText = (text, charsPerLine = 10) => {
+        if (!text || text.length <= charsPerLine) {
+            return text;
+        }
+        
+        // Split the text into words
+        const words = text.split(' ');
+        let formattedText = '';
+        let currentLine = '';
+        
+        // Build the text with line breaks
+        words.forEach(word => {
+            if ((currentLine + word).length > charsPerLine) {
+            formattedText += currentLine.trim() + '\n';
+            currentLine = word + ' ';
+            } else {
+            currentLine += word + ' ';
+            }
+        });
+        
+        // Add the last line
+        if (currentLine.trim()) {
+            formattedText += currentLine.trim();
+        }
+        
+        return formattedText;
     };
+    
+    // In the fetchShelterDetails function, add this code:
+    const fetchShelterDetails = async (shelterId) => {
+        try {
+            showShelterModal.value = true;
+            isLoadingShelterDetails.value = true;
+            
+            // First check if the shelter already exists in your list
+            const existingPendingShelter = pendingShelters.value.find(s => s.id === shelterId);
+            
+            // If it exists and already has a correctly processed profile image, use it
+            if (existingPendingShelter && existingPendingShelter.profilePicture) {
+                console.log("Using image from pendingShelters list");
+                
+                // Get the rest of the data from the API
+                const shelterData = await getShelterDetails(shelterId);
+                
+                // Format the mission text
+                const formattedMission = formatLongText(
+                    shelterData.mission ? shelterData.mission.trim() : '', 
+                    80 // Characters per line - adjust as needed
+                );
+                
+                // But use the already processed image
+                selectedShelter.value = {
+                    ...shelterData,
+                    profilePicture: existingPendingShelter.profilePicture,
+                    mission: formattedMission
+                };
+                
+                isLoadingShelterDetails.value = false;
+                return;
+            }
+            
+            // If it doesn't exist in the list, continue with your original code
+            const shelterData = await getShelterDetails(shelterId);
+            
+            // Process the image in the same way it's processed in the initial list
+            let profilePictureUrl = null;
+            if (shelterData.profilePicture) {
+                if (typeof shelterData.profilePicture === 'string') {
+                    profilePictureUrl = `data:image/jpeg;base64,${shelterData.profilePicture}`;
+                } else if (Array.isArray(shelterData.profilePicture)) {
+                    try {
+                        const binary = shelterData.profilePicture
+                            .map(byte => String.fromCharCode(byte))
+                            .join('');
+                        profilePictureUrl = `data:image/jpeg;base64,${btoa(binary)}`;
+                    } catch (e) {
+                        console.error("Error converting image:", e);
+                    }
+                }
+            }
+            
+            // Format the mission text
+            const formattedMission = formatLongText(
+                shelterData.mission ? shelterData.mission.trim() : '', 
+                40 // Characters per line - adjust as needed
+            );
+            
+            selectedShelter.value = {
+                ...shelterData,
+                profilePicture: profilePictureUrl,
+                mission: formattedMission
+            };
+            
+            isLoadingShelterDetails.value = false;
+        } catch (error) {
+            console.error('Error fetching shelter details:', error);
+            isLoadingShelterDetails.value = false;
+            showToastMessage('Failed to load shelter details. Please try again later.');
+        }
+    };
+    
     
     const mockFetchUsers = () => {
       return new Promise((resolve) => {
@@ -2025,6 +2134,7 @@ export default {
       formatDate,
       getDocumentTypeName,
       getDocumentUrl,
+      viewShelterDocument,
       logout
     };
   }

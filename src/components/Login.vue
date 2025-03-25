@@ -181,34 +181,88 @@ export default {
               // Store the status in localStorage for reference
               localStorage.setItem("shelterProfileStatus", profileStatus);
               
+              console.log("Shelter login: Profile status =", profileStatus);
+              
               if (profileStatus === 'NEW' || profileStatus === 'DRAFT') {
                 // Profile needs completion
                 this.successMessage = "Login successful! Redirecting to complete your shelter profile...";
                 setTimeout(() => {
                   this.$router.push("/shelter-profile-completion");
                 }, 2000);
-              // In the PENDING_APPROVAL condition:
-                } else if (profileStatus === 'PENDING_APPROVAL') {
-                  // Profile is pending approval
-                  this.successMessage = "Login successful! Your profile is pending approval...";
+              } else if (profileStatus === 'PENDING_APPROVAL') {
+                // Profile is pending approval
+                this.successMessage = "Login successful! Your profile is pending approval...";
+                setTimeout(() => {
+                  this.$router.push("/shelter-profile-completion");
+                }, 2000);
+              } else if (profileStatus === 'APPROVED') {
+                // Check if this is the first login after approval
+                try {
+                  const welcomeResponse = await fetch(`http://localhost:8080/api/v1/shelters/${data.id}/check-welcome`, {
+                    headers: {
+                      "Authorization": `Bearer ${data.token}`
+                    }
+                  });
+                  
+                  if (welcomeResponse.ok) {
+                    const welcomeData = await welcomeResponse.json();
+                    console.log("Welcome check response:", welcomeData);
+                    
+                    if (welcomeData.showWelcome) {
+                      this.successMessage = "Login successful! Redirecting to dashboard...";
+                      setTimeout(() => {
+                        this.$router.push("/welcome");
+                      }, 2000);
+                    } else {
+                      // No welcome needed
+                      this.successMessage = "Login successful! Redirecting to dashboard...";
+                      setTimeout(() => {
+                        this.$router.push("/shelter-dashboard");
+                      }, 2000);
+                    }
+                  } else {
+                    // Fallback if welcome check fails
+                    this.successMessage = "Login successful! Redirecting to dashboard...";
+                    setTimeout(() => {
+                      this.$router.push("/shelter-dashboard");
+                    }, 2000);
+                  }
+                } catch (welcomeError) {
+                  console.error("Error checking welcome status:", welcomeError);
+                  // Fallback to dashboard
+                  this.successMessage = "Login successful! Redirecting to dashboard...";
                   setTimeout(() => {
-                    this.$router.push("/shelter-profile-completion"); // Change this line
+                    this.$router.push("/shelter-dashboard");
                   }, 2000);
-                } else {
-                // Profile is complete and approved
-                this.$router.push("/shelter-dashboard");
+                }
+              } else {
+                // Default case - go to dashboard
+                this.successMessage = "Login successful! Redirecting to dashboard...";
+                setTimeout(() => {
+                  this.$router.push("/shelter-dashboard");
+                }, 2000);
               }
             } else {
               // If can't get profile info, default to profile completion page
-              this.$router.push("/shelter-profile-completion");
+              this.successMessage = "Login successful! Redirecting...";
+              setTimeout(() => {
+                this.$router.push("/shelter-profile-completion");
+              }, 2000);
             }
           } catch (profileError) {
             console.error("Error fetching shelter profile:", profileError);
             // Default to profile completion on error
-            this.$router.push("/shelter-profile-completion");
+            this.successMessage = "Login successful! Redirecting...";
+            setTimeout(() => {
+              this.$router.push("/shelter-profile-completion");
+            }, 2000);
           }
         } else {
-          this.$router.push("/home");
+          // For non-shelter users
+          this.successMessage = "Login successful! Redirecting...";
+          setTimeout(() => {
+            this.$router.push("/home");
+          }, 2000);
         }
       } catch (error) {
         this.loginError = "Invalid email or password. Please try again or reset your password.";

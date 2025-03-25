@@ -14,6 +14,7 @@ import EditShelterProfileVue from '@/pages/EditShelterProfile.vue';
 import AvailablePetsPage from '@/pages/AvailablePetsPage.vue';
 import ShelterProfilePage from '@/pages/ShelterProfilePage.vue';
 import ShelterProfileCompletionPage from '@/pages/ShelterProfileCompletionPage.vue';
+import WelcomePage from '@/pages/WelcomePage.vue';
 import AdminDashboardPage from '@/pages/AdminDashboardPage.vue';
 
 const router = createRouter({
@@ -103,6 +104,12 @@ const router = createRouter({
       path: '/admin-dashboard',
       name: 'AdminDashboardPage',
       component: AdminDashboardPage, 
+      // meta: { requiresAuth: true },
+    },
+    {
+      path: '/welcome',
+      name: 'WelcomePage',
+      component: WelcomePage, 
       // meta: { requiresAuth: true },
     },
   ],

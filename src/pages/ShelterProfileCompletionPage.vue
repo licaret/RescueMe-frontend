@@ -41,7 +41,7 @@
         </button>
       </div>
 
-      <!-- Success view (displayed after successful submission) -->
+      <!-- Success view (displayed after successful submission or approval) -->
       <div v-if="profileSubmitted" class="text-center mt-10">
         <div class="p-10 bg-white rounded-lg shadow-md">
           <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-6">
@@ -49,58 +49,99 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h1 class="text-2xl font-bold text-gray-800 mb-4">Profile Submitted Successfully!</h1>
-          <p class="text-gray-600 mb-6">
-            Thank you for completing your shelter profile. Your information has been submitted for administrator review.
-            You'll receive an email once your account is approved. Our team will try to review your application within 24 hours.
-          </p>
           
-          <!-- Status indicator -->
-          <div class="bg-blue-50 border-l-4 border-blue-500 text-blue-700 p-4 rounded-lg mb-8 inline-block">
-            <div class="flex items-center">
-              <div class="flex-shrink-0 mr-2">
-                <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9a1 1 0 00-1-1z" clip-rule="evenodd" />
-                </svg>
+          <!-- When status is PENDING_APPROVAL -->
+          <div v-if="shelterData.status === 'PENDING_APPROVAL'">
+            <h1 class="text-2xl font-bold text-gray-800 mb-4">Profile Submitted Successfully!</h1>
+            <p class="text-gray-600 mb-6">
+              Thank you for completing your shelter profile. Your information has been submitted for administrator review.
+              You'll receive an email once your account is approved. Our team will try to review your application within 24 hours.
+            </p>
+            
+            <!-- Status indicator -->
+            <div class="bg-blue-50 border-l-4 border-blue-500 text-blue-700 p-4 rounded-lg mb-8 inline-block">
+              <div class="flex items-center">
+                <div class="flex-shrink-0 mr-2">
+                  <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9a1 1 0 00-1-1z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+                <div>
+                  <span class="font-medium">Current status: </span>
+                  <span class="font-bold">Pending Approval</span>
+                </div>
               </div>
-              <div>
-                <span class="font-medium">Current status: </span>
-                <span class="font-bold">Pending Approval</span>
+            </div>
+            
+            <!-- Next steps section -->
+            <div class="bg-gray-50 p-6 rounded-lg mb-8">
+              <h2 class="text-lg font-semibold text-gray-800 mb-4">What happens next?</h2>
+              <div class="flex flex-col md:flex-row justify-between gap-4">
+                <div class="flex-1 p-4 bg-white rounded shadow-sm">
+                  <div class="flex items-center mb-3">
+                    <div class="bg-blue-100 rounded-full h-8 w-8 flex items-center justify-center mr-3">
+                      <span class="text-blue-600 font-bold">1</span>
+                    </div>
+                    <h3 class="font-medium">Admin Review</h3>
+                  </div>
+                  <p class="text-gray-600 text-sm">Our team will review your shelter profile within 24 hours</p>
+                </div>
+                <div class="flex-1 p-4 bg-white rounded shadow-sm">
+                  <div class="flex items-center mb-3">
+                    <div class="bg-blue-100 rounded-full h-8 w-8 flex items-center justify-center mr-3">
+                      <span class="text-blue-600 font-bold">2</span>
+                    </div>
+                    <h3 class="font-medium">Email Notification</h3>
+                  </div>
+                  <p class="text-gray-600 text-sm">You'll receive an email when your account is approved</p>
+                </div>
+                <div class="flex-1 p-4 bg-white rounded shadow-sm">
+                  <div class="flex items-center mb-3">
+                    <div class="bg-blue-100 rounded-full h-8 w-8 flex items-center justify-center mr-3">
+                      <span class="text-blue-600 font-bold">3</span>
+                    </div>
+                    <h3 class="font-medium">Start Using RescueMe</h3>
+                  </div>
+                  <p class="text-gray-600 text-sm">Once approved, you can log in and start managing your shelter profile</p>
+                </div>
               </div>
             </div>
           </div>
           
-          <!-- Next steps section -->
-          <div class="bg-gray-50 p-6 rounded-lg mb-8">
-            <h2 class="text-lg font-semibold text-gray-800 mb-4">What happens next?</h2>
-            <div class="flex flex-col md:flex-row justify-between gap-4">
-              <div class="flex-1 p-4 bg-white rounded shadow-sm">
-                <div class="flex items-center mb-3">
-                  <div class="bg-blue-100 rounded-full h-8 w-8 flex items-center justify-center mr-3">
-                    <span class="text-blue-600 font-bold">1</span>
-                  </div>
-                  <h3 class="font-medium">Admin Review</h3>
+          <!-- When status is APPROVED -->
+          <div v-else-if="shelterData.status === 'APPROVED'">
+            <h1 class="text-2xl font-bold text-gray-800 mb-4">Your Shelter Has Been Approved!</h1>
+            <p class="text-gray-600 mb-6">
+              Congratulations! Your shelter profile has been reviewed and approved by our administrators.
+              You can now access your dashboard and begin listing animals for adoption.
+            </p>
+            
+            <!-- Status indicator -->
+            <div class="bg-green-50 border-l-4 border-green-500 text-green-700 p-4 rounded-lg mb-8 inline-block">
+              <div class="flex items-center">
+                <div class="flex-shrink-0 mr-2">
+                  <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                  </svg>
                 </div>
-                <p class="text-gray-600 text-sm">Our team will review your shelter profile within 24 hours</p>
-              </div>
-              <div class="flex-1 p-4 bg-white rounded shadow-sm">
-                <div class="flex items-center mb-3">
-                  <div class="bg-blue-100 rounded-full h-8 w-8 flex items-center justify-center mr-3">
-                    <span class="text-blue-600 font-bold">2</span>
-                  </div>
-                  <h3 class="font-medium">Email Notification</h3>
+                <div>
+                  <span class="font-medium">Current status: </span>
+                  <span class="font-bold">Approved</span>
                 </div>
-                <p class="text-gray-600 text-sm">You'll receive an email when your account is approved</p>
               </div>
-              <div class="flex-1 p-4 bg-white rounded shadow-sm">
-                <div class="flex items-center mb-3">
-                  <div class="bg-blue-100 rounded-full h-8 w-8 flex items-center justify-center mr-3">
-                    <span class="text-blue-600 font-bold">3</span>
-                  </div>
-                  <h3 class="font-medium">Start Using RescueMe</h3>
-                </div>
-                <p class="text-gray-600 text-sm">Once approved, you can log in and start managing your shelter profile</p>
-              </div>
+            </div>
+            
+            <!-- Dashboard access section -->
+            <div class="bg-blue-50 p-6 rounded-lg mb-8 text-center">
+              <h2 class="text-lg font-semibold text-gray-800 mb-4">Ready to start helping animals find homes?</h2>
+              <p class="text-gray-600 mb-6">Your shelter dashboard is now available where you can manage your shelter profile, add animals, and more.</p>
+              
+              <button 
+                @click="goToDashboard" 
+                class="inline-block px-6 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors"
+              >
+                Go to Dashboard
+              </button>
             </div>
           </div>
           
@@ -111,7 +152,7 @@
           </p>
           
           <!-- Return to home button -->
-          <button @click="goBack"  class="inline-block px-6 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors">
+          <button @click="goBack" class="inline-block px-6 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors">
             Return to Home
           </button>
         </div>
@@ -347,13 +388,91 @@
               <label class="block text-sm font-medium mb-1">
                 Hours of Operation <span class="text-red-500">*</span>
               </label>
-              <input 
-                v-model="shelterData.hoursOfOperation"
-                type="text"
-                class="w-full border rounded p-2"
-                placeholder="e.g., Mon-Fri: 9AM-5PM, Sat: 10AM-2PM"
-                required
-              />
+              
+              <div class="mb-4">
+                <div class="flex flex-col space-y-4">
+                  <!-- Weekdays selection -->
+                  <div class="bg-gray-50 rounded-lg border border-gray-200 p-3">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Weekdays (Mon-Fri)</label>
+                    <div class="flex items-center">
+                      <select v-model="weekdayOpen" class="border rounded p-2 text-sm w-24 mr-2" @change="updateHoursString">
+                        <option value="Closed">Closed</option>
+                        <option value="08:00">8:00 AM</option>
+                        <option value="09:00">9:00 AM</option>
+                        <option value="10:00">10:00 AM</option>
+                        <option value="11:00">11:00 AM</option>
+                        <option value="12:00">12:00 PM</option>
+                      </select>
+                      
+                      <span class="text-gray-500 mx-1">to</span>
+                      
+                      <select v-model="weekdayClose" class="border rounded p-2 text-sm w-24" @change="updateHoursString"
+                              :disabled="weekdayOpen === 'Closed'" :class="{'opacity-50': weekdayOpen === 'Closed'}">
+                        <option value="16:00">4:00 PM</option>
+                        <option value="17:00">5:00 PM</option>
+                        <option value="18:00">6:00 PM</option>
+                        <option value="19:00">7:00 PM</option>
+                        <option value="20:00">8:00 PM</option>
+                      </select>
+                    </div>
+                  </div>
+                  
+                  <!-- Weekend selection -->
+                  <div class="bg-gray-50 rounded-lg border border-gray-200 p-3">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Weekend (Sat-Sun)</label>
+                    <div class="flex items-center">
+                      <select v-model="weekendOpen" class="border rounded p-2 text-sm w-24 mr-2" @change="updateHoursString">
+                        <option value="Closed">Closed</option>
+                        <option value="09:00">9:00 AM</option>
+                        <option value="10:00">10:00 AM</option>
+                        <option value="11:00">11:00 AM</option>
+                        <option value="12:00">12:00 PM</option>
+                      </select>
+                      
+                      <span class="text-gray-500 mx-1">to</span>
+                      
+                      <select v-model="weekendClose" class="border rounded p-2 text-sm w-24" @change="updateHoursString"
+                              :disabled="weekendOpen === 'Closed'" :class="{'opacity-50': weekendOpen === 'Closed'}">
+                        <option value="14:00">2:00 PM</option>
+                        <option value="15:00">3:00 PM</option>
+                        <option value="16:00">4:00 PM</option>
+                        <option value="17:00">5:00 PM</option>
+                        <option value="18:00">6:00 PM</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Preview -->
+                <div class="mt-3 p-2 bg-blue-50 border border-blue-100 rounded text-sm">
+                  <div class="flex items-center mb-1">
+                    <svg class="h-4 w-4 text-blue-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                    </svg>
+                    <span class="text-sm font-medium text-blue-700">Opening Hours Preview:</span>
+                  </div>
+                  <p class="text-blue-800">{{ formattedHours }}</p>
+                </div>
+                
+                <!-- Custom hours option -->
+                <div class="mt-2">
+                  <label class="flex items-center text-sm cursor-pointer">
+                    <input type="checkbox" id="custom-hours" v-model="useCustomHours" @change="toggleCustomHours" class="form-checkbox h-4 w-4 text-blue-600 rounded border-gray-300 mr-2">
+                    <span>I need to specify custom hours</span>
+                  </label>
+                  
+                  <div v-if="useCustomHours" class="mt-2">
+                    <input 
+                      v-model="shelterData.hoursOfOperation"
+                      type="text"
+                      class="w-full border rounded p-2"
+                      placeholder="e.g., Mon-Fri: 9AM-5PM, Sat-Sun: 10AM-4PM, Holidays: Closed"
+                    />
+                    <p class="mt-1 text-xs text-gray-500">You can add special conditions or irregular hours here.</p>
+                  </div>
+                </div>
+              </div>
+              
               <p v-if="errors.hoursOfOperation" class="text-red-500 text-sm mt-1">{{ errors.hoursOfOperation }}</p>
             </div>
           </div>
@@ -688,6 +807,12 @@ export default {
       isDeletingProfilePicture: false,
       county: '',
       city: '',
+      weekdayOpen: '09:00',
+      weekdayClose: '17:00',
+      weekendOpen: '10:00',
+      weekendClose: '15:00',
+      useCustomHours: false,
+      formattedHours: 'Mon-Fri: 9AM-5PM, Sat-Sun: 10AM-3PM',
       shelterData: {
         username: '',
         email: '',
@@ -792,9 +917,8 @@ export default {
       // Update status immediately 
       this.shelterData.status = profileData.status || 'NEW';
       
-      // If status is PENDING_APPROVAL, show success view immediately
-      if (this.shelterData.status === 'PENDING_APPROVAL') {
-        console.log('Profile is in PENDING_APPROVAL status, showing success view');
+      if (this.shelterData.status === 'PENDING_APPROVAL' || this.shelterData.status === 'APPROVED') {
+        console.log(`Profile is in ${this.shelterData.status} status, showing appropriate view`);
         this.profileSubmitted = true;
         return; // Skip loading other data
       }
@@ -825,6 +949,8 @@ export default {
       if (profileData.documents) {
         this.documentStatus = profileData.documents;
       }
+
+      this.initHoursFromString();
       
       // Store the selected city temporarily
       const selectedCity = this.shelterData.city;
@@ -859,6 +985,16 @@ export default {
       };
       
       return statusMap[this.shelterData.status] || 'Pending Completion';
+    },
+
+    goToDashboard() {
+      // Check if router exists
+      if (this.$router) {
+        this.$router.push(`/shelter/dashboard`);
+      } else {
+        // Fallback
+        window.location.href = `/shelter/dashboard`;
+      }
     },
     
     async loadShelterProfile() {
@@ -907,6 +1043,99 @@ export default {
       }
     },
     
+    // Inițializează programul din string-ul existent
+    initHoursFromString() {
+      if (this.shelterData.hoursOfOperation) {
+        // Dacă avem deja date, activăm modul custom
+        this.useCustomHours = true;
+        
+        // Încercăm să parsăm formatul simplu "Mon-Fri: 9AM-5PM, Sat-Sun: 10AM-3PM"
+        const hoursString = this.shelterData.hoursOfOperation;
+        
+        // Căutăm programul pentru zilele săptămânii
+        try {
+          const weekdayMatch = hoursString.match(/Mon-Fri:\s*(\d+)(AM|PM)-(\d+)(AM|PM)/i);
+          const weekendMatch = hoursString.match(/Sat-Sun:\s*(\d+)(AM|PM)-(\d+)(AM|PM)/i);
+          
+          if (weekdayMatch) {
+            const [_, openHour, openAmPm, closeHour, closeAmPm] = weekdayMatch;
+            this.weekdayOpen = this.convertTo24Hour(openHour, openAmPm);
+            this.weekdayClose = this.convertTo24Hour(closeHour, closeAmPm);
+          }
+          
+          if (weekendMatch) {
+            const [_, openHour, openAmPm, closeHour, closeAmPm] = weekendMatch;
+            this.weekendOpen = this.convertTo24Hour(openHour, openAmPm);
+            this.weekendClose = this.convertTo24Hour(closeHour, closeAmPm);
+          }
+          
+          // Dacă am reușit să parsăm, dezactivăm modul custom
+          if (weekdayMatch && weekendMatch) {
+            this.useCustomHours = false;
+            this.updateHoursString();
+          }
+        } catch (e) {
+          console.log('Nu s-a putut parsa formatul programului, folosim modul custom');
+        }
+      } else {
+        // Dacă nu avem date, inițializăm cu valori implicite
+        this.updateHoursString();
+      }
+    },
+
+    // Convertește din format 12 ore în format 24 ore
+    convertTo24Hour(hour, ampm) {
+      hour = parseInt(hour);
+      if (ampm.toUpperCase() === 'PM' && hour < 12) {
+        hour += 12;
+      } else if (ampm.toUpperCase() === 'AM' && hour === 12) {
+        hour = 0;
+      }
+      return hour.toString().padStart(2, '0') + ':00';
+    },
+
+    // Convertește din format 24 ore în format 12 ore cu AM/PM
+    convertTo12Hour(time) {
+      if (time === 'Closed') return 'Closed';
+      
+      const [hours, minutes] = time.split(':');
+      const hour = parseInt(hours);
+      const ampm = hour >= 12 ? 'PM' : 'AM';
+      const hour12 = hour % 12 || 12;
+      return `${hour12}${minutes !== '00' ? ':' + minutes : ''}${ampm}`;
+    },
+
+    // Actualizează string-ul orarului
+    updateHoursString() {
+      let parts = [];
+      
+      // Adaugă programul zilelor săptămânii
+      if (this.weekdayOpen === 'Closed') {
+        parts.push('Mon-Fri: Closed');
+      } else {
+        const weekdayOpenStr = this.convertTo12Hour(this.weekdayOpen);
+        const weekdayCloseStr = this.convertTo12Hour(this.weekdayClose);
+        parts.push(`Mon-Fri: ${weekdayOpenStr}-${weekdayCloseStr}`);
+      }
+      
+      // Adaugă programul de weekend
+      if (this.weekendOpen === 'Closed') {
+        parts.push('Sat-Sun: Closed');
+      } else {
+        const weekendOpenStr = this.convertTo12Hour(this.weekendOpen);
+        const weekendCloseStr = this.convertTo12Hour(this.weekendClose);
+        parts.push(`Sat-Sun: ${weekendOpenStr}-${weekendCloseStr}`);
+      }
+      
+      // Formatul final
+      this.formattedHours = parts.join(', ');
+      
+      // Actualizează modelul principal dacă nu folosim modul custom
+      if (!this.useCustomHours) {
+        this.shelterData.hoursOfOperation = this.formattedHours;
+      }
+    },
+
     async tryLoadProfilePicture() {
       try {
         const shelterId = this.getCurrentShelterId();
