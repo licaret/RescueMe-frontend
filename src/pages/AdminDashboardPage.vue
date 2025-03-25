@@ -8,7 +8,7 @@
               <h1 class="text-3xl font-bold text-gray-900">RescueMe Admin Dashboard</h1>
             </div>
             <div class="flex items-center">
-              <span class="text-gray-700 mr-4">{{ adminName }}</span>
+              <!-- <span class="text-gray-700 mr-4">{{ adminName }}</span> -->
               <button 
                 @click="logout" 
                 class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium"
@@ -27,16 +27,16 @@
           <div class="bg-white overflow-hidden shadow rounded-lg">
             <div class="px-4 py-5 sm:p-6">
               <dl>
-                <dt class="text-sm font-medium text-gray-500 truncate">Total Shelters</dt>
-                <dd class="mt-1 text-3xl font-semibold text-gray-900">{{ stats.totalShelters }}</dd>
+                <dt class="text-sm font-medium text-gray-500 truncate">Pending Approvals</dt>
+                <dd class="mt-1 text-3xl font-semibold text-gray-900">{{ stats.pendingApprovals }}</dd>
               </dl>
             </div>
           </div>
           <div class="bg-white overflow-hidden shadow rounded-lg">
             <div class="px-4 py-5 sm:p-6">
               <dl>
-                <dt class="text-sm font-medium text-gray-500 truncate">Pending Approvals</dt>
-                <dd class="mt-1 text-3xl font-semibold text-gray-900">{{ stats.pendingApprovals }}</dd>
+                <dt class="text-sm font-medium text-gray-500 truncate">Total Shelters</dt>
+                <dd class="mt-1 text-3xl font-semibold text-gray-900">{{ stats.totalShelters }}</dd>
               </dl>
             </div>
           </div>
@@ -1167,7 +1167,8 @@
 <script>
 import { ref, computed, onMounted, watch} from 'vue';
 import { useRouter } from 'vue-router';
-import {getTotalShelterCount, getPendingShelterCount, getTotalUserCount, getTotalAnimalCount, getPendingShelters, getShelterDetails} from '@/services/admin_dashboard_service.js';
+import {getTotalShelterCount, getPendingShelterCount, getTotalUserCount, getTotalAnimalCount, getPendingShelters, getApprovedShelters, getShelterDetails} from '@/services/admin_dashboard_service.js';
+
 import blankProfilePicture from '@/assets/blank_profile_picture.jpg';
 
 export default {
@@ -1367,22 +1368,52 @@ export default {
             
             // Fetch actual pending shelters
             const pendingSheltersData = await getPendingShelters();
-            pendingShelters.value = pendingSheltersData.map(shelter => ({
-            id: shelter.id,
-            username: shelter.username,
-            email: shelter.email,
-            phoneNumber: shelter.phoneNumber,
-            shelterType: shelter.shelterType,
-            county: shelter.county,
-            city: shelter.city,
-            fullAddress: shelter.fullAddress,
-            createdAt: shelter.submittedAt || new Date().toISOString(),
-            profilePicture: shelter.profilePicture ? `data:image/jpeg;base64,${shelter.profilePicture}` : null
+              pendingShelters.value = pendingSheltersData.map(shelter => ({
+              id: shelter.id,
+              username: shelter.username,
+              email: shelter.email,
+              phoneNumber: shelter.phoneNumber,
+              shelterType: shelter.shelterType,
+              county: shelter.county,
+              city: shelter.city,
+              fullAddress: shelter.fullAddress,
+              createdAt: shelter.submittedAt || new Date().toISOString(),
+              profilePicture: shelter.profilePicture ? `data:image/jpeg;base64,${shelter.profilePicture}` : null
             }));
             
-            // Pentru restul datelor, poți continua să utilizezi mock data temporar
-            const dashboardResponse = await mockFetchDashboardData();
-            approvedShelters.value = dashboardResponse.approvedShelters;
+            // Fetch approved shelters
+            // Fetch approved shelters
+          const approvedSheltersData = await getApprovedShelters();
+          approvedShelters.value = await Promise.all(
+              approvedSheltersData.map(async (shelter) => {
+                  let animalCount = 0;
+                  try {
+                      const response = await fetch(`http://localhost:8080/pets/count/${shelter.id}`);
+                      if (response.ok) {
+                          animalCount = await response.json();
+                      }
+                  } catch (error) {
+                      console.error(`Failed to fetch animal count for shelter ${shelter.id}:`, error);
+                  }
+
+                  return {
+                      id: shelter.id,
+                      username: shelter.username,
+                      email: shelter.email,
+                      phoneNumber: shelter.phoneNumber,
+                      shelterType: shelter.shelterType,
+                      county: shelter.county,
+                      city: shelter.city,
+                      fullAddress: shelter.fullAddress,
+                      status: shelter.status,
+                      approvedAt: shelter.approvedAt || new Date().toISOString(),
+                      animalCount: animalCount,
+                      profilePicture: shelter.profilePicture 
+                          ? `data:image/jpeg;base64,${shelter.profilePicture}` 
+                          : null
+                  };
+              })
+          );
             
             isLoading.value = false;
         } catch (error) {
@@ -1876,76 +1907,80 @@ export default {
     
     // In the fetchShelterDetails function, add this code:
     const fetchShelterDetails = async (shelterId) => {
-        try {
-            showShelterModal.value = true;
-            isLoadingShelterDetails.value = true;
-            
-            // First check if the shelter already exists in your list
-            const existingPendingShelter = pendingShelters.value.find(s => s.id === shelterId);
-            
-            // If it exists and already has a correctly processed profile image, use it
-            if (existingPendingShelter && existingPendingShelter.profilePicture) {
-                console.log("Using image from pendingShelters list");
-                
-                // Get the rest of the data from the API
-                const shelterData = await getShelterDetails(shelterId);
-                
-                // Format the mission text
-                const formattedMission = formatLongText(
-                    shelterData.mission ? shelterData.mission.trim() : '', 
-                    80 // Characters per line - adjust as needed
-                );
-                
-                // But use the already processed image
-                selectedShelter.value = {
-                    ...shelterData,
-                    profilePicture: existingPendingShelter.profilePicture,
-                    mission: formattedMission
-                };
-                
-                isLoadingShelterDetails.value = false;
-                return;
-            }
-            
-            // If it doesn't exist in the list, continue with your original code
-            const shelterData = await getShelterDetails(shelterId);
-            
-            // Process the image in the same way it's processed in the initial list
-            let profilePictureUrl = null;
-            if (shelterData.profilePicture) {
-                if (typeof shelterData.profilePicture === 'string') {
-                    profilePictureUrl = `data:image/jpeg;base64,${shelterData.profilePicture}`;
-                } else if (Array.isArray(shelterData.profilePicture)) {
-                    try {
-                        const binary = shelterData.profilePicture
-                            .map(byte => String.fromCharCode(byte))
-                            .join('');
-                        profilePictureUrl = `data:image/jpeg;base64,${btoa(binary)}`;
-                    } catch (e) {
-                        console.error("Error converting image:", e);
-                    }
-                }
-            }
-            
-            // Format the mission text
-            const formattedMission = formatLongText(
-                shelterData.mission ? shelterData.mission.trim() : '', 
-                40 // Characters per line - adjust as needed
-            );
-            
-            selectedShelter.value = {
-                ...shelterData,
-                profilePicture: profilePictureUrl,
-                mission: formattedMission
-            };
-            
-            isLoadingShelterDetails.value = false;
-        } catch (error) {
-            console.error('Error fetching shelter details:', error);
-            isLoadingShelterDetails.value = false;
-            showToastMessage('Failed to load shelter details. Please try again later.');
-        }
-    };
+      try {
+          showShelterModal.value = true;
+          isLoadingShelterDetails.value = true;
+          
+          // Check in both pending and approved shelters lists
+          const existingPendingShelter = pendingShelters.value.find(s => s.id === shelterId);
+          const existingApprovedShelter = approvedShelters.value.find(s => s.id === shelterId);
+          
+          // Prioritize checking approved shelters if not found in pending
+          const existingShelter = existingPendingShelter || existingApprovedShelter;
+          
+          // If it exists and already has a correctly processed profile image, use it
+          if (existingShelter && existingShelter.profilePicture) {
+              console.log("Using image from existing shelters list");
+              
+              // Get the rest of the data from the API
+              const shelterData = await getShelterDetails(shelterId);
+              
+              // Format the mission text
+              const formattedMission = formatLongText(
+                  shelterData.mission ? shelterData.mission.trim() : '', 
+                  80 // Characters per line - adjust as needed
+              );
+              
+              // But use the already processed image
+              selectedShelter.value = {
+                  ...shelterData,
+                  profilePicture: existingShelter.profilePicture,
+                  mission: formattedMission
+              };
+              
+              isLoadingShelterDetails.value = false;
+              return;
+          }
+          
+          // If it doesn't exist in either list, continue with full processing
+          const shelterData = await getShelterDetails(shelterId);
+          
+          // Process the image in the same way it's processed in the initial list
+          let profilePictureUrl = null;
+          if (shelterData.profilePicture) {
+              if (typeof shelterData.profilePicture === 'string') {
+                  profilePictureUrl = `data:image/jpeg;base64,${shelterData.profilePicture}`;
+              } else if (Array.isArray(shelterData.profilePicture)) {
+                  try {
+                      const binary = shelterData.profilePicture
+                          .map(byte => String.fromCharCode(byte))
+                          .join('');
+                      profilePictureUrl = `data:image/jpeg;base64,${btoa(binary)}`;
+                  } catch (e) {
+                      console.error("Error converting image:", e);
+                  }
+              }
+          }
+          
+          // Format the mission text
+          const formattedMission = formatLongText(
+              shelterData.mission ? shelterData.mission.trim() : '', 
+              40 // Characters per line - adjust as needed
+          );
+          
+          selectedShelter.value = {
+              ...shelterData,
+              profilePicture: profilePictureUrl,
+              mission: formattedMission
+          };
+          
+          isLoadingShelterDetails.value = false;
+      } catch (error) {
+          console.error('Error fetching shelter details:', error);
+          isLoadingShelterDetails.value = false;
+          showToastMessage('Failed to load shelter details. Please try again later.');
+      }
+  };
     
     
     const mockFetchUsers = () => {

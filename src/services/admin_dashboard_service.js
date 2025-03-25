@@ -92,6 +92,19 @@ const getPendingShelters = async () => {
     }
 };
 
+const getApprovedShelters = async () => {
+  try {
+      const response = await fetch('http://localhost:8080/api/v1/admin/shelters/approved');
+      if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return await response.json();
+  } catch (error) {
+      console.error('Error fetching approved shelters:', error);
+      throw error;
+  }
+};
+
 const getShelterDetails = async (shelterId) => {
     try {
       // Fetch shelter profile
@@ -196,7 +209,8 @@ export {
     getTotalUserCount,
     getTotalAnimalCount,
     getPendingShelters,
+    getApprovedShelters,
     getShelterDetails,
     checkWelcomeStatus,
-    acknowledgeWelcome
+    acknowledgeWelcome,
 };

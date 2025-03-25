@@ -110,6 +110,12 @@ async function updatePet(shelterId, petId, petData, photos, photoIdsToDelete = [
   }
 }
 
+const getPetCountByShelter = async (shelterId) => {
+  const response = await fetch(`http://localhost:8080/pets/count/${shelterId}`);
+  if (!response.ok) {
+      throw new Error('Failed to fetch pet count');
+  }
+  return await response.json();
+};
 
-
-export { fetchShelterPets, deletePet, updatePet };
+export { fetchShelterPets, deletePet, updatePet, getPetCountByShelter };

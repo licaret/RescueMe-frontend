@@ -78,9 +78,11 @@
 import TermsModal from './TermsModal.vue';
 
 export default {
+
   components: {
     TermsModal,
   },
+
   data() {
     return {
       email: "",
@@ -92,7 +94,9 @@ export default {
       successMessage: "",
     };
   },
+
   methods: {
+
     togglePasswordVisibility() {
       this.showPassword = !this.showPassword;
     },
@@ -105,7 +109,6 @@ export default {
       this.$router.push('/request-reset-password'); 
     },
 
-
     validateEmail() {
       const emailRegex = /^(?!.*\s)[^\s@]+@[^\s@]+\.[^\s@]+$/; 
       if (!emailRegex.test(this.email)) {
@@ -115,29 +118,24 @@ export default {
       }
     },
 
-
-
     async handleLogin() {
       this.loginError = "";
       this.successMessage = "";
       this.validateEmail();
-      // this.validatePassword();
 
       if (this.emailError || this.passwordError) return; 
 
       if (this.email === "rescueme.care@gmail.com" && this.password === "ParolaAdmin!") {
-        // Set admin data in localStorage
         localStorage.setItem("token", "admin-token");
         localStorage.setItem("Id", "admin-id");
         localStorage.setItem("Username", "Admin");
         localStorage.setItem("Role", "ADMIN");
         
-        // Show success message and redirect
         this.successMessage = "Admin login successful! Redirecting to dashboard...";
         setTimeout(() => {
           this.$router.push("/admin-dashboard");
         }, 2000);
-        return; // Exit function early
+        return; 
       }
 
       try {
@@ -176,7 +174,7 @@ export default {
             
             if (profileResponse.ok) {
               const profileData = await profileResponse.json();
-              const profileStatus = profileData.status; // Use the actual status from the backend
+              const profileStatus = profileData.status; 
               
               // Store the status in localStorage for reference
               localStorage.setItem("shelterProfileStatus", profileStatus);
@@ -184,13 +182,11 @@ export default {
               console.log("Shelter login: Profile status =", profileStatus);
               
               if (profileStatus === 'NEW' || profileStatus === 'DRAFT') {
-                // Profile needs completion
                 this.successMessage = "Login successful! Redirecting to complete your shelter profile...";
                 setTimeout(() => {
                   this.$router.push("/shelter-profile-completion");
                 }, 2000);
               } else if (profileStatus === 'PENDING_APPROVAL') {
-                // Profile is pending approval
                 this.successMessage = "Login successful! Your profile is pending approval...";
                 setTimeout(() => {
                   this.$router.push("/shelter-profile-completion");
