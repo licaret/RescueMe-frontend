@@ -132,10 +132,11 @@
           </div>
         </div>
         
-        <!-- Pending Shelters Tab -->
-        <div v-if="activeTab === 'pending'">
-          <div class="bg-white shadow overflow-hidden sm:rounded-md">
-            <div class="px-4 py-5 border-b border-gray-200 sm:px-6">
+<!-- Pending Shelters Tab -->
+<div v-if="activeTab === 'pending'">
+        <div class="bg-white shadow overflow-hidden sm:rounded-md">
+          <div class="px-4 py-5 border-b border-gray-200 sm:px-6 flex justify-between items-center">
+            <div>
               <h3 class="text-lg leading-6 font-medium text-gray-900">
                 Shelters Pending Approval
               </h3>
@@ -143,75 +144,161 @@
                 Review and approve shelter account applications.
               </p>
             </div>
-            
-            <div v-if="isLoading" class="flex justify-center items-center py-10">
-              <svg class="animate-spin -ml-1 mr-3 h-8 w-8 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              <span class="text-gray-700">Loading applications...</span>
+            <div>
+              <button 
+                @click="sortPendingShelters()" 
+                class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+              >
+                Sort Newest First
+              </button>
+              <button 
+                @click="sortPendingShelters(true)" 
+                class="ml-2 inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+              >
+                Sort Oldest First
+              </button>
             </div>
-            
-            <div v-else-if="pendingShelters.length === 0" class="py-10 text-center">
-              <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              <h3 class="mt-2 text-sm font-medium text-gray-900">No pending applications</h3>
-              <p class="mt-1 text-sm text-gray-500">All shelter applications have been processed.</p>
-            </div>
-            
-            <ul v-else class="divide-y divide-gray-200">
-              <li v-for="shelter in pendingShelters" :key="shelter.id" class="px-4 py-4 sm:px-6">
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center">
-                    <img :src="shelter.profilePicture || defaultShelterImage" alt="Shelter profile" class="h-12 w-12 rounded-full object-cover mr-4">
-                    <div>
-                      <p class="text-sm font-medium text-red-600 truncate">{{ shelter.username }}</p>
-                      <p class="text-sm text-gray-500">
-                        {{ shelter.email }} · {{ formatDate(shelter.createdAt) }}
-                      </p>
-                    </div>
-                  </div>
-                  <div class="flex space-x-2">
-                    <button 
-                      @click="viewShelterDetails(shelter.id)" 
-                      class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-                    >
-                      View Details
-                    </button>
-                    <button 
-                      @click="approveShelter(shelter.id)" 
-                      class="inline-flex items-center px-3 py-1.5 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
-                    >
-                      Approve
-                    </button>
-                    <button 
-                      @click="rejectShelter(shelter.id)" 
-                      class="inline-flex items-center px-3 py-1.5 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
-                    >
-                      Reject
-                    </button>
+          </div>
+
+          <div v-if="isLoading" class="flex justify-center items-center py-10">
+            <svg class="animate-spin -ml-1 mr-3 h-8 w-8 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span class="text-gray-700">Loading applications...</span>
+          </div>
+          
+          <div v-else-if="pendingShelters.length === 0" class="py-10 text-center">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">No pending applications</h3>
+            <p class="mt-1 text-sm text-gray-500">All shelter applications have been processed.</p>
+          </div>
+          
+          <ul v-else class="divide-y divide-gray-200">
+            <li v-for="shelter in paginatedPendingShelters" :key="shelter.id" class="px-4 py-4 sm:px-6">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                  <img :src="shelter.profilePicture || defaultShelterImage" alt="Shelter profile" class="h-12 w-12 rounded-full object-cover mr-4">
+                  <div>
+                    <p class="text-sm font-medium text-red-600 truncate">{{ shelter.username }}</p>
+                    <p class="text-sm text-gray-500">
+                      {{ shelter.email }} · 
+                      <span class="text-xs text-gray-400">
+                        Submitted {{ formatRelativeTime(shelter.createdAt) }}
+                      </span>
+                    </p>
                   </div>
                 </div>
-                <div class="mt-2">
-                  <div class="flex items-center text-sm text-gray-500">
-                    <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                      <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
-                    </svg>
-                    <span>{{ shelter.city }}, {{ shelter.county }}</span>
-                  </div>
-                  <div class="mt-1 flex items-center text-sm text-gray-500">
-                    <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                      <path fill-rule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clip-rule="evenodd" />
-                      <path d="M2 13.692V16a2 2 0 002 2h12a2 2 0 002-2v-2.308A24.974 24.974 0 0110 15c-2.796 0-5.487-.46-8-1.308z" />
-                    </svg>
-                    <span>{{ shelter.shelterType }}</span>
-                  </div>
+                <div class="flex space-x-2">
+                  <button 
+                    @click="viewShelterDetails(shelter.id)" 
+                    class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                  >
+                    View Details
+                  </button>
+                  <button 
+                    @click="approveShelter(shelter.id)" 
+                    class="inline-flex items-center px-3 py-1.5 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
+                  >
+                    Approve
+                  </button>
+                  <button 
+                    @click="rejectShelter(shelter.id)" 
+                    class="inline-flex items-center px-3 py-1.5 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
+                  >
+                    Reject
+                  </button>
                 </div>
-              </li>
-            </ul>
+              </div>
+              <div class="mt-2">
+                <div class="flex items-center text-sm text-gray-500">
+                  <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+                  </svg>
+                  <span>{{ shelter.city }}, {{ shelter.county }}</span>
+                </div>
+                <div class="mt-1 flex items-center text-sm text-gray-500">
+                  <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clip-rule="evenodd" />
+                    <path d="M2 13.692V16a2 2 0 002 2h12a2 2 0 002-2v-2.308A24.974 24.974 0 0110 15c-2.796 0-5.487-.46-8-1.308z" />
+                  </svg>
+                  <span>{{ shelter.shelterType }}</span>
+                </div>
+              </div>
+            </li>
+          </ul>
+          
+          <!-- Pagination for Pending Shelters -->
+          <div v-if="pendingShelters.length > 0" class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+            <div class="flex-1 flex justify-between sm:hidden">
+              <button 
+                @click="pendingCurrentPage > 1 && pendingCurrentPage--" 
+                :disabled="pendingCurrentPage === 1" 
+                class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+              >
+                Previous
+              </button>
+              <button 
+                @click="pendingCurrentPage < pendingTotalPages && pendingCurrentPage++" 
+                :disabled="pendingCurrentPage === pendingTotalPages" 
+                class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+              >
+                Next
+              </button>
+            </div>
+            <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+              <div>
+                <p class="text-sm text-gray-700">
+                  Showing 
+                  <span class="font-medium">{{ (pendingCurrentPage - 1) * pendingItemsPerPage + 1 }}</span> 
+                  to 
+                  <span class="font-medium">{{ Math.min(pendingCurrentPage * pendingItemsPerPage, pendingShelters.length) }}</span> 
+                  of 
+                  <span class="font-medium">{{ pendingShelters.length }}</span> 
+                  results
+                </p>
+              </div>
+              <div>
+                <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                  <button 
+                    @click="pendingCurrentPage > 1 && pendingCurrentPage--" 
+                    :disabled="pendingCurrentPage === 1" 
+                    class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                  >
+                    <span class="sr-only">Previous</span>
+                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                  </button>
+                  <button 
+                    v-for="page in pendingPaginationPages" 
+                    :key="page" 
+                    @click="pendingCurrentPage = page" 
+                    :class="[
+                      page === pendingCurrentPage ? 'z-10 bg-red-50 border-red-500 text-red-600' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50',
+                      'relative inline-flex items-center px-4 py-2 border text-sm font-medium'
+                    ]"
+                  >
+                    {{ page }}
+                  </button>
+                  <button 
+                    @click="pendingCurrentPage < pendingTotalPages && pendingCurrentPage++" 
+                    :disabled="pendingCurrentPage === pendingTotalPages" 
+                    class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                  >
+                    <span class="sr-only">Next</span>
+                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                    </svg>
+                  </button>
+                </nav>
+              </div>
+            </div>
           </div>
         </div>
+      </div>
         
         <!-- Approved Shelters Tab -->
         <div v-if="activeTab === 'approved'">
@@ -1219,6 +1306,10 @@ export default {
     const selectedShelter = ref(null);
     const selectedUser = ref(null);
     const userNotes = ref('');
+
+    // Pagination for Pending Shelters
+    const pendingCurrentPage = ref(1);
+    const pendingItemsPerPage = 10; // Same as approved shelters
     
     // Confirmation Modal Data
     const confirmationTitle = ref('');
@@ -1245,6 +1336,45 @@ export default {
       sessionDurationChange: 0
     });
     
+    const sortPendingShelters = (ascending = false) => {
+      pendingShelters.value.sort((a, b) => {
+        const dateA = new Date(a.createdAt);
+        const dateB = new Date(b.createdAt);
+        return ascending 
+          ? dateA - dateB  // crescător (cele mai vechi primul)
+          : dateB - dateA; // descrescător (cele mai noi primul)
+      });
+    };
+
+    const formatRelativeTime = (dateString) => {
+      const date = new Date(dateString);
+      const now = new Date();
+      const diffInSeconds = Math.floor((now - date) / 1000);
+      
+      const units = [
+        { name: 'year', seconds: 31536000 },
+        { name: 'month', seconds: 2592000 },
+        { name: 'week', seconds: 604800 },
+        { name: 'day', seconds: 86400 },
+        { name: 'hour', seconds: 3600 },
+        { name: 'minute', seconds: 60 },
+        { name: 'second', seconds: 1 }
+      ];
+
+      for (let unit of units) {
+        const interval = Math.floor(diffInSeconds / unit.seconds);
+        if (interval >= 1) {
+          return interval === 1 
+            ? `1 ${unit.name} ago` 
+            : `${interval} ${unit.name}s ago`;
+        }
+      }
+
+      return 'just now';
+    };
+
+    
+
     // Computed Properties
     const filteredApprovedShelters = computed(() => {
       if (!searchQuery.value) return approvedShelters.value;
@@ -1263,6 +1393,36 @@ export default {
       const start = (currentPage.value - 1) * itemsPerPage;
       const end = start + itemsPerPage;
       return filteredApprovedShelters.value.slice(start, end);
+    });
+
+    // Pagination for Pending Shelters
+    const paginatedPendingShelters = computed(() => {
+      const start = (pendingCurrentPage.value - 1) * pendingItemsPerPage;
+      const end = start + pendingItemsPerPage;
+      return pendingShelters.value.slice(start, end);
+    });
+
+    const pendingTotalPages = computed(() => {
+      return Math.ceil(pendingShelters.value.length / pendingItemsPerPage);
+    });
+    
+    const pendingPaginationPages = computed(() => {
+      const pages = [];
+      const maxPages = 5;
+      const halfMax = Math.floor(maxPages / 2);
+      
+      let startPage = Math.max(1, pendingCurrentPage.value - halfMax);
+      let endPage = Math.min(pendingTotalPages.value, startPage + maxPages - 1);
+      
+      if (endPage - startPage + 1 < maxPages && startPage > 1) {
+        startPage = Math.max(1, endPage - maxPages + 1);
+      }
+      
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+      }
+      
+      return pages;
     });
     
     const totalPages = computed(() => {
@@ -2151,8 +2311,10 @@ export default {
       paginatedUsers,
       userTotalPages,
       userPaginationPages,
-      
+
       // Methods
+      sortPendingShelters,
+      formatRelativeTime,
       viewShelterDetails,
       viewUserDetails,
       approveShelter,
@@ -2170,7 +2332,12 @@ export default {
       getDocumentTypeName,
       getDocumentUrl,
       viewShelterDocument,
-      logout
+      logout,
+
+      pendingCurrentPage,
+      pendingItemsPerPage,
+      paginatedPendingShelters,
+      pendingPaginationPages
     };
   }
 };
