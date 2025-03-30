@@ -1,276 +1,372 @@
 <template>
-    <nav class="fixed top-0 z-50 w-full bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-    <div class="px-3 py-3 lg:px-5 lg:pl-3">
-        <div class="flex items-center justify-between">
-        <div class="flex items-center justify-start rtl:justify-end">
-            <!-- <button data-drawer-target="logo-sidebar" data-drawer-toggle="logo-sidebar" aria-controls="logo-sidebar" type="button" class="inline-flex items-center p-2 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600">
-                <span class="sr-only">Open sidebar</span>
+    <div class="dashboard-container">
+      <!-- Top Navigation Bar -->
+      <nav class="fixed top-0 z-50 w-full bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+        <div class="px-3 py-3 lg:px-5 lg:pl-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center justify-start rtl:justify-end">
+              <button @click="toggleSidebar" data-drawer-target="logo-sidebar" data-drawer-toggle="logo-sidebar" aria-controls="logo-sidebar" type="button" class="inline-flex items-center p-2 text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600">
+                <span class="sr-only">Toggle sidebar</span>
                 <svg class="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                <path clip-rule="evenodd" fill-rule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z"></path>
+                  <path clip-rule="evenodd" fill-rule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z"></path>
                 </svg>
-            </button> -->
-            <a class="flex items-center">
+              </button>
+              <a class="flex items-center ml-2">
                 <span class="self-center text-2xl font-medium whitespace-nowrap">
-                <span class="text-gray-700 ">RESCUE</span>
-                <span class="text-red-600 font-bold">ME</span>
+                  <span class="text-gray-700">RESCUE</span>
+                  <span class="text-red-600 font-bold">ME</span>
                 </span>
-            </a>
-        </div>
-        <div class="flex items-center">
-            <div class="flex items-center ms-3">
+              </a>
+            </div>
+            <div class="flex items-center">
+              <!-- Notifications -->
+              <div class="flex items-center mr-4 relative notifications-container">
+                <button @click="toggleNotifications" type="button" class="relative p-2 text-gray-500 rounded-lg hover:text-gray-900 hover:bg-gray-100">
+                  <span class="sr-only">View notifications</span>
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                  </svg>
+                  <div v-if="unreadNotifications > 0" class="absolute inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full -top-1 -right-1">
+                    {{ unreadNotifications }}
+                  </div>
+                </button>
+                <!-- Dropdown menu -->
+                <div v-if="showNotifications" class="absolute top-full right-0 mt-2 w-80 bg-white rounded-lg shadow-lg overflow-hidden z-50">
+                  <div class="p-3 border-b border-gray-200">
+                    <h5 class="text-sm font-semibold text-gray-700">Notifications</h5>
+                  </div>
+                  <div class="max-h-60 overflow-y-auto">
+                    <div v-if="notifications.length === 0" class="p-4 text-center text-gray-500">
+                      No notifications yet
+                    </div>
+                    <a v-for="(notification, index) in notifications" :key="index" href="#" class="flex px-4 py-3 border-b hover:bg-gray-50">
+                      <div class="flex-shrink-0">
+                        <div :class="notification.icon.bg" class="w-10 h-10 rounded-full flex items-center justify-center">
+                          <svg class="w-5 h-5 text-white" :fill="notification.icon.fill" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path :d="notification.icon.path" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                          </svg>
+                        </div>
+                      </div>
+                      <div class="w-full pl-3">
+                        <div class="text-gray-500 text-sm mb-1.5">
+                          {{ notification.message }}
+                        </div>
+                        <div class="text-xs text-blue-600">
+                          {{ notification.time }}
+                        </div>
+                      </div>
+                    </a>
+                  </div>
+                  <a href="#" class="block py-2 text-sm font-medium text-center text-gray-900 bg-gray-50 hover:bg-gray-100">
+                    View all notifications
+                  </a>
+                </div>
+              </div>
+              <!-- User Menu -->
+              <div class="flex items-center ms-3 user-menu-container">
                 <div>
-                    <router-link to="/shelter-dashboard/edit-profile">
-                        <button type="button" class="flex items-center px-4 py-2 text-sm font-medium bg-red-700 text-white rounded-full">
-                            {{ shelterUsername }}
-                        </button>
-                    </router-link>
+                  <router-link to="/shelter-dashboard/edit-profile">
+                    <button type="button" class="flex items-center px-4 py-2 text-sm font-medium bg-red-700 text-white rounded-full">
+                      {{ shelterUsername }}
+                    </button>
+                  </router-link>
                 </div>
-                <!-- <div class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-sm shadow-sm dark:bg-gray-700 dark:divide-gray-600" id="dropdown-user">
-                <div class="px-4 py-3" role="none">
-                    <p class="text-sm text-gray-900 dark:text-white" role="none">
-                    Neil Sims
-                    </p>
-                    <p class="text-sm font-medium text-gray-900 truncate dark:text-gray-300" role="none">
-                    neil.sims@flowbite.com
-                    </p>
-                </div>
-                <ul class="py-1" role="none">
-                    <li>
-                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white" role="menuitem">Dashboard</a>
-                    </li>
-                    <li>
-                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white" role="menuitem">Settings</a>
-                    </li>
-                    <li>
-                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white" role="menuitem">Earnings</a>
-                    </li>
-                    <li>
-                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white" role="menuitem">Sign out</a>
-                    </li>
-                </ul>
-                </div> -->
+              </div>
             </div>
-            </div>
+          </div>
         </div>
+      </nav>
+  
+      <!-- Sidebar -->
+      <aside :id="'logo-sidebar'" :class="{'sm:translate-x-0': true, '-translate-x-full': !sidebarOpen, 'translate-x-0': sidebarOpen}" class="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700" aria-label="Sidebar">
+        <div class="h-full px-3 pb-4 overflow-y-auto bg-white dark:bg-gray-800">
+          <ul class="space-y-2 font-medium">
+            <li>
+              <router-link 
+                to="/shelter-dashboard/" 
+                class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                :class="{ 'bg-gray-100': isActive('/shelter-dashboard/') }"
+              >
+                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                </svg>
+                <span class="flex-1 ms-3 whitespace-nowrap">Dashboard</span>
+              </router-link>
+            </li>
+            <li>
+              <router-link 
+                to="/shelter-dashboard/manage-pets" 
+                class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                :class="{ 'bg-gray-100': isActive('/shelter-dashboard/manage-pets') }"
+              >
+                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+                <span class="flex-1 ms-3 whitespace-nowrap">Manage Pets</span>
+              </router-link>
+            </li>
+            <li>
+              <router-link 
+                to="/shelter-dashboard/adoption-requests" 
+                class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                :class="{ 'bg-gray-100': isActive('/shelter-dashboard/adoption-requests') }"
+              >
+                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                </svg>
+                <span class="flex-1 ms-3 whitespace-nowrap">Adoption Requests</span>
+                <span class="inline-flex items-center justify-center w-3 h-3 p-3 ms-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300">2</span>
+              </router-link>
+            </li>
+            <li>
+              <router-link 
+                to="/shelter-dashboard/events" 
+                class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                :class="{ 'bg-gray-100': isActive('/shelter-dashboard/events') }"
+              >
+                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                <span class="flex-1 ms-3 whitespace-nowrap">Manage Events</span>
+              </router-link>
+            </li>
+            <li>
+              <router-link 
+                to="/shelter-dashboard/messages" 
+                class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                :class="{ 'bg-gray-100': isActive('/shelter-dashboard/messages') }"
+              >
+                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                </svg>
+                <span class="flex-1 ms-3 whitespace-nowrap">Inbox</span>
+                <span class="inline-flex items-center justify-center w-3 h-3 p-3 ms-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300">3</span>
+              </router-link>
+            </li>
+            <li>
+              <router-link 
+                to="/shelter-dashboard/donations" 
+                class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                :class="{ 'bg-gray-100': isActive('/shelter-dashboard/donations') }"
+              >
+                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+                <span class="flex-1 ms-3 whitespace-nowrap">Donations</span>
+              </router-link>
+            </li>
+            <li>
+              <router-link 
+                to="/shelter-dashboard/reports" 
+                class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                :class="{ 'bg-gray-100': isActive('/shelter-dashboard/reports') }"
+              >
+                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+                <span class="flex-1 ms-3 whitespace-nowrap">Reports & Analytics</span>
+              </router-link>
+            </li>
+            <li>
+              <router-link 
+                to="/shelter-dashboard/settings" 
+                class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                :class="{ 'bg-gray-100': isActive('/shelter-dashboard/settings') }"
+              >
+                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                <span class="flex-1 ms-3 whitespace-nowrap">Settings</span>
+              </router-link>
+            </li>
+            <li>
+              <a @click="handleLogout" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group cursor-pointer">
+                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                </svg>
+                <span class="flex-1 ms-3 whitespace-nowrap">Sign Out</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </aside>
+  
+      <!-- Main Content -->
+      <div class="p-4 sm:ml-64 pt-20 min-h-screen bg-gray-50 dark:bg-gray-900">
+        <transition name="fade" mode="out-in">
+          <router-view></router-view>
+        </transition>
+      </div>
     </div>
-    </nav>
-
-    <aside id="logo-sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -translate-x-full bg-white border-r border-gray-200 sm:translate-x-0 dark:bg-gray-800 dark:border-gray-700" aria-label="Sidebar">
-    <div class="h-full px-3 pb-4 overflow-y-auto bg-white dark:bg-gray-800">
-        <ul class="space-y-2 font-medium">
-            <!-- <li>
-                <a href="#" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                    <img src="../assets/dashboard.png" alt="Dashboard icon" class="w-5 h-5">
-                    <span class="flex-1 ms-3 whitespace-nowrap">Dashboard</span>
-                </a>
-            </li> -->
-            <li>
-                <router-link 
-                    to="/shelter-dashboard/" 
-                    class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
-                >
-                    <img src="../assets/dashboard.png" alt="Dashboard icon" class="w-5 h-5">
-                    <span class="flex-1 ms-3 whitespace-nowrap">Dashboard</span>
-                </router-link>
-            </li>
-            <li>
-                <router-link 
-                    to="/shelter-dashboard/manage-pets" 
-                    class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
-                >
-                    <img src="../assets/available-pets.png" alt="Dog paw icon" class="w-5 h-5">
-                    <span class="flex-1 ms-3 whitespace-nowrap">Manage Pets</span>
-                </router-link>
-            </li>
-            <li>
-                <a href="#" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                    <img src="../assets/adoption-requests.png" alt="Pet home icon" class="w-5 h-5">
-                    <span class="flex-1 ms-3 whitespace-nowrap">Adoption Request</span>
-                </a>
-            </li>
-            <li>
-                <a href="#" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                    <img src="../assets/events.png" alt="Event icon" class="w-5 h-5">
-                    <span class="flex-1 ms-3 whitespace-nowrap">Manage Events</span>
-                </a>
-            </li>
-            <li>
-                <a href="#" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                    <img src="../assets/inbox.png" alt="Inbox icon" class="w-5 h-5">
-                    <span class="flex-1 ms-3 whitespace-nowrap">Inbox</span>
-                    <span class="inline-flex items-center justify-center w-3 h-3 p-3 ms-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300">3</span>
-                </a>
-            </li>
-            <li>
-                <a href="#" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                    <img src="../assets/donations.png" alt="Donate icon" class="w-5 h-5">
-                    <span class="flex-1 ms-3 whitespace-nowrap">Donations</span>
-                </a>
-            </li>
-            <li>
-                <a href="#" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                    <img src="../assets/settings.png" alt="Settings icon" class="w-5 h-5">
-                    <span class="flex-1 ms-3 whitespace-nowrap">Settings</span>
-                </a>
-            </li>
-            <li>
-                <a @click="handleLogout" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                    <img src="../assets/signout.png" alt="Signout icon" class="w-5 h-5">
-                    <span class="flex-1 ms-3 whitespace-nowrap">Sign Out</span>
-                </a>
-            </li>
-        </ul>
-    </div>
-    </aside>
-
-    <div class="p-4 sm:ml-64">
-        <router-view></router-view>
-    <!-- <div class="p-4 border-2 border-gray-200 border-dashed rounded-lg dark:border-gray-700 mt-14">
-        <div class="grid grid-cols-3 gap-4 mb-4">
-            <div class="flex items-center justify-center h-24 rounded-sm bg-gray-50 dark:bg-gray-800">
-                <p class="text-2xl text-gray-400 dark:text-gray-500">
-                <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
-                </svg>
-                </p>
-            </div>
-            <div class="flex items-center justify-center h-24 rounded-sm bg-gray-50 dark:bg-gray-800">
-                <p class="text-2xl text-gray-400 dark:text-gray-500">
-                <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
-                </svg>
-                </p>
-            </div>
-            <div class="flex items-center justify-center h-24 rounded-sm bg-gray-50 dark:bg-gray-800">
-                <p class="text-2xl text-gray-400 dark:text-gray-500">
-                <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
-                </svg>
-                </p>
-            </div>
-        </div>
-        <div class="flex items-center justify-center h-48 mb-4 rounded-sm bg-gray-50 dark:bg-gray-800">
-            <p class="text-2xl text-gray-400 dark:text-gray-500">
-                <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
-                </svg>
-            </p>
-        </div>
-        <div class="grid grid-cols-2 gap-4 mb-4">
-            <div class="flex items-center justify-center rounded-sm bg-gray-50 h-28 dark:bg-gray-800">
-                <p class="text-2xl text-gray-400 dark:text-gray-500">
-                <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
-                </svg>
-                </p>
-            </div>
-            <div class="flex items-center justify-center rounded-sm bg-gray-50 h-28 dark:bg-gray-800">
-                <p class="text-2xl text-gray-400 dark:text-gray-500">
-                <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
-                </svg>
-                </p>
-            </div>
-            <div class="flex items-center justify-center rounded-sm bg-gray-50 h-28 dark:bg-gray-800">
-                <p class="text-2xl text-gray-400 dark:text-gray-500">
-                <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
-                </svg>
-                </p>
-            </div>
-            <div class="flex items-center justify-center rounded-sm bg-gray-50 h-28 dark:bg-gray-800">
-                <p class="text-2xl text-gray-400 dark:text-gray-500">
-                <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
-                </svg>
-                </p>
-            </div>
-        </div>
-        <div class="flex items-center justify-center h-48 mb-4 rounded-sm bg-gray-50 dark:bg-gray-800">
-            <p class="text-2xl text-gray-400 dark:text-gray-500">
-                <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
-                </svg>
-            </p>
-        </div>
-        <div class="grid grid-cols-2 gap-4">
-            <div class="flex items-center justify-center rounded-sm bg-gray-50 h-28 dark:bg-gray-800">
-                <p class="text-2xl text-gray-400 dark:text-gray-500">
-                <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
-                </svg>
-                </p>
-            </div>
-            <div class="flex items-center justify-center rounded-sm bg-gray-50 h-28 dark:bg-gray-800">
-                <p class="text-2xl text-gray-400 dark:text-gray-500">
-                <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
-                </svg>
-                </p>
-            </div>
-            <div class="flex items-center justify-center rounded-sm bg-gray-50 h-28 dark:bg-gray-800">
-                <p class="text-2xl text-gray-400 dark:text-gray-500">
-                <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
-                </svg>
-                </p>
-            </div>
-            <div class="flex items-center justify-center rounded-sm bg-gray-50 h-28 dark:bg-gray-800">
-                <p class="text-2xl text-gray-400 dark:text-gray-500">
-                <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 1v16M1 9h16"/>
-                </svg>
-                </p>
-            </div>
-        </div>
-    </div> -->
-    </div>
-</template>
-
-
-
-<script>
-    import { ref, onMounted, onUnmounted } from "vue";
-    import { useRouter } from "vue-router";
-    import PetStatsChart from "@/components/PetStatsChart.vue";
-
-    export default {
-        components: { PetStatsChart },
-        setup() {
-            const router = useRouter();
-            const shelterUsername = ref("Shelter");
-
-            const blockBackButton = () => {
-                history.pushState(null, "", location.href); 
-            };
-
-            const handleLogout = () => {
-                localStorage.clear();
-
-                router.push("/login");
-            };
-
-
-            onMounted(() => {
-                const username = localStorage.getItem("Username");
-                if (username) {
-                    shelterUsername.value = username;
-                } else {
-                    console.error("Username not found in localStorage.");
-                }
-
-                window.history.pushState(null, "", window.location.href);
-                window.addEventListener("popstate", blockBackButton);
-            });
-
-            onUnmounted(() => {
-                window.removeEventListener("popstate", blockBackButton);
-            });
-
-            return {
-                shelterUsername,
-                handleLogout, 
-            };
+  </template>
+  
+  <script>
+  import { ref, onMounted, onUnmounted, computed } from "vue";
+  import { useRouter, useRoute } from "vue-router";
+  
+  export default {
+    name: 'ShelterDashboardLayout',
+    components: {
+    },
+    setup() {
+      const router = useRouter();
+      const route = useRoute();
+      const shelterUsername = ref("Shelter");
+      const sidebarOpen = ref(window.innerWidth >= 768); // Default open on desktop
+      const showNotifications = ref(false);
+      const unreadNotifications = ref(3);
+      
+      // Sample notifications
+      const notifications = ref([
+        {
+          message: "New adoption request for Max",
+          time: "A few moments ago",
+          icon: {
+            bg: "bg-blue-600",
+            fill: "none",
+            path: "M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+          }
         },
-    };
-</script>
+        {
+          message: "Donation received: $250.00",
+          time: "2 hours ago",
+          icon: {
+            bg: "bg-green-500",
+            fill: "none",
+            path: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          }
+        },
+        {
+          message: "Document approved: Vet Authorization",
+          time: "Yesterday",
+          icon: {
+            bg: "bg-green-500",
+            fill: "none",
+            path: "M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+          }
+        }
+      ]);
+  
+      // Check if the route matches the given path
+      const isActive = (path) => {
+        if (path === '/shelter-dashboard/' && route.path === '/shelter-dashboard/') {
+          return true;
+        }
+        return path !== '/shelter-dashboard/' && route.path.startsWith(path);
+      };
+  
+      // Toggle sidebar (especially important for mobile)
+      const toggleSidebar = () => {
+        sidebarOpen.value = !sidebarOpen.value;
+      };
+  
+      // Toggle notifications
+      const toggleNotifications = () => {
+        showNotifications.value = !showNotifications.value;
+      };
+  
+      // Block back button to prevent going back to login page
+      const blockBackButton = () => {
+        history.pushState(null, "", location.href);
+      };
+  
+      // Handle logout
+      const handleLogout = () => {
+        localStorage.clear();
+        router.push("/login");
+      };
+  
+      // Close dropdowns when clicking outside
+      const handleClickOutside = (event) => {
+        if (showNotifications.value && !event.target.closest('.notifications-container')) {
+          showNotifications.value = false;
+        }
+      };
+  
+      // Adjust sidebar based on screen size
+      const handleResize = () => {
+        if (window.innerWidth < 768) {
+          sidebarOpen.value = false;
+        } else {
+          sidebarOpen.value = true;
+        }
+      };
+  
+      onMounted(() => {
+        // Get user data from localStorage
+        const username = localStorage.getItem("Username");
+        if (username) {
+          shelterUsername.value = username;
+        } else {
+          console.error("Username not found in localStorage.");
+        }
+  
+        // Prevent navigation back to login
+        window.history.pushState(null, "", window.location.href);
+        window.addEventListener("popstate", blockBackButton);
+        
+        // Close dropdown menus when clicking outside
+        document.addEventListener('click', handleClickOutside);
+        
+        // Adjust sidebar for responsive design
+        window.addEventListener('resize', handleResize);
+        handleResize();
+      });
+  
+      onUnmounted(() => {
+        window.removeEventListener("popstate", blockBackButton);
+        document.removeEventListener('click', handleClickOutside);
+        window.removeEventListener('resize', handleResize);
+      });
+  
+      return {
+        shelterUsername,
+        sidebarOpen,
+        showNotifications,
+        unreadNotifications,
+        notifications,
+        isActive,
+        toggleSidebar,
+        toggleNotifications,
+        handleLogout
+      };
+    }
+  };
+  </script>
+  
+  <style scoped>
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: opacity 0.2s ease;
+  }
+  
+  .fade-enter-from,
+  .fade-leave-to {
+    opacity: 0;
+  }
+  
+  /* Ensures content min-height fills the screen */
+  .dashboard-container {
+    min-height: 100vh;
+    background-color: #f9fafb;
+  }
+  
+  /* Custom scrollbar for notifications */
+  .overflow-y-auto::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  .overflow-y-auto::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+  
+  .overflow-y-auto::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+  }
+  
+  .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+  </style>

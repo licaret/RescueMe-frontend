@@ -42,26 +42,10 @@
         </button>
       </div>
 
-      <!-- <div class="flex justify-between items-center mb-8">
-        <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Edit Shelter Profile</h1>
-        <button 
-          @click="goBack" 
-          class="flex items-center text-gray-600 hover:text-gray-800"
-        >
-          <svg class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
-          Back to Dashboard
-        </button>
-      </div> -->
-
-      <!-- Enhanced profile header with better spacing, design, and visual hierarchy -->
       <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
-        <!-- Cover image/banner area -->
         <div class="h-32 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
         
         <div class="p-6 relative">
-          <!-- Profile picture with overlap on banner -->
           <div class="absolute -top-16 left-6 md:left-8">
             <div class="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-white shadow-md overflow-hidden bg-white">
               <img 
@@ -117,11 +101,6 @@
                 <span>{{ shelter.hoursOfOperation }}</span>
               </div>
             </div>
-            
-            <!-- Brief mission statement if available, truncated if too long -->
-            <!-- <div v-if="shelter.mission" class="mt-4 text-gray-600 text-sm border-t pt-4">
-              <p>{{ truncatedMission }}</p>
-            </div> -->
           </div>
         </div>
       </div>
@@ -234,7 +213,6 @@
                 </svg>
               </div>
               
-              <!-- Prefix +40 -->
               <div class="absolute inset-y-0 left-8 flex items-center pointer-events-none">
                 <span class="text-gray-500 pl-2">+40</span>
               </div>
@@ -246,7 +224,6 @@
                 class="w-full border rounded p-2 pl-20"
                 :class="{
                   'border-red-500': phoneError, 
-                  // 'border-green-500': phoneInput && isValidPhone && !phoneError
                 }"
                 placeholder="712 345 678"
               />

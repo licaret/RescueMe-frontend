@@ -394,6 +394,7 @@ export default {
         delete petDataToSend.ageUnit;
         delete petDataToSend.shelterTimeValue;
         delete petDataToSend.shelterTimeUnit;
+        delete petDataToSend.shelterId;
 
 
         console.log("Submitting form with:", {
