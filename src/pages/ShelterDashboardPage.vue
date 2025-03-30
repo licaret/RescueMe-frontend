@@ -194,179 +194,492 @@
   
       <!-- Main Content -->
       <div class="p-4 sm:ml-64 pt-20 min-h-screen bg-gray-50 dark:bg-gray-900">
-        <transition name="fade" mode="out-in">
-          <router-view></router-view>
-        </transition>
+        <!-- NEW CONTENT STARTS HERE -->
+        <div v-if="route.path === '/shelter-dashboard/'">
+          <!-- Dashboard Summary Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div class="bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow">
+              <div class="flex items-center">
+                <div class="rounded-full p-3 bg-blue-100">
+                  <svg class="w-6 h-6 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                  </svg>
+                </div>
+                <div class="ml-4">
+                  <p class="text-gray-500 text-sm">Total Pets</p>
+                  <h3 class="text-2xl font-bold">24</h3>
+                </div>
+              </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow">
+              <div class="flex items-center">
+                <div class="rounded-full p-3 bg-green-100">
+                  <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                </div>
+                <div class="ml-4">
+                  <p class="text-gray-500 text-sm">Adopted</p>
+                  <h3 class="text-2xl font-bold">8</h3>
+                </div>
+              </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow">
+              <div class="flex items-center">
+                <div class="rounded-full p-3 bg-yellow-100">
+                  <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </div>
+                <div class="ml-4">
+                  <p class="text-gray-500 text-sm">Pending</p>
+                  <h3 class="text-2xl font-bold">3</h3>
+                </div>
+              </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow">
+              <div class="flex items-center">
+                <div class="rounded-full p-3 bg-red-100">
+                  <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </div>
+                <div class="ml-4">
+                  <p class="text-gray-500 text-sm">Available</p>
+                  <h3 class="text-2xl font-bold">13</h3>
+                </div>
+              </div>
+            </div>
+          </div>
+  
+          <!-- Main Dashboard Sections -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Recent Activity Section -->
+            <div class="lg:col-span-2 bg-white rounded-lg shadow">
+              <div class="p-4 border-b">
+                <h2 class="text-lg font-semibold text-gray-800">Recent Activity</h2>
+              </div>
+              <div class="p-4">
+                <ul class="divide-y">
+                  <li class="py-3">
+                    <div class="flex items-start">
+                      <div class="bg-blue-100 p-2 rounded-full">
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                        </svg>
+                      </div>
+                      <div class="ml-3">
+                        <p class="text-sm font-medium">New adoption request for <span class="font-semibold">Max</span></p>
+                        <p class="text-xs text-gray-500">15 minutes ago</p>
+                      </div>
+                      <div class="ml-auto">
+                        <span class="text-xs font-medium text-white bg-blue-500 px-2 py-1 rounded-full">Pending</span>
+                      </div>
+                    </div>
+                  </li>
+                  <li class="py-3">
+                    <div class="flex items-start">
+                      <div class="bg-green-100 p-2 rounded-full">
+                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                      </div>
+                      <div class="ml-3">
+                        <p class="text-sm font-medium">Updated profile for <span class="font-semibold">Luna</span></p>
+                        <p class="text-xs text-gray-500">2 hours ago</p>
+                      </div>
+                      <div class="ml-auto">
+                        <span class="text-xs font-medium text-white bg-green-500 px-2 py-1 rounded-full">Completed</span>
+                      </div>
+                    </div>
+                  </li>
+                  <li class="py-3">
+                    <div class="flex items-start">
+                      <div class="bg-green-100 p-2 rounded-full">
+                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                      </div>
+                      <div class="ml-3">
+                        <p class="text-sm font-medium">Donation received from <span class="font-semibold">Sarah Johnson</span></p>
+                        <p class="text-xs text-gray-500">Yesterday, 3:45 PM</p>
+                      </div>
+                      <div class="ml-auto">
+                        <span class="text-sm font-medium text-green-600">$120.00</span>
+                      </div>
+                    </div>
+                  </li>
+                  <li class="py-3">
+                    <div class="flex items-start">
+                      <div class="bg-purple-100 p-2 rounded-full">
+                        <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 15.546c-.523 0-1.046.151-1.5.454a2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.701 2.701 0 00-1.5-.454M9 6v2m3-2v2m3-2v2M9 3h.01M12 3h.01M15 3h.01M21 21v-7a2 2 0 00-2-2H5a2 2 0 00-2 2v7h18zm-3-9v-2a2 2 0 00-2-2H8a2 2 0 00-2 2v2h12z"></path>
+                      </svg>
+                    </div>
+                    <div class="ml-3">
+                      <p class="text-sm font-medium"><span class="font-semibold">Bella</span> has been adopted by Michael Collins</p>
+                      <p class="text-xs text-gray-500">Yesterday, 5:20 PM</p>
+                    </div>
+                    <div class="ml-auto">
+                      <span class="text-xs font-medium text-white bg-purple-500 px-2 py-1 rounded-full">Adoption</span>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+              <div class="mt-3 text-center">
+                <a href="#" class="text-sm font-medium text-blue-600 hover:text-blue-800">View all activity</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Upcoming Events Section -->
+          <div class="bg-white rounded-lg shadow">
+            <div class="p-4 border-b">
+              <h2 class="text-lg font-semibold text-gray-800">Upcoming Events</h2>
+            </div>
+            <div class="p-4">
+              <ul class="divide-y">
+                <li class="py-3">
+                  <div class="flex items-center">
+                    <div class="bg-indigo-100 p-2 rounded text-center w-12">
+                      <div class="text-xs text-indigo-600 font-medium">APR</div>
+                      <div class="text-indigo-800 font-bold">15</div>
+                    </div>
+                    <div class="ml-3">
+                      <p class="text-sm font-medium">Adoption Day</p>
+                      <p class="text-xs text-gray-500">10:00 AM - 4:00 PM</p>
+                    </div>
+                  </div>
+                </li>
+                <li class="py-3">
+                  <div class="flex items-center">
+                    <div class="bg-indigo-100 p-2 rounded text-center w-12">
+                      <div class="text-xs text-indigo-600 font-medium">APR</div>
+                      <div class="text-indigo-800 font-bold">22</div>
+                    </div>
+                    <div class="ml-3">
+                      <p class="text-sm font-medium">Fundraiser</p>
+                      <p class="text-xs text-gray-500">6:30 PM - 9:00 PM</p>
+                    </div>
+                  </div>
+                </li>
+                <li class="py-3">
+                  <div class="flex items-center">
+                    <div class="bg-indigo-100 p-2 rounded text-center w-12">
+                      <div class="text-xs text-indigo-600 font-medium">MAY</div>
+                      <div class="text-indigo-800 font-bold">05</div>
+                    </div>
+                    <div class="ml-3">
+                      <p class="text-sm font-medium">Volunteer Training</p>
+                      <p class="text-xs text-gray-500">2:00 PM - 5:00 PM</p>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+              <div class="mt-3 text-center">
+                <a href="#" class="text-sm font-medium text-blue-600 hover:text-blue-800">View all events</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional Sections -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+          <!-- Urgent Adoptions Needed -->
+          <div class="bg-white rounded-lg shadow">
+            <div class="p-4 border-b">
+              <h2 class="text-lg font-semibold text-gray-800">Urgent Adoptions Needed</h2>
+            </div>
+            <div class="p-4">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="border rounded-lg overflow-hidden flex">
+                  <div class="w-24 h-24 bg-gray-200 flex-shrink-0">
+                    <img src="https://via.placeholder.com/96" alt="Placeholder" class="w-full h-full object-cover" />
+                  </div>
+                  <div class="p-3">
+                    <h3 class="text-sm font-semibold">Buddy</h3>
+                    <p class="text-xs text-gray-500">German Shepherd, 6 years</p>
+                    <span class="inline-block mt-1 text-xs bg-red-100 text-red-800 px-2 py-0.5 rounded-full">12 days left</span>
+                  </div>
+                </div>
+                <div class="border rounded-lg overflow-hidden flex">
+                  <div class="w-24 h-24 bg-gray-200 flex-shrink-0">
+                    <img src="https://via.placeholder.com/96" alt="Placeholder" class="w-full h-full object-cover" />
+                  </div>
+                  <div class="p-3">
+                    <h3 class="text-sm font-semibold">Mittens</h3>
+                    <p class="text-xs text-gray-500">Tabby Cat, 4 years</p>
+                    <span class="inline-block mt-1 text-xs bg-red-100 text-red-800 px-2 py-0.5 rounded-full">7 days left</span>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-3 text-center">
+                <router-link to="/shelter-dashboard/manage-pets" class="text-sm font-medium text-blue-600 hover:text-blue-800">View all urgent cases</router-link>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Donations -->
+          <div class="bg-white rounded-lg shadow">
+            <div class="p-4 border-b">
+              <h2 class="text-lg font-semibold text-gray-800">Recent Donations</h2>
+            </div>
+            <div class="p-4">
+              <ul class="divide-y">
+                <li class="py-2 flex justify-between items-center">
+                  <div>
+                    <p class="text-sm font-medium">Sarah Johnson</p>
+                    <p class="text-xs text-gray-500">Yesterday</p>
+                  </div>
+                  <span class="font-semibold text-green-600">$120.00</span>
+                </li>
+                <li class="py-2 flex justify-between items-center">
+                  <div>
+                    <p class="text-sm font-medium">Anonymous</p>
+                    <p class="text-xs text-gray-500">2 days ago</p>
+                  </div>
+                  <span class="font-semibold text-green-600">$50.00</span>
+                </li>
+                <li class="py-2 flex justify-between items-center">
+                  <div>
+                    <p class="text-sm font-medium">Robert Williams</p>
+                    <p class="text-xs text-gray-500">3 days ago</p>
+                  </div>
+                  <span class="font-semibold text-green-600">$75.00</span>
+                </li>
+              </ul>
+              <div class="mt-4 p-3 bg-gray-50 rounded-lg">
+                <div class="flex justify-between items-center">
+                  <p class="text-sm font-medium">Month Total</p>
+                  <p class="text-lg font-bold text-green-600">$1,245.00</p>
+                </div>
+                <div class="mt-2">
+                  <div class="h-2 bg-gray-200 rounded-full">
+                    <div class="h-2 bg-green-500 rounded-full" style="width: 45%"></div>
+                  </div>
+                  <p class="text-xs text-gray-500 mt-1">45% of monthly goal</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="mt-6 bg-white rounded-lg shadow p-4">
+          <h2 class="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h2>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <router-link to="/shelter-dashboard/manage-pets" class="flex flex-col items-center justify-center p-4 border rounded-lg hover:bg-gray-50 transition">
+              <svg class="w-8 h-8 text-blue-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+              </svg>
+              <span class="text-sm font-medium">Add New Pet</span>
+            </router-link>
+            <a href="#" class="flex flex-col items-center justify-center p-4 border rounded-lg hover:bg-gray-50 transition">
+              <svg class="w-8 h-8 text-purple-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+              <span class="text-sm font-medium">Create Event</span>
+            </a>
+            <a href="#" class="flex flex-col items-center justify-center p-4 border rounded-lg hover:bg-gray-50 transition">
+              <svg class="w-8 h-8 text-green-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+              <span class="text-sm font-medium">Generate Report</span>
+            </a>
+            <a href="#" class="flex flex-col items-center justify-center p-4 border rounded-lg hover:bg-gray-50 transition">
+              <svg class="w-8 h-8 text-red-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
+              </svg>
+              <span class="text-sm font-medium">Send Updates</span>
+            </a>
+          </div>
+        </div>
       </div>
+      <!-- NEW CONTENT ENDS HERE -->
+
+      <transition name="fade" mode="out-in">
+        <router-view></router-view>
+      </transition>
     </div>
-  </template>
-  
-  <script>
-  import { ref, onMounted, onUnmounted, computed } from "vue";
-  import { useRouter, useRoute } from "vue-router";
-  
-  export default {
-    name: 'ShelterDashboardLayout',
-    components: {
-    },
-    setup() {
-      const router = useRouter();
-      const route = useRoute();
-      const shelterUsername = ref("Shelter");
-      const sidebarOpen = ref(window.innerWidth >= 768); // Default open on desktop
-      const showNotifications = ref(false);
-      const unreadNotifications = ref(3);
+  </div>
+</template>
+
+<script>
+import { ref, onMounted, onUnmounted, computed } from "vue";
+import { useRouter, useRoute } from "vue-router";
+
+export default {
+  name: 'ShelterDashboardLayout',
+  components: {
+  },
+  setup() {
+    const router = useRouter();
+    const route = useRoute();
+    const shelterUsername = ref("Shelter");
+    const sidebarOpen = ref(window.innerWidth >= 768); // Default open on desktop
+    const showNotifications = ref(false);
+    const unreadNotifications = ref(3);
+    
+    // Sample stats for the dashboard
+    const stats = ref({
+      totalPets: 24,
+      adopted: 8,
+      pending: 3,
+      available: 13
+    });
+    
+    // Sample notifications
+    const notifications = ref([
+      {
+        message: "New adoption request for Max",
+        time: "A few moments ago",
+        icon: {
+          bg: "bg-blue-600",
+          fill: "none",
+          path: "M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+        }
+      },
+      {
+        message: "Donation received: $250.00",
+        time: "2 hours ago",
+        icon: {
+          bg: "bg-green-500",
+          fill: "none",
+          path: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        }
+      },
+      {
+        message: "Document approved: Vet Authorization",
+        time: "Yesterday",
+        icon: {
+          bg: "bg-green-500",
+          fill: "none",
+          path: "M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+        }
+      }
+    ]);
+
+    // Check if the route matches the given path
+    const isActive = (path) => {
+      if (path === '/shelter-dashboard/' && route.path === '/shelter-dashboard/') {
+        return true;
+      }
+      return path !== '/shelter-dashboard/' && route.path.startsWith(path);
+    };
+
+    // Toggle sidebar (especially important for mobile)
+    const toggleSidebar = () => {
+      sidebarOpen.value = !sidebarOpen.value;
+    };
+
+    // Toggle notifications
+    const toggleNotifications = () => {
+      showNotifications.value = !showNotifications.value;
+    };
+
+    // Block back button to prevent going back to login page
+    const blockBackButton = () => {
+      history.pushState(null, "", location.href);
+    };
+
+    // Handle logout
+    const handleLogout = () => {
+      localStorage.clear();
+      router.push("/login");
+    };
+
+    // Close dropdowns when clicking outside
+    const handleClickOutside = (event) => {
+      if (showNotifications.value && !event.target.closest('.notifications-container')) {
+        showNotifications.value = false;
+      }
+    };
+
+    // Adjust sidebar based on screen size
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        sidebarOpen.value = false;
+      } else {
+        sidebarOpen.value = true;
+      }
+    };
+
+    onMounted(() => {
+      // Get user data from localStorage
+      const username = localStorage.getItem("Username");
+      if (username) {
+        shelterUsername.value = username;
+      } else {
+        console.error("Username not found in localStorage.");
+      }
+
+      // Prevent navigation back to login
+      window.history.pushState(null, "", window.location.href);
+      window.addEventListener("popstate", blockBackButton);
       
-      // Sample notifications
-      const notifications = ref([
-        {
-          message: "New adoption request for Max",
-          time: "A few moments ago",
-          icon: {
-            bg: "bg-blue-600",
-            fill: "none",
-            path: "M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-          }
-        },
-        {
-          message: "Donation received: $250.00",
-          time: "2 hours ago",
-          icon: {
-            bg: "bg-green-500",
-            fill: "none",
-            path: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-          }
-        },
-        {
-          message: "Document approved: Vet Authorization",
-          time: "Yesterday",
-          icon: {
-            bg: "bg-green-500",
-            fill: "none",
-            path: "M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
-          }
-        }
-      ]);
-  
-      // Check if the route matches the given path
-      const isActive = (path) => {
-        if (path === '/shelter-dashboard/' && route.path === '/shelter-dashboard/') {
-          return true;
-        }
-        return path !== '/shelter-dashboard/' && route.path.startsWith(path);
-      };
-  
-      // Toggle sidebar (especially important for mobile)
-      const toggleSidebar = () => {
-        sidebarOpen.value = !sidebarOpen.value;
-      };
-  
-      // Toggle notifications
-      const toggleNotifications = () => {
-        showNotifications.value = !showNotifications.value;
-      };
-  
-      // Block back button to prevent going back to login page
-      const blockBackButton = () => {
-        history.pushState(null, "", location.href);
-      };
-  
-      // Handle logout
-      const handleLogout = () => {
-        localStorage.clear();
-        router.push("/login");
-      };
-  
-      // Close dropdowns when clicking outside
-      const handleClickOutside = (event) => {
-        if (showNotifications.value && !event.target.closest('.notifications-container')) {
-          showNotifications.value = false;
-        }
-      };
-  
-      // Adjust sidebar based on screen size
-      const handleResize = () => {
-        if (window.innerWidth < 768) {
-          sidebarOpen.value = false;
-        } else {
-          sidebarOpen.value = true;
-        }
-      };
-  
-      onMounted(() => {
-        // Get user data from localStorage
-        const username = localStorage.getItem("Username");
-        if (username) {
-          shelterUsername.value = username;
-        } else {
-          console.error("Username not found in localStorage.");
-        }
-  
-        // Prevent navigation back to login
-        window.history.pushState(null, "", window.location.href);
-        window.addEventListener("popstate", blockBackButton);
-        
-        // Close dropdown menus when clicking outside
-        document.addEventListener('click', handleClickOutside);
-        
-        // Adjust sidebar for responsive design
-        window.addEventListener('resize', handleResize);
-        handleResize();
-      });
-  
-      onUnmounted(() => {
-        window.removeEventListener("popstate", blockBackButton);
-        document.removeEventListener('click', handleClickOutside);
-        window.removeEventListener('resize', handleResize);
-      });
-  
-      return {
-        shelterUsername,
-        sidebarOpen,
-        showNotifications,
-        unreadNotifications,
-        notifications,
-        isActive,
-        toggleSidebar,
-        toggleNotifications,
-        handleLogout
-      };
-    }
-  };
-  </script>
-  
-  <style scoped>
-  .fade-enter-active,
-  .fade-leave-active {
-    transition: opacity 0.2s ease;
+      // Close dropdown menus when clicking outside
+      document.addEventListener('click', handleClickOutside);
+      
+      // Adjust sidebar for responsive design
+      window.addEventListener('resize', handleResize);
+      handleResize();
+    });
+
+    onUnmounted(() => {
+      window.removeEventListener("popstate", blockBackButton);
+      document.removeEventListener('click', handleClickOutside);
+      window.removeEventListener('resize', handleResize);
+    });
+
+    return {
+      shelterUsername,
+      sidebarOpen,
+      showNotifications,
+      unreadNotifications,
+      notifications,
+      isActive,
+      toggleSidebar,
+      toggleNotifications,
+      handleLogout,
+      route,
+      stats
+    };
   }
-  
-  .fade-enter-from,
-  .fade-leave-to {
-    opacity: 0;
-  }
-  
-  /* Ensures content min-height fills the screen */
-  .dashboard-container {
-    min-height: 100vh;
-    background-color: #f9fafb;
-  }
-  
-  /* Custom scrollbar for notifications */
-  .overflow-y-auto::-webkit-scrollbar {
-    width: 4px;
-  }
-  
-  .overflow-y-auto::-webkit-scrollbar-track {
-    background: #f1f1f1;
-  }
-  
-  .overflow-y-auto::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 4px;
-  }
-  
-  .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-    background: #555;
-  }
-  </style>
+};
+</script>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* Ensures content min-height fills the screen */
+.dashboard-container {
+  min-height: 100vh;
+  background-color: #f9fafb;
+}
+
+/* Custom scrollbar for notifications */
+.overflow-y-auto::-webkit-scrollbar {
+  width: 4px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+</style>

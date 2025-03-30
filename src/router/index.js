@@ -84,11 +84,6 @@ const router = createRouter({
           name: 'EditShelterProfileVue',
           component: EditShelterProfileVue
         },
-        {
-          path: '',
-          name: 'PetStatsChart',
-          component: PetStatsChartVue
-        },
       ]
     },
     {
