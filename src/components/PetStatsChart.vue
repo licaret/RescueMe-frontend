@@ -68,13 +68,13 @@ export default {
 
     const fetchStats = async () => {
       try {
-        const shelterId = localStorage.getItem("shelterId"); // 🔹 Obținem `shelterId`
-        if (!shelterId) {
+        const Id = localStorage.getItem("Id"); // 🔹 Obținem `Id`
+        if (!Id) {
           console.error("Shelter ID not found.");
           return;
         }
 
-        const response = await fetch(`http://localhost:8080/pets/stats/${shelterId}`);
+        const response = await fetch(`http://localhost:8080/pets/stats/${Id}`);
         if (!response.ok) {
           throw new Error("Failed to fetch pet stats");
         }

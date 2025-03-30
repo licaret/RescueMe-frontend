@@ -105,17 +105,17 @@ const getApprovedShelters = async () => {
   }
 };
 
-const getShelterDetails = async (shelterId) => {
+const getShelterDetails = async (Id) => {
     try {
       // Fetch shelter profile
-      const profileResponse = await fetch(`http://localhost:8080/api/v1/shelters/${shelterId}/profile`);
+      const profileResponse = await fetch(`http://localhost:8080/api/v1/shelters/${Id}/profile`);
       if (!profileResponse.ok) {
         throw new Error('Failed to fetch shelter profile');
       }
       const profileData = await profileResponse.json();
       
       // Fetch document status
-      const documentsResponse = await fetch(`http://localhost:8080/api/v1/shelters/${shelterId}/documents/status`);
+      const documentsResponse = await fetch(`http://localhost:8080/api/v1/shelters/${Id}/documents/status`);
       if (!documentsResponse.ok) {
         throw new Error('Failed to fetch document status');
       }
@@ -160,48 +160,6 @@ export const byteArrayToImageUrl = (byteArray, mimeType = 'image/jpeg') => {
     }
 };
 
-async function checkWelcomeStatus(shelterId) {
-  try {
-    const response = await fetch(`http://localhost:8080/api/v1/shelters/${shelterId}/check-welcome`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      }
-    });
-    
-    if (!response.ok) {
-      throw new Error('Failed to check welcome status');
-    }
-    
-    return await response.json();
-  } catch (error) {
-    console.error('Error checking welcome status:', error);
-    return { showWelcome: false };
-  }
-}
-
-// Acknowledge welcome page has been seen
-async function acknowledgeWelcome(shelterId) {
-  try {
-    const response = await fetch(`http://localhost:8080/api/v1/shelters/${shelterId}/acknowledge-welcome`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        'Content-Type': 'application/json'
-      }
-    });
-    
-    if (!response.ok) {
-      throw new Error('Failed to acknowledge welcome');
-    }
-    
-    return await response.json();
-  } catch (error) {
-    console.error('Error acknowledging welcome:', error);
-    throw error;
-  }
-}
-
 
 export { 
     getTotalShelterCount,
@@ -211,6 +169,4 @@ export {
     getPendingShelters,
     getApprovedShelters,
     getShelterDetails,
-    checkWelcomeStatus,
-    acknowledgeWelcome,
 };

@@ -1,5 +1,6 @@
 const API_URL = "http://localhost:8080/api/v1/auth";
 
+
 async function registerAdopter(adopterData) {
   try {
     const response = await fetch(`${API_URL}/register/adopter`, {
@@ -58,7 +59,6 @@ async function registerShelter(shelterData) {
 }
 
 
-
 async function login(email, password) {
   try {
     const response = await fetch(`${API_URL}/login`, {
@@ -76,24 +76,19 @@ async function login(email, password) {
 
     const data = await response.json();
     
-    // Store basic authentication data
     localStorage.setItem("token", data.token);
     localStorage.setItem("Id", data.id);
     localStorage.setItem("Username", data.username);
     localStorage.setItem("Role", data.role);
     
-    // Check if this is a shelter and needs profile completion
+    //aici verific daca uns helter are nevoie sa si completeze profilul
     if (data.role === "SHELTER") {
-      localStorage.setItem("shelterId", data.id);
-      
-      // Check if the shelter profile is completed by looking for specific fields
-      if (!data.fullAddress || !data.yearFounded || !data.hoursOfOperation || !data.mission) {
+      if (data.first_login_after_approval == true) {
         localStorage.setItem("firstLogin", "true");
       } else {
         localStorage.removeItem("firstLogin");
       }
     }
-
     return data;
   } catch (error) {
     console.error("Error logging in:", error);
@@ -302,6 +297,7 @@ async function resetPassword(token, newPassword) {
 
 
 async function changePassword(userId, currentPassword, newPassword) {
+  console.log("Sending password change request:", { userId, currentPassword, newPassword });
   try {
     const response = await fetch(`http://localhost:8080/users/${userId}/change-password`, {
       method: "PATCH",
@@ -314,24 +310,32 @@ async function changePassword(userId, currentPassword, newPassword) {
         newPassword: newPassword,
       }),
     });
+    
+    console.log("Response status:", response.status);
+    console.log("Response headers:", response.headers);
 
     if (!response.ok) {
-      // Verifică dacă răspunsul conține JSON
       const contentType = response.headers.get("content-type");
+      console.log("Error content type:", contentType);
+      
       if (contentType && contentType.includes("application/json")) {
         const errorData = await response.json();
+        console.log("Error data received:", errorData);
         throw new Error(errorData.message || "Failed to change password");
       } else {
+        const textResponse = await response.text();
+        console.log("Error text response:", textResponse);
         throw new Error(`Server responded with status: ${response.status}`);
       }
     }
 
-    // Verifică dacă există conținut pentru a fi parsat ca JSON
     const contentType = response.headers.get("content-type");
     if (contentType && contentType.includes("application/json")) {
-      return await response.json();
+      const data = await response.json();
+      console.log("Success response:", data);
+      return data;
     } else {
-      // Dacă nu e JSON, returnează doar statutul de succes
+      console.log("Non-JSON success response");
       return { success: true };
     }
   } catch (error) {
@@ -342,18 +346,18 @@ async function changePassword(userId, currentPassword, newPassword) {
 
 /**
  * Uploads a document for a shelter
- * @param {string} shelterId - The ID of the shelter
+ * @param {string} Id - The ID of the shelter
  * @param {string} documentType - The type of document (taxCertificate, vetAuthorization, vetContract, idCard)
  * @param {File} file - The file to upload
  * @returns {Promise<Object>} - Response from the server
  */
-const uploadShelterDocument = async (shelterId, documentType, file) => {
+const uploadShelterDocument = async (Id, documentType, file) => {
   try {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('documentType', documentType);
     
-    const response = await fetch(`${API_BASE_URL}/shelters/${shelterId}/documents`, {
+    const response = await fetch(`${API_BASE_URL}/shelters/${Id}/documents`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`

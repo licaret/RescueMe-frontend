@@ -1,16 +1,11 @@
-// shelter_profile_service.js
 const API_BASE_URL = "http://localhost:8080/api/v1";
 
-/**
- * Fetches shelter profile data from the server
- * @param {string} shelterId - The ID of the shelter
- * @returns {Promise<Object>} - The shelter profile data
- */
-async function getShelterProfile(shelterId) {
+
+async function getShelterProfile(Id) {
   try {
     const token = localStorage.getItem("token");
     
-    const response = await fetch(`${API_BASE_URL}/shelters/${shelterId}/profile`, {
+    const response = await fetch(`${API_BASE_URL}/shelters/${Id}/profile`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -30,17 +25,57 @@ async function getShelterProfile(shelterId) {
   }
 }
 
-/**
- * Saves shelter profile as a draft
- * @param {string} shelterId - The ID of the shelter
- * @param {Object} profileData - The profile data to save
- * @returns {Promise<Object>} - Response from the server
- */
-async function saveShelterProfileDraft(shelterId, profileData) {
+
+async function checkWelcomeStatus(Id) {
+  try {
+    const response = await fetch(`http://localhost:8080/api/v1/shelters/${Id}/check-welcome`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to check welcome status');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error checking welcome status:', error);
+    return { showWelcome: false };
+  }
+}
+
+
+// Acknowledge welcome page has been seen
+async function acknowledgeWelcome(Id) {
+  try {
+    const response = await fetch(`http://localhost:8080/api/v1/shelters/${Id}/acknowledge-welcome`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to acknowledge welcome');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error acknowledging welcome:', error);
+    throw error;
+  }
+}
+
+
+
+async function saveShelterProfileDraft(Id, profileData) {
   try {
     const token = localStorage.getItem("token");
     
-    const response = await fetch(`${API_BASE_URL}/shelters/${shelterId}/profile/draft`, {
+    const response = await fetch(`${API_BASE_URL}/shelters/${Id}/profile/draft`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -61,17 +96,12 @@ async function saveShelterProfileDraft(shelterId, profileData) {
   }
 }
 
-/**
- * Submits shelter profile for approval
- * @param {string} shelterId - The ID of the shelter
- * @param {Object} profileData - The complete profile data to submit
- * @returns {Promise<Object>} - Response from the server
- */
-async function submitShelterProfile(shelterId, profileData) {
+
+async function submitShelterProfile(Id, profileData) {
   try {
     const token = localStorage.getItem("token");
     
-    const response = await fetch(`${API_BASE_URL}/shelters/${shelterId}/profile/submit`, {
+    const response = await fetch(`${API_BASE_URL}/shelters/${Id}/profile/submit`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -92,16 +122,10 @@ async function submitShelterProfile(shelterId, profileData) {
   }
 }
 
-/**
- * Uploads a document for a shelter
- * @param {string} shelterId - The ID of the shelter
- * @param {string} documentType - The type of document (taxCertificate, vetAuthorization, vetContract, idCard)
- * @param {File} file - The file to upload
- * @returns {Promise<Object>} - Response from the server
- */
-async function uploadDocument(shelterId, documentType, file) {
+
+async function uploadDocument(Id, documentType, file) {
   // Validate inputs
-  if (!shelterId || !documentType || !file) {
+  if (!Id || !documentType || !file) {
     throw new Error("Missing required parameters");
   }
   
@@ -121,10 +145,10 @@ async function uploadDocument(shelterId, documentType, file) {
     const formData = new FormData();
     formData.append("file", file);
     
-    console.log(`Uploading ${documentType} document for shelter ${shelterId}`);
+    console.log(`Uploading ${documentType} document for shelter ${Id}`);
     console.log(`File name: ${file.name}, type: ${file.type}, size: ${file.size} bytes`);
     
-    const response = await fetch(`${API_BASE_URL}/shelters/${shelterId}/documents/${documentType}`, {
+    const response = await fetch(`${API_BASE_URL}/shelters/${Id}/documents/${documentType}`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${token}`
@@ -145,17 +169,12 @@ async function uploadDocument(shelterId, documentType, file) {
   }
 }
 
-/**
- * Deletes a document for a shelter
- * @param {string} shelterId - The ID of the shelter
- * @param {string} documentType - The type of document (taxCertificate, vetAuthorization, vetContract, idCard)
- * @returns {Promise<Object>} - Response from the server
- */
-async function deleteDocument(shelterId, documentType) {
+
+async function deleteDocument(Id, documentType) {
   try {
     const token = localStorage.getItem("token");
     
-    const response = await fetch(`${API_BASE_URL}/shelters/${shelterId}/documents/${documentType}`, {
+    const response = await fetch(`${API_BASE_URL}/shelters/${Id}/documents/${documentType}`, {
       method: "DELETE",
       headers: {
         "Authorization": `Bearer ${token}`
@@ -174,21 +193,44 @@ async function deleteDocument(shelterId, documentType) {
   }
 }
 
-/**
- * Gets the URL for a document
- * @param {string} shelterId - The ID of the shelter
- * @param {string} documentType - The type of document
- * @returns {string} - URL for the document
- */
-function getDocumentUrl(shelterId, documentType) {
-  return `${API_BASE_URL}/shelters/${shelterId}/documents/${documentType}?t=${Date.now()}`;
+
+async function getDocumentStatus(shelterId) {
+  try {
+    const token = localStorage.getItem("token");
+    
+    const response = await fetch(`${API_BASE_URL}/shelters/${shelterId}/documents/status`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Failed to fetch document status");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching document status:", error);
+    throw error;
+  }
+}
+
+
+function getDocumentUrl(Id, documentType) {
+  return `${API_BASE_URL}/shelters/${Id}/documents/${documentType}?t=${Date.now()}`;
 }
 
 export {
   getShelterProfile,
+  checkWelcomeStatus,
+  acknowledgeWelcome,
   saveShelterProfileDraft,
   submitShelterProfile,
   uploadDocument,
   deleteDocument,
+  getDocumentStatus,
   getDocumentUrl
 };

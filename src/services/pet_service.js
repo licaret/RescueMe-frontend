@@ -1,8 +1,8 @@
-async function fetchShelterPets(shelterId) {
+async function fetchShelterPets(Id) {
   try {
-    console.log(`Fetching pets for shelter ID: ${shelterId}`);
+    console.log(`Fetching pets for shelter ID: ${Id}`);
 
-    const response = await fetch(`http://localhost:8080/pets/${shelterId}`, {
+    const response = await fetch(`http://localhost:8080/pets/${Id}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -43,9 +43,9 @@ async function fetchShelterPets(shelterId) {
 
 
 
-async function deletePet(shelterId, petId) {
+async function deletePet(Id, petId) {
   try {
-    const response = await fetch(`http://localhost:8080/pets/${shelterId}/delete/${petId}`, {
+    const response = await fetch(`http://localhost:8080/pets/${Id}/delete/${petId}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -65,9 +65,9 @@ async function deletePet(shelterId, petId) {
 }
 
 
-async function updatePet(shelterId, petId, petData, photos, photoIdsToDelete = []) {
+async function updatePet(Id, petId, petData, photos, photoIdsToDelete = []) {
   try {
-    console.log(`Updating pet with ID ${petId} from shelter ID ${shelterId}...`);
+    console.log(`Updating pet with ID ${petId} from shelter ID ${Id}...`);
 
     const formData = new FormData();
 
@@ -110,8 +110,8 @@ async function updatePet(shelterId, petId, petData, photos, photoIdsToDelete = [
   }
 }
 
-const getPetCountByShelter = async (shelterId) => {
-  const response = await fetch(`http://localhost:8080/pets/count/${shelterId}`);
+const getPetCountByShelter = async (Id) => {
+  const response = await fetch(`http://localhost:8080/pets/count/${Id}`);
   if (!response.ok) {
       throw new Error('Failed to fetch pet count');
   }

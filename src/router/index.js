@@ -76,14 +76,17 @@ const router = createRouter({
       children: [
         {
           path: 'manage-pets',
+          name: 'ManagePets',
           component: ManagePets
         },
         {
           path: 'edit-profile',
+          name: 'EditShelterProfileVue',
           component: EditShelterProfileVue
         },
         {
           path: '',
+          name: 'PetStatsChart',
           component: PetStatsChartVue
         },
       ]

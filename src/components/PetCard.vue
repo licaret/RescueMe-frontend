@@ -372,11 +372,11 @@ export default {
 
   methods: {
     async deletePet() {
-      const shelterId = localStorage.getItem("shelterId");
+      const Id = localStorage.getItem("Id");
       const petId = this.pet.id;
 
       try {
-        await deletePet(shelterId, petId);
+        await deletePet(Id, petId);
         this.$emit("petDeleted", petId); 
         this.showModal = false; 
       } catch (error) {

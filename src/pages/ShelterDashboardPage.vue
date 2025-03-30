@@ -245,21 +245,14 @@
             };
 
             const handleLogout = () => {
-                // localStorage.removeItem("token");
-                // localStorage.removeItem("Username");
-                // localStorage.removeItem("Id");
-                // localStorage.removeItem("shelterUsername");
-                // localStorage.removeItem("shelterId");
                 localStorage.clear();
-
-                // window.removeEventListener("popstate", blockBackButton);
 
                 router.push("/login");
             };
 
 
             onMounted(() => {
-                const username = localStorage.getItem("shelterUsername");
+                const username = localStorage.getItem("Username");
                 if (username) {
                     shelterUsername.value = username;
                 } else {

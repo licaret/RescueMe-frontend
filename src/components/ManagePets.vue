@@ -298,7 +298,7 @@
     setup() {
       const pets = ref([]);
       const searchQuery = ref("");
-      const shelterId = localStorage.getItem("shelterId");
+      const Id = localStorage.getItem("Id");
       const showAddPetForm = ref(false);
       const formKey = ref(0);
       const showBreedMessage = ref(false);
@@ -347,13 +347,13 @@
       });
       
       const loadPets = async () => {
-        if (!shelterId) {
+        if (!Id) {
           console.error("No shelter ID found");
           return;
         }
         try {
           console.log("Loading pets...");
-          const petsData = await fetchShelterPets(shelterId);
+          const petsData = await fetchShelterPets(Id);
 
           if (!petsData) {
             console.error("fetchShelterPets returned null!");

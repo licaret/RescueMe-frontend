@@ -1,13 +1,23 @@
 <script>
 export default {
+  data() {
+    return {
+      isLoading: false
+    }
+  },
   methods: {
     navigateToSignUp() {
-      this.$router.push("/signup"); 
+      this.isLoading = true;
+      setTimeout(() => {
+        this.$router.push("/signup")
+          .catch(() => {
+            this.isLoading = false;
+          });
+      }, 800);
     },
   },
 };
 </script>
-
 
 <template>
   <section class="hero">
@@ -16,7 +26,10 @@ export default {
     </h1>
     <img src="@/assets/dog.png" alt="Dog" class="hero-image" />
     <div class="button-container">
-      <button class="action-button" @click="navigateToSignUp">JOIN US</button>
+      <button class="action-button" @click="navigateToSignUp" :disabled="isLoading">
+        <span v-if="!isLoading">JOIN US</span>
+        <span v-else class="spinner"></span>
+      </button>
     </div>
   </section>
 </template>
@@ -83,11 +96,21 @@ h1, img, .hero {
   border-radius: 30px;
   cursor: pointer;
   transition: transform 0.2s, background-color 0.3s;
+  min-width: 120px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.action-button:hover {
+.action-button:hover:not(:disabled) {
   transform: scale(1.1);
   background-color: darkred;
+}
+
+.action-button:disabled {
+  background-color: #cc3333;
+  cursor: default;
 }
 
 button {
@@ -99,6 +122,21 @@ button {
   opacity: 0; 
 }
 
+.spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 
 @media (max-width: 768px) {
   .hero-title {

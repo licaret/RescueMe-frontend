@@ -376,7 +376,7 @@ export default {
         const isUpdate = !!props.petToEdit;
 
         const petDataToSend = { ...petData.value };
-        delete petDataToSend.shelterId;
+        delete petDataToSend.Id;
         delete petDataToSend.shelterUsername;
         delete petDataToSend.photoUrls;
 
@@ -420,7 +420,7 @@ export default {
           method: isUpdate ? "PATCH" : "POST",
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
-            "shelterId": localStorage.getItem("shelterId"),
+            "Id": localStorage.getItem("Id"),
           },
           body: formData,
         });

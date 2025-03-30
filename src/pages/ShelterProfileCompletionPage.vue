@@ -1,6 +1,7 @@
 <template>
   <div class="bg-white min-h-screen py-10">
     <div class="max-w-4xl mx-auto px-4">
+
       <!-- Toast notification -->
       <div 
         v-if="isToastVisible && successMessage" 
@@ -50,111 +51,76 @@
             </svg>
           </div>
           
+          
           <!-- When status is PENDING_APPROVAL -->
-          <div v-if="shelterData.status === 'PENDING_APPROVAL'">
-            <h1 class="text-2xl font-bold text-gray-800 mb-4">Profile Submitted Successfully!</h1>
-            <p class="text-gray-600 mb-6">
+          <div v-if="shelterData.status === 'PENDING_APPROVAL'" class="max-w-4xl mx-auto text-center">
+
+            <h1 class="text-2xl font-bold text-blue-600 mb-6">
+              Profile Submitted Successfully!
+            </h1>
+            
+            <p class="text-gray-600 mb-10 max-w-2xl mx-auto">
               Thank you for completing your shelter profile. Your information has been submitted for administrator review.
-              You'll receive an email once your account is approved. Our team will try to review your application within 24 hours.
+              Our team will try to review your application within 24 hours. Please check back later to see your approval status.
             </p>
             
-            <!-- Status indicator -->
-            <div class="bg-blue-50 border-l-4 border-blue-500 text-blue-700 p-4 rounded-lg mb-8 inline-block">
-              <div class="flex items-center">
-                <div class="flex-shrink-0 mr-2">
-                  <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9a1 1 0 00-1-1z" clip-rule="evenodd" />
+            <!-- Three-panel feature section -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+
+              <div class="bg-blue-50 p-6 rounded-lg shadow-sm">
+                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span class="text-blue-600 font-bold">1</span>
+                </div>
+                <h3 class="font-semibold mb-2">Admin Review</h3>
+                <p class="text-gray-600 text-sm">Our team will review your shelter profile within 24 hours.</p>
+              </div>
+
+              <div class="bg-blue-50 p-6 rounded-lg shadow-sm">
+                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span class="text-blue-600 font-bold">2</span>
+                </div>
+                <h3 class="font-semibold mb-2">Status Update</h3>
+                <p class="text-gray-600 text-sm">Your profile status will be updated when reviewed.</p>
+              </div>
+
+              <div class="bg-blue-50 p-6 rounded-lg shadow-sm">
+                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span class="text-blue-600 font-bold">3</span>
+                </div>
+                <h3 class="font-semibold mb-2">Start Using RescueMe</h3>
+                <p class="text-gray-600 text-sm">Once approved, you can start managing your shelter profile.</p>
+              </div>
+
+            </div>
+            
+            <!-- Current status section -->
+            <div class="bg-blue-50 p-8 rounded-lg mb-8 relative overflow-hidden">
+              <div class="relative z-10">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Current Status: Pending Approval</h2>
+                <p class="text-gray-700 mb-6">
+                  Your shelter dashboard will be available once your profile is approved by our administrators.
+                </p>
+                
+                <button @click="goBack" class="px-6 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-all duration-300 inline-flex items-center">
+                  <span >  Return Home</span>
+                  <svg class="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                   </svg>
-                </div>
-                <div>
-                  <span class="font-medium">Current status: </span>
-                  <span class="font-bold">Pending Approval</span>
-                </div>
+                </button>
               </div>
-            </div>
-            
-            <!-- Next steps section -->
-            <div class="bg-gray-50 p-6 rounded-lg mb-8">
-              <h2 class="text-lg font-semibold text-gray-800 mb-4">What happens next?</h2>
-              <div class="flex flex-col md:flex-row justify-between gap-4">
-                <div class="flex-1 p-4 bg-white rounded shadow-sm">
-                  <div class="flex items-center mb-3">
-                    <div class="bg-blue-100 rounded-full h-8 w-8 flex items-center justify-center mr-3">
-                      <span class="text-blue-600 font-bold">1</span>
-                    </div>
-                    <h3 class="font-medium">Admin Review</h3>
-                  </div>
-                  <p class="text-gray-600 text-sm">Our team will review your shelter profile within 24 hours</p>
-                </div>
-                <div class="flex-1 p-4 bg-white rounded shadow-sm">
-                  <div class="flex items-center mb-3">
-                    <div class="bg-blue-100 rounded-full h-8 w-8 flex items-center justify-center mr-3">
-                      <span class="text-blue-600 font-bold">2</span>
-                    </div>
-                    <h3 class="font-medium">Email Notification</h3>
-                  </div>
-                  <p class="text-gray-600 text-sm">You'll receive an email when your account is approved</p>
-                </div>
-                <div class="flex-1 p-4 bg-white rounded shadow-sm">
-                  <div class="flex items-center mb-3">
-                    <div class="bg-blue-100 rounded-full h-8 w-8 flex items-center justify-center mr-3">
-                      <span class="text-blue-600 font-bold">3</span>
-                    </div>
-                    <h3 class="font-medium">Start Using RescueMe</h3>
-                  </div>
-                  <p class="text-gray-600 text-sm">Once approved, you can log in and start managing your shelter profile</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- When status is APPROVED -->
-          <div v-else-if="shelterData.status === 'APPROVED'">
-            <h1 class="text-2xl font-bold text-gray-800 mb-4">Your Shelter Has Been Approved!</h1>
-            <p class="text-gray-600 mb-6">
-              Congratulations! Your shelter profile has been reviewed and approved by our administrators.
-              You can now access your dashboard and begin listing animals for adoption.
-            </p>
-            
-            <!-- Status indicator -->
-            <div class="bg-green-50 border-l-4 border-green-500 text-green-700 p-4 rounded-lg mb-8 inline-block">
-              <div class="flex items-center">
-                <div class="flex-shrink-0 mr-2">
-                  <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                  </svg>
-                </div>
-                <div>
-                  <span class="font-medium">Current status: </span>
-                  <span class="font-bold">Approved</span>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Dashboard access section -->
-            <div class="bg-blue-50 p-6 rounded-lg mb-8 text-center">
-              <h2 class="text-lg font-semibold text-gray-800 mb-4">Ready to start helping animals find homes?</h2>
-              <p class="text-gray-600 mb-6">Your shelter dashboard is now available where you can manage your shelter profile, add animals, and more.</p>
               
-              <button 
-                @click="goToDashboard" 
-                class="inline-block px-6 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors"
-              >
-                Go to Dashboard
-              </button>
+              <!-- Decorative circles -->
+              <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 rounded-full bg-blue-200 opacity-50"></div>
+              <div class="absolute bottom-0 left-0 -mb-4 -ml-4 w-16 h-16 rounded-full bg-blue-200 opacity-50"></div>
             </div>
+            
+            <!-- Footer text -->
+            <p class="text-gray-500 text-sm">
+              Have questions? Contact our support team at <a href="mailto:rescueme.care@gmail.com" class="text-blue-600 hover:underline">rescueme.care@gmail.com</a>
+            </p>
+
           </div>
           
-          <!-- Email reminder with corrected mailto link -->
-          <p class="text-gray-600 mb-6">
-            If you have any questions or issues, please contact us at 
-            <a href="mailto:rescueme.care@gmail.com?subject=Account%20Approval%20Request" class="text-blue-600 hover:underline">rescueme.care@gmail.com</a>
-          </p>
-          
-          <!-- Return to home button -->
-          <button @click="goBack" class="inline-block px-6 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors">
-            Return to Home
-          </button>
         </div>
       </div>
 
@@ -540,7 +506,7 @@
                   </div>
                   <div class="flex space-x-2">
                     <a 
-                      :href="getDocumentUrl(getCurrentShelterId(), 'taxCertificate')" 
+                      :href="getDocumentUrl(getCurrentId(), 'taxCertificate')" 
                       target="_blank" 
                       class="text-blue-600 hover:text-blue-800 text-xs font-medium px-2 py-1 bg-blue-50 rounded"
                     >
@@ -604,7 +570,7 @@
                   </div>
                   <div class="flex space-x-2">
                     <a 
-                      :href="getDocumentUrl(getCurrentShelterId(), 'vetAuthorization')" 
+                      :href="getDocumentUrl(getCurrentId(), 'vetAuthorization')" 
                       target="_blank" 
                       class="text-blue-600 hover:text-blue-800 text-xs font-medium px-2 py-1 bg-blue-50 rounded"
                     >
@@ -668,7 +634,7 @@
                   </div>
                   <div class="flex space-x-2">
                     <a 
-                      :href="getDocumentUrl(getCurrentShelterId(), 'vetContract')" 
+                      :href="getDocumentUrl(getCurrentId(), 'vetContract')" 
                       target="_blank"
                       class="text-blue-600 hover:text-blue-800 text-xs font-medium px-2 py-1 bg-blue-50 rounded"
                     >
@@ -732,7 +698,7 @@
                   </div>
                   <div class="flex space-x-2">
                     <a 
-                      :href="getDocumentUrl(getCurrentShelterId(), 'idCard')" 
+                      :href="getDocumentUrl(getCurrentId(), 'idCard')" 
                       target="_blank" 
                       class="text-blue-600 hover:text-blue-800 text-xs font-medium px-2 py-1 bg-blue-50 rounded"
                     >
@@ -901,9 +867,9 @@ export default {
 
   async mounted() {
     try {
-      const shelterId = this.getCurrentShelterId();
+      const Id = this.getCurrentId();
       
-      if (!shelterId) {
+      if (!Id) {
         this.showToast('Error: Shelter ID not found. Please login again.', 'error');
         setTimeout(() => {
           this.$router.push('/login');
@@ -912,7 +878,7 @@ export default {
       }
 
       // First load shelter profile to check status first
-      const profileData = await getShelterProfile(shelterId);
+      const profileData = await getShelterProfile(Id);
       
       // Update status immediately 
       this.shelterData.status = profileData.status || 'NEW';
@@ -999,9 +965,9 @@ export default {
     
     async loadShelterProfile() {
       try {
-        const shelterId = this.getCurrentShelterId();
+        const Id = this.getCurrentId();
         
-        if (!shelterId) {
+        if (!Id) {
           this.showToast('Error: Shelter ID not found. Please login again.');
           setTimeout(() => {
             this.$router.push('/login');
@@ -1009,7 +975,7 @@ export default {
           return;
         }
         
-        const profileData = await getShelterProfile(shelterId);
+        const profileData = await getShelterProfile(Id);
         
         // Update shelter data with the retrieved profile
         this.shelterData = {
@@ -1138,11 +1104,11 @@ export default {
 
     async tryLoadProfilePicture() {
       try {
-        const shelterId = this.getCurrentShelterId();
-        if (!shelterId) return;
+        const Id = this.getCurrentId();
+        if (!Id) return;
         
         // Call the fetch profile picture function
-        const imageUrl = await fetchProfilePicture(shelterId);
+        const imageUrl = await fetchProfilePicture(Id);
         
         // Debug the returned URL
         console.log('Fetched profile picture URL:', imageUrl);
@@ -1227,8 +1193,8 @@ export default {
           return;
         }
         
-        const shelterId = this.getCurrentShelterId();
-        if (!shelterId) {
+        const Id = this.getCurrentId();
+        if (!Id) {
           this.showToast('Error: Shelter ID not found');
           return;
         }
@@ -1237,7 +1203,7 @@ export default {
         this.isUploadingProfilePicture = true;
         
         // Upload profile picture
-        const imageUrl = await uploadProfilePicture(shelterId, file);
+        const imageUrl = await uploadProfilePicture(Id, file);
         if (imageUrl) {
           this.profilePictureUrl = imageUrl;
           this.shelterData.profilePicture = true; // Set flag that picture exists
@@ -1253,8 +1219,8 @@ export default {
     
     async removeProfilePicture() {
       try {
-        const shelterId = this.getCurrentShelterId();
-        if (!shelterId) {
+        const Id = this.getCurrentId();
+        if (!Id) {
           this.showToast('Error: Shelter ID not found');
           return;
         }
@@ -1263,7 +1229,7 @@ export default {
         this.isDeletingProfilePicture = true;
         
         // Call service to delete profile picture
-        await deleteProfilePicture(shelterId);
+        await deleteProfilePicture(Id);
         
         // Reset profile picture
         this.profilePictureUrl = "";
@@ -1296,8 +1262,8 @@ export default {
           return;
         }
         
-        const shelterId = this.getCurrentShelterId();
-        if (!shelterId) {
+        const Id = this.getCurrentId();
+        if (!Id) {
           this.showToast('Error: Shelter ID not found', 'error');
           return;
         }
@@ -1306,7 +1272,7 @@ export default {
         this.isUploading[documentType] = true;
         
         // Upload document
-        await uploadDocument(shelterId, documentType, file);
+        await uploadDocument(Id, documentType, file);
         
         // Update document status
         this.documentStatus[documentType] = true;
@@ -1327,8 +1293,8 @@ export default {
     
     async handleDocumentDelete(documentType) {
       try {
-        const shelterId = this.getCurrentShelterId();
-        if (!shelterId) {
+        const Id = this.getCurrentId();
+        if (!Id) {
           this.showToast('Error: Shelter ID not found');
           return;
         }
@@ -1337,7 +1303,7 @@ export default {
         this.isDeleting[documentType] = true;
         
         // Delete document
-        await deleteDocument(shelterId, documentType);
+        await deleteDocument(Id, documentType);
         
         // Update document status
         this.documentStatus[documentType] = false;
@@ -1468,8 +1434,8 @@ export default {
       this.isSubmitting = true;
       
       try {
-        const shelterId = this.getCurrentShelterId();
-        if (!shelterId) {
+        const Id = this.getCurrentId();
+        if (!Id) {
           this.showToast('Error: Shelter ID not found');
           this.isSubmitting = false;
           return;
@@ -1479,7 +1445,7 @@ export default {
         const dataToSave = { ...this.shelterData };
         
         // Save the profile data to backend
-        await saveShelterProfileDraft(shelterId, dataToSave);
+        await saveShelterProfileDraft(Id, dataToSave);
         
         // Update local status
         this.shelterData.status = 'DRAFT';
@@ -1507,8 +1473,8 @@ export default {
       this.isSubmitting = true;
       
       try {
-        const shelterId = this.getCurrentShelterId();
-        if (!shelterId) {
+        const Id = this.getCurrentId();
+        if (!Id) {
           this.showToast('Error: Shelter ID not found');
           this.isSubmitting = false;
           return;
@@ -1518,7 +1484,7 @@ export default {
         const dataToSubmit = { ...this.shelterData };
         
         // Submit the profile data to backend
-        await submitShelterProfile(shelterId, dataToSubmit);
+        await submitShelterProfile(Id, dataToSubmit);
         
         // Update local status
         this.shelterData.status = 'PENDING_APPROVAL';
@@ -1561,8 +1527,8 @@ export default {
       }
     },
     
-    getCurrentShelterId() {
-      return localStorage.getItem('shelterId') || localStorage.getItem('Id');
+    getCurrentId() {
+      return localStorage.getItem('Id') || localStorage.getItem('Id');
     },
     
     getDocumentTypeName(documentType) {

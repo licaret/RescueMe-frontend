@@ -31,8 +31,4 @@ export default {
 .hero {
   flex: 1; 
 }
-
-/* footer {
-  height: 64px;
-} */
 </style>

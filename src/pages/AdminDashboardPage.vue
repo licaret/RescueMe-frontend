@@ -1501,9 +1501,9 @@ export default {
       return pages;
     });
     
-    const viewShelterDocument = (shelterId, documentType) => {
+    const viewShelterDocument = (Id, documentType) => {
         // Create the document URL
-        const documentUrl = `http://localhost:8080/api/v1/shelters/${shelterId}/documents/${documentType}`;
+        const documentUrl = `http://localhost:8080/api/v1/shelters/${Id}/documents/${documentType}`;
         
         // Open document in a new tab
         window.open(documentUrl, '_blank');
@@ -1599,8 +1599,8 @@ export default {
       }
     };
     
-    const viewShelterDetails = (shelterId) => {
-        fetchShelterDetails(shelterId);
+    const viewShelterDetails = (Id) => {
+        fetchShelterDetails(Id);
     };
     
     const viewUserDetails = async (userId) => {
@@ -1621,9 +1621,9 @@ export default {
       }
     };
     
-    const approveShelter = (shelterId, fromModal = false) => {
+    const approveShelter = (Id, fromModal = false) => {
       if (fromModal) {
-        performShelterAction(shelterId, 'approve');
+        performShelterAction(Id, 'approve');
         return;
       }
       
@@ -1631,13 +1631,13 @@ export default {
       confirmationMessage.value = 'Are you sure you want to approve this shelter? This will grant them access to the platform.';
       confirmationActionType.value = 'approve';
       confirmationActionText.value = 'Approve';
-      confirmationCallback.value = () => performShelterAction(shelterId, 'approve');
+      confirmationCallback.value = () => performShelterAction(Id, 'approve');
       showConfirmationModal.value = true;
     };
     
-    const rejectShelter = (shelterId, fromModal = false) => {
+    const rejectShelter = (Id, fromModal = false) => {
       if (fromModal) {
-        performShelterAction(shelterId, 'reject');
+        performShelterAction(Id, 'reject');
         return;
       }
       
@@ -1645,13 +1645,13 @@ export default {
       confirmationMessage.value = 'Are you sure you want to reject this shelter application? This action cannot be undone.';
       confirmationActionType.value = 'reject';
       confirmationActionText.value = 'Reject';
-      confirmationCallback.value = () => performShelterAction(shelterId, 'reject');
+      confirmationCallback.value = () => performShelterAction(Id, 'reject');
       showConfirmationModal.value = true;
     };
     
-    const suspendShelter = (shelterId, fromModal = false) => {
+    const suspendShelter = (Id, fromModal = false) => {
       if (fromModal) {
-        performShelterAction(shelterId, 'suspend');
+        performShelterAction(Id, 'suspend');
         return;
       }
       
@@ -1659,17 +1659,17 @@ export default {
       confirmationMessage.value = 'Are you sure you want to suspend this shelter? This will temporarily restrict their access to the platform.';
       confirmationActionType.value = 'suspend';
       confirmationActionText.value = 'Suspend';
-      confirmationCallback.value = () => performShelterAction(shelterId, 'suspend');
+      confirmationCallback.value = () => performShelterAction(Id, 'suspend');
       showConfirmationModal.value = true;
     };
     
-    const performShelterAction = async (shelterId, action) => {
+    const performShelterAction = async (Id, action) => {
       try {
           // Call the real API endpoint
           let response;
           
           if (action === 'approve') {
-              response = await fetch(`http://localhost:8080/api/v1/admin/shelters/${shelterId}/approve`, {
+              response = await fetch(`http://localhost:8080/api/v1/admin/shelters/${Id}/approve`, {
                   method: 'POST',
                   headers: {
                       'Content-Type': 'application/json'
@@ -1678,7 +1678,7 @@ export default {
                   body: JSON.stringify({})
               });
           } else if (action === 'reject') {
-              response = await fetch(`http://localhost:8080/api/v1/admin/shelters/${shelterId}/reject`, {
+              response = await fetch(`http://localhost:8080/api/v1/admin/shelters/${Id}/reject`, {
                   method: 'POST',
                   headers: {
                       'Content-Type': 'application/json'
@@ -1686,7 +1686,7 @@ export default {
                   body: JSON.stringify({})
               });
           } else if (action === 'suspend') {
-              response = await fetch(`http://localhost:8080/api/v1/admin/shelters/${shelterId}/suspend`, {
+              response = await fetch(`http://localhost:8080/api/v1/admin/shelters/${Id}/suspend`, {
                   method: 'POST',
                   headers: {
                       'Content-Type': 'application/json'
@@ -1712,7 +1712,7 @@ export default {
           
           // Update local data and UI
           if (action === 'approve' || action === 'reject') {
-              pendingShelters.value = pendingShelters.value.filter(s => s.id !== shelterId);
+              pendingShelters.value = pendingShelters.value.filter(s => s.id !== Id);
               stats.value.pendingApprovals = pendingShelters.value.length;
               
               if (action === 'approve') {
@@ -1901,9 +1901,9 @@ export default {
       return names[documentType] || documentType;
     };
     
-    const getDocumentUrl = (shelterId, documentType) => {
+    const getDocumentUrl = (Id, documentType) => {
         // Generate the actual API URL for the document
-        return `/api/v1/shelters/${shelterId}/documents/${documentType}`;
+        return `/api/v1/shelters/${Id}/documents/${documentType}`;
     };
     
     const logout = () => {
@@ -2066,14 +2066,14 @@ export default {
     };
     
     // In the fetchShelterDetails function, add this code:
-    const fetchShelterDetails = async (shelterId) => {
+    const fetchShelterDetails = async (Id) => {
       try {
           showShelterModal.value = true;
           isLoadingShelterDetails.value = true;
           
           // Check in both pending and approved shelters lists
-          const existingPendingShelter = pendingShelters.value.find(s => s.id === shelterId);
-          const existingApprovedShelter = approvedShelters.value.find(s => s.id === shelterId);
+          const existingPendingShelter = pendingShelters.value.find(s => s.id === Id);
+          const existingApprovedShelter = approvedShelters.value.find(s => s.id === Id);
           
           // Prioritize checking approved shelters if not found in pending
           const existingShelter = existingPendingShelter || existingApprovedShelter;
@@ -2083,7 +2083,7 @@ export default {
               console.log("Using image from existing shelters list");
               
               // Get the rest of the data from the API
-              const shelterData = await getShelterDetails(shelterId);
+              const shelterData = await getShelterDetails(Id);
               
               // Format the mission text
               const formattedMission = formatLongText(
@@ -2103,7 +2103,7 @@ export default {
           }
           
           // If it doesn't exist in either list, continue with full processing
-          const shelterData = await getShelterDetails(shelterId);
+          const shelterData = await getShelterDetails(Id);
           
           // Process the image in the same way it's processed in the initial list
           let profilePictureUrl = null;
@@ -2194,12 +2194,12 @@ export default {
       });
     };
     
-    const mockPerformShelterAction = (shelterId, action) => {
+    const mockPerformShelterAction = (Id, action) => {
       return new Promise((resolve) => {
         setTimeout(() => {
           // Find the shelter
-          const shelter = pendingShelters.value.find(s => s.id === shelterId) || 
-                          approvedShelters.value.find(s => s.id === shelterId);
+          const shelter = pendingShelters.value.find(s => s.id === Id) || 
+                          approvedShelters.value.find(s => s.id === Id);
           
           if (shelter) {
             resolve(shelter);
