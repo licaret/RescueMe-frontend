@@ -16,6 +16,7 @@ import ShelterProfilePage from '@/pages/ShelterProfilePage.vue';
 import ShelterProfileCompletionPage from '@/pages/ShelterProfileCompletionPage.vue';
 import WelcomePage from '@/pages/WelcomePage.vue';
 import AdminDashboardPage from '@/pages/AdminDashboardPage.vue';
+import FavoritesPage from '@/pages/FavoritesPage.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -57,6 +58,12 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: '/favorites',
+      name: 'FavoritesPage',
+      component: FavoritesPage, 
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/available-pets',
       name: 'AvailablePetsPage',
       component: AvailablePetsPage, 
@@ -69,7 +76,7 @@ const router = createRouter({
       // meta: { requiresAuth: true },
     },
     {
-      path: '/shelter-dashboard',
+      path: '/shelter-dashboard/',
       name: 'ShelterDashboardPage',
       component: ShelterDashboardPage, 
       meta: { requiresAuth: true },

@@ -242,7 +242,7 @@ export default {
                     // No welcome needed
                     this.successMessage = "Login successful! Redirecting to dashboard...";
                     setTimeout(() => {
-                      this.$router.push("/shelter-dashboard");
+                      this.$router.push("/shelter-dashboard/");
                     }, 2000);
                   }
                 } catch (welcomeError) {
@@ -250,14 +250,14 @@ export default {
                   // Fallback to dashboard
                   this.successMessage = "Login successful! Redirecting to dashboard...";
                   setTimeout(() => {
-                    this.$router.push("/shelter-dashboard");
+                    this.$router.push("/shelter-dashboard/");
                   }, 2000);
                 }
               } else {
               // Default case - go to dashboard
               this.successMessage = "Login successful! Redirecting to dashboard...";
               setTimeout(() => {
-                this.$router.push("/shelter-dashboard");
+                this.$router.push("/shelter-dashboard/");
               }, 2000);
             }
           } catch (profileError) {

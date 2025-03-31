@@ -169,9 +169,9 @@
             </li>
             <li>
               <router-link 
-                to="/shelter-dashboard/settings" 
+                to="/shelter-dashboard/edit-profile" 
                 class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
-                :class="{ 'bg-gray-100': isActive('/shelter-dashboard/settings') }"
+                :class="{ 'bg-gray-100': isActive('/shelter-dashboard/edit-profile') }"
               >
                 <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
@@ -197,7 +197,7 @@
         <!-- NEW CONTENT STARTS HERE -->
         <div v-if="route.path === '/shelter-dashboard/'">
           <!-- Dashboard Summary Cards -->
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
             <div class="bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow">
               <div class="flex items-center">
                 <div class="rounded-full p-3 bg-blue-100">
@@ -207,7 +207,20 @@
                 </div>
                 <div class="ml-4">
                   <p class="text-gray-500 text-sm">Total Pets</p>
-                  <h3 class="text-2xl font-bold">24</h3>
+                  <h3 class="text-2xl font-bold">{{ stats.total }}</h3>
+                </div>
+              </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow">
+              <div class="flex items-center">
+                <div class="rounded-full p-3 bg-red-100">
+                    <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v8m0 4h.01"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                  <p class="text-gray-500 text-sm">Urgent Adoption Needed</p>
+                  <h3 class="text-2xl font-bold">{{ stats.urgent }}</h3>
                 </div>
               </div>
             </div>
@@ -219,8 +232,8 @@
                   </svg>
                 </div>
                 <div class="ml-4">
-                  <p class="text-gray-500 text-sm">Adopted</p>
-                  <h3 class="text-2xl font-bold">8</h3>
+                  <p class="text-gray-500 text-sm">Available</p>
+                  <h3 class="text-2xl font-bold">{{ stats.available }}</h3>
                 </div>
               </div>
             </div>
@@ -233,20 +246,20 @@
                 </div>
                 <div class="ml-4">
                   <p class="text-gray-500 text-sm">Pending</p>
-                  <h3 class="text-2xl font-bold">3</h3>
+                  <h3 class="text-2xl font-bold">{{ stats.pending }}</h3>
                 </div>
               </div>
             </div>
             <div class="bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow">
               <div class="flex items-center">
-                <div class="rounded-full p-3 bg-red-100">
-                  <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                  </svg>
+                <div class="rounded-full p-3 bg-gray-200">
+                    <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 6l12 12m0-12L6 18"></path>
+                    </svg>
                 </div>
                 <div class="ml-4">
-                  <p class="text-gray-500 text-sm">Available</p>
-                  <h3 class="text-2xl font-bold">13</h3>
+                  <p class="text-gray-500 text-sm">Adopted</p>
+                  <h3 class="text-2xl font-bold">{{ stats.adopted }}</h3>
                 </div>
               </div>
             </div>
@@ -383,6 +396,10 @@
           </div>
         </div>
 
+        <div>
+            <PetAdoptionPieChart :stats="stats" />
+        </div>
+
         <!-- Additional Sections -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
           <!-- Urgent Adoptions Needed -->
@@ -394,7 +411,9 @@
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="border rounded-lg overflow-hidden flex">
                   <div class="w-24 h-24 bg-gray-200 flex-shrink-0">
-                    <img src="https://via.placeholder.com/96" alt="Placeholder" class="w-full h-full object-cover" />
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
                   </div>
                   <div class="p-3">
                     <h3 class="text-sm font-semibold">Buddy</h3>
@@ -403,9 +422,9 @@
                   </div>
                 </div>
                 <div class="border rounded-lg overflow-hidden flex">
-                  <div class="w-24 h-24 bg-gray-200 flex-shrink-0">
-                    <img src="https://via.placeholder.com/96" alt="Placeholder" class="w-full h-full object-cover" />
-                  </div>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
                   <div class="p-3">
                     <h3 class="text-sm font-semibold">Mittens</h3>
                     <p class="text-xs text-gray-500">Tabby Cat, 4 years</p>
@@ -506,11 +525,14 @@
 
 <script>
 import { ref, onMounted, onUnmounted, computed } from "vue";
-import { useRouter, useRoute } from "vue-router";
+import { useRouter, useRoute, onBeforeRouteUpdate } from "vue-router";
+import {fetchShelterPetStats} from '@/services/pet_service.js';
+import PetAdoptionPieChart from '@/components/PetAdoptionPieChart.vue';
 
 export default {
   name: 'ShelterDashboardLayout',
   components: {
+    PetAdoptionPieChart
   },
   setup() {
     const router = useRouter();
@@ -520,13 +542,36 @@ export default {
     const showNotifications = ref(false);
     const unreadNotifications = ref(3);
     
-    // Sample stats for the dashboard
-    const stats = ref({
-      totalPets: 24,
-      adopted: 8,
-      pending: 3,
-      available: 13
+    onMounted(() => {
+      loadStats();
     });
+
+    onBeforeRouteUpdate((to, from, next) => {
+      if (to.path === "/shelter-dashboard/") {
+        loadStats();
+      }
+      next();
+    });
+
+    const stats = ref({
+      total: 0,
+      urgent: 0,
+      adopted: 0,
+      available: 0,
+      pending: 0
+    });
+
+    const loadStats = async () => {
+      const shelterId = localStorage.getItem("Id");
+      const data = await fetchShelterPetStats(shelterId);
+      if (data) {
+        stats.value.total = data.total;
+        stats.value.urgent = data.urgent;
+        stats.value.adopted = data.adopted;
+        stats.value.available = data.available;
+        stats.value.pending = data.pending;
+      }
+    };
     
     // Sample notifications
     const notifications = ref([
@@ -642,7 +687,8 @@ export default {
       toggleNotifications,
       handleLogout,
       route,
-      stats
+      stats,
+      loadStats
     };
   }
 };

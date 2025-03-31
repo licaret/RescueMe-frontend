@@ -157,7 +157,7 @@ export default {
       this.goToDashboard();
     },
     goToDashboard() {
-      this.$router.push('/shelter-dashboard');
+      this.$router.push('/shelter-dashboard/');
     },
     getCurrentId() {
       return localStorage.getItem('Id') || localStorage.getItem('Id');

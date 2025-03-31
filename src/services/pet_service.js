@@ -118,4 +118,32 @@ const getPetCountByShelter = async (Id) => {
   return await response.json();
 };
 
-export { fetchShelterPets, deletePet, updatePet, getPetCountByShelter };
+async function fetchShelterPetStats(Id) {
+  try {
+    console.log(`Fetching pet statistics for shelter ID: ${Id}`);
+
+    const response = await fetch(`http://localhost:8080/pets/stats/${Id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+
+    if (!response.ok) {
+      console.error("Failed to fetch pet statistics. Response status:", response.status);
+      throw new Error("Failed to fetch pet statistics");
+    }
+
+    const data = await response.json();
+    console.log("Pet statistics data:", data);
+    return data;
+
+  } catch (error) {
+    console.error("Error occurred while fetching pet statistics:", error);
+    return null;
+  }
+}
+
+
+export { fetchShelterPets, deletePet, updatePet, getPetCountByShelter, fetchShelterPetStats };
