@@ -1,3 +1,12 @@
+<template>
+  <div class="landing-page">
+    <IntroNavbar />
+    <Hero />
+    <IntroFooter />
+  </div>
+</template>
+
+
 <script>
 import IntroNavbar from "@/components/IntroNavbar.vue";
 import Hero from "@/components/Hero.vue";
@@ -13,13 +22,6 @@ export default {
 };
 </script>
 
-<template>
-  <div class="landing-page">
-    <IntroNavbar />
-    <Hero />
-    <IntroFooter />
-  </div>
-</template>
 
 <style scoped>
 .landing-page {

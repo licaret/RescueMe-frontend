@@ -9,7 +9,6 @@ import ResetPasswordPage from '@/pages/ResetPasswordPage.vue';
 import ContactUsPage from '@/pages/ContactUsPage.vue';
 import AboutUsPage from '@/pages/AboutUsPage.vue';
 import ManagePets from '@/components/ManagePets.vue';
-import PetStatsChartVue from '@/components/PetStatsChart.vue';
 import EditShelterProfileVue from '@/pages/EditShelterProfile.vue';
 import AvailablePetsPage from '@/pages/AvailablePetsPage.vue';
 import ShelterProfilePage from '@/pages/ShelterProfilePage.vue';
@@ -17,6 +16,9 @@ import ShelterProfileCompletionPage from '@/pages/ShelterProfileCompletionPage.v
 import WelcomePage from '@/pages/WelcomePage.vue';
 import AdminDashboardPage from '@/pages/AdminDashboardPage.vue';
 import FavoritesPage from '@/pages/FavoritesPage.vue';
+import AdoptionRequestDetail from '@/components/AdoptionRequestDetail.vue';
+import AdoptionRequestForm from '@/components/AdoptionRequestForm.vue';
+import AdoptionRequestsView from '@/pages/AdoptionRequestsView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -70,9 +72,10 @@ const router = createRouter({
       // meta: { requiresAuth: true },
     },
     {
-      path: '/shelter/:username',
+      path: '/shelter/:id',
       name: 'ShelterProfilePage',
       component: ShelterProfilePage, 
+      props: true,
       // meta: { requiresAuth: true },
     },
     {
@@ -117,6 +120,66 @@ const router = createRouter({
       component: WelcomePage, 
       // meta: { requiresAuth: true },
     },
+    {
+      path: '/adopt/:petId',
+      name: 'AdoptionForm',
+      component: AdoptionRequestForm,
+      props: route => {
+        return {
+          petId: route.params.petId,
+          pet: route.params.pet || null
+        };
+      },
+      // Guard to check if user is logged in and is an ADOPTER
+      beforeEnter: (to, from, next) => {
+        const userId = localStorage.getItem('Id');
+        const userRole = localStorage.getItem('Role');
+        
+        if (!userId) {
+          // Redirect to login
+          next({
+            path: '/login',
+            query: { redirect: 'adoption', petId: to.params.petId }
+          });
+        } else if (userRole !== 'ADOPTER') {
+          // Only adopters can submit adoption requests
+          alert('Only adopters can submit adoption requests.');
+          next(from);
+        } else {
+          next();
+        }
+      }
+    },
+    {
+      path: '/adoption-requests',
+      name: 'AdoptionRequests',
+      component: AdoptionRequestsView,
+      // Guard to ensure user is logged in
+      beforeEnter: (to, from, next) => {
+        const userId = localStorage.getItem('Id');
+        
+        if (!userId) {
+          next({ path: '/login' });
+        } else {
+          next();
+        }
+      }
+    },
+    {
+      path: '/adoption-requests/:id',
+      name: 'AdoptionRequestDetail',
+      component: AdoptionRequestDetail,
+      // Guard to ensure user is logged in
+      beforeEnter: (to, from, next) => {
+        const userId = localStorage.getItem('Id');
+        
+        if (!userId) {
+          next({ path: '/login' });
+        } else {
+          next();
+        }
+      }
+    }
   ],
 });
 
@@ -141,7 +204,6 @@ router.beforeEach((to, from, next) => {
     window.history.replaceState(null, null, '/');
   }
 
-  // Verifică dacă este prima autentificare a unui adăpost și încearcă să navigheze în altă parte
   if (isAuthenticated && isFirstLogin && isShelter && to.path !== '/shelter-profile-completion') {
     next('/shelter-profile-completion');
     return;

@@ -1,7 +1,6 @@
 <template>
     <IntroNavbar />
     <div class="max-w-6xl mx-auto px-4 py-16">
-      <!-- Hero Section with Logo -->
       <div class="text-center mb-16">
         <div class="relative inline-block mb-8">
           <h2 class="text-xl text-gray-600 mb-2">WHO ARE WE?</h2>
@@ -21,7 +20,6 @@
         </div>
       </div>
   
-      <!-- Two Column Layout for Mission and How it Works -->
       <div class="grid md:grid-cols-2 gap-16 mb-20">
         <!-- Our Mission and Purpose -->
         <div>
@@ -222,6 +220,8 @@
     <Footer></Footer>
   </template>
   
+
+
   <script>
   import IntroNavbar from '@/components/IntroNavbar.vue';
   import Footer from '@/components/Footer.vue';
@@ -234,6 +234,8 @@
     }
   }
   </script>
+  
+
   
   <style scoped>
   * {
@@ -260,7 +262,6 @@
     cursor: pointer;
   }
   
-  /* Animations */
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }

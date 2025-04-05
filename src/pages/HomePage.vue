@@ -47,7 +47,7 @@
     </div>
   </section>
 
-  <!-- Mission Statement - Made more rounded -->
+  <!-- Mission Statement-->
   <section class="py-16 bg-white">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
       <div class="max-w-4xl mx-auto text-center bg-gray-50 p-8 rounded-3xl shadow-lg">
@@ -57,7 +57,7 @@
           Every animal deserves love, respect, and a permanent home.
         </p>
         <div class="flex justify-center">
-          <router-link to="/adopt" class="px-8 py-3 bg-red-600 text-white font-semibold rounded-full hover:bg-red-700 transition-colors duration-300 shadow-lg">
+          <router-link to="/available-pets" class="px-8 py-3 bg-red-600 text-white font-semibold rounded-full hover:bg-red-700 transition-colors duration-300 shadow-lg">
             Adopt Now
           </router-link>
         </div>
@@ -65,118 +65,73 @@
     </div>
   </section>
 
-  <!-- Featured Animals - More rounded cards -->
+  <!-- Featured Animals -->
   <section class="py-16 bg-gray-50">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
       <h2 class="text-3xl sm:text-4xl font-bold text-center text-gray-900 mb-12">Animals Looking for a Home</h2>
       
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        <!-- Animal Card 1 -->
-        <div class="bg-white rounded-3xl overflow-hidden shadow-lg transition-transform duration-300 hover:shadow-xl hover:-translate-y-1">
-          <div class="relative">
-            <img src="../assets/dog1.jpg" alt="Max" class="w-full h-64 object-cover">
-            <div class="absolute top-4 right-4 bg-red-600 text-white text-sm font-bold px-3 py-1 rounded-full">
-              Looking for Home
-            </div>
-          </div>
-          <div class="p-6">
-            <h3 class="text-xl font-bold text-gray-900 mb-2">Max</h3>
-            <p class="text-gray-600 mb-4">Golden Retriever • 2 ani • Mascul</p>
-            <p class="text-gray-700 mb-4">Prietenos, energic și iubitor, Max caută o familie activă care să îi ofere dragoste și spațiu pentru a alerga.</p>
-            <router-link to="/animals/max" class="inline-block px-4 py-2 bg-red-600 text-white font-semibold rounded-full hover:bg-red-700 transition-colors duration-300 shadow-md">
-              Cunoscu-l pe Max
-            </router-link>
-          </div>
-        </div>
-
-        <!-- Animal Card 2 -->
-        <div class="bg-white rounded-3xl overflow-hidden shadow-lg transition-transform duration-300 hover:shadow-xl hover:-translate-y-1">
-          <div class="relative">
-            <img src="../assets/cat1.jpg" alt="Luna" class="w-full h-64 object-cover">
-            <div class="absolute top-4 right-4 bg-red-600 text-white text-sm font-bold px-3 py-1 rounded-full">
-              Looking for Home
-            </div>
-          </div>
-          <div class="p-6">
-            <h3 class="text-xl font-bold text-gray-900 mb-2">Luna</h3>
-            <p class="text-gray-600 mb-4">Domestic Shorthair • 1 an • Femelă</p>
-            <p class="text-gray-700 mb-4">Blândă și jucăușă, Luna adoră să se cuibărească în brațele tale și să primească afecțiune.</p>
-            <router-link to="/animals/luna" class="inline-block px-4 py-2 bg-red-600 text-white font-semibold rounded-full hover:bg-red-700 transition-colors duration-300 shadow-md">
-              Cunoscu-o pe Luna
-            </router-link>
-          </div>
-        </div>
-
-        <!-- Animal Card 3 -->
-        <div class="bg-white rounded-3xl overflow-hidden shadow-lg transition-transform duration-300 hover:shadow-xl hover:-translate-y-1">
-          <div class="relative">
-            <img src="../assets/dog2.jpg" alt="Rex" class="w-full h-64 object-cover">
-            <div class="absolute top-4 right-4 bg-red-600 text-white text-sm font-bold px-3 py-1 rounded-full">
-              Looking for Home
-            </div>
-          </div>
-          <div class="p-6">
-            <h3 class="text-xl font-bold text-gray-900 mb-2">Rex</h3>
-            <p class="text-gray-600 mb-4">Husky Mix • 3 ani • Mascul</p>
-            <p class="text-gray-700 mb-4">Loial și protector, Rex este un companion perfect care așteaptă să își găsească familia pentru totdeauna.</p>
-            <router-link to="/animals/rex" class="inline-block px-4 py-2 bg-red-600 text-white font-semibold rounded-full hover:bg-red-700 transition-colors duration-300 shadow-md">
-              Cunoscu-l pe Rex
-            </router-link>
-          </div>
-        </div>
+        <PetCard
+          v-for="pet in displayedPets"
+          :key="pet.id"
+          :pet="pet"
+          :favorited="false"
+        />
       </div>
 
       <div class="mt-12 text-center">
-        <router-link to="/animals" class="inline-block px-8 py-3 bg-transparent border-2 border-red-600 text-red-600 font-semibold rounded-full hover:bg-red-600 hover:text-white transition-colors duration-300 shadow-md">
-          Vezi toate animalele
+        <router-link to="/available-pets" class="inline-block px-8 py-3 bg-transparent border-2 border-red-600 text-red-600 font-semibold rounded-full hover:bg-red-600 hover:text-white transition-colors duration-300 shadow-md">
+          See All Animals
         </router-link>
       </div>
     </div>
   </section>
 
-  <!-- Adoption Process - New section with original colors -->
+
+  <!-- Adoption Process -->
   <section class="py-16 bg-white">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
       <h2 class="text-3xl sm:text-4xl font-bold text-center text-gray-900 mb-12">Adoption Process</h2>
-      
+
       <div class="relative">
         <!-- Connection line -->
         <div class="hidden md:block absolute top-1/2 left-0 right-0 h-1 bg-gray-300 -translate-y-1/2 z-0"></div>
-        
+
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8 relative z-10">
           <!-- Step 1 -->
           <div class="bg-white rounded-3xl p-6 shadow-lg text-center">
             <div class="w-16 h-16 mx-auto bg-red-600 text-white rounded-full flex items-center justify-center mb-4 text-xl font-bold">1</div>
             <h3 class="text-xl font-bold text-gray-900 mb-3">Browse</h3>
-            <p class="text-gray-700">Look through our available animals and find your perfect match.</p>
+            <p class="text-gray-700">Explore available pets and choose the one you feel a connection with.</p>
           </div>
-          
+
           <!-- Step 2 -->
           <div class="bg-white rounded-3xl p-6 shadow-lg text-center">
             <div class="w-16 h-16 mx-auto bg-red-600 text-white rounded-full flex items-center justify-center mb-4 text-xl font-bold">2</div>
-            <h3 class="text-xl font-bold text-gray-900 mb-3">Meet</h3>
-            <p class="text-gray-700">Visit our shelter to meet the animal and see if you connect.</p>
+            <h3 class="text-xl font-bold text-gray-900 mb-3">Contact</h3>
+            <p class="text-gray-700">Reach out to the shelter for more details or to arrange a visit.</p>
           </div>
-          
+
           <!-- Step 3 -->
           <div class="bg-white rounded-3xl p-6 shadow-lg text-center">
             <div class="w-16 h-16 mx-auto bg-red-600 text-white rounded-full flex items-center justify-center mb-4 text-xl font-bold">3</div>
             <h3 class="text-xl font-bold text-gray-900 mb-3">Apply</h3>
-            <p class="text-gray-700">Complete our adoption application and home verification process.</p>
+            <p class="text-gray-700">Submit your adoption application and wait for approval from the shelter.</p>
           </div>
-          
+
           <!-- Step 4 -->
           <div class="bg-white rounded-3xl p-6 shadow-lg text-center">
             <div class="w-16 h-16 mx-auto bg-red-600 text-white rounded-full flex items-center justify-center mb-4 text-xl font-bold">4</div>
-            <h3 class="text-xl font-bold text-gray-900 mb-3">Welcome Home</h3>
-            <p class="text-gray-700">Take your new family member home and begin your journey together.</p>
+            <h3 class="text-xl font-bold text-gray-900 mb-3">Bring Them Home</h3>
+            <p class="text-gray-700">Once approved, welcome your new furry friend into your family!</p>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Success Stories - More rounded profiles -->
+
+  <!-- Success Stories -->
   <section class="py-16 bg-gray-50">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
       <h2 class="text-3xl sm:text-4xl font-bold text-center text-gray-900 mb-12">Successful Stories</h2>
@@ -211,15 +166,15 @@
         </div>
       </div>
 
-      <div class="mt-12 text-center">
+      <!-- <div class="mt-12 text-center">
         <router-link to="/success-stories" class="inline-block px-8 py-3 bg-transparent border-2 border-red-600 text-red-600 font-semibold rounded-full hover:bg-red-600 hover:text-white transition-colors duration-300 shadow-md">
           Read more stories
         </router-link>
-      </div>
+      </div> -->
     </div>
   </section>
 
-  <!-- How to Help - More rounded cards -->
+  <!-- How to Help -->
   <section class="py-16 text-black" style="background-color: rgba(0, 0, 0, 0.05);">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
       <h2 class="text-3xl sm:text-4xl font-bold text-center mb-12">How You Can Help</h2>
@@ -269,16 +224,10 @@
           <p class="text-gray-700">Help us increase visibility by sharing our stories with your friends and family.</p>
         </div>
       </div>
-
-      <div class="mt-12 text-center">
-        <router-link to="/help" class="inline-block px-8 py-3 bg-red-600 text-white font-semibold rounded-full hover:bg-red-700 transition-colors duration-300 shadow-md">
-          Discover how to get involved
-        </router-link>
-      </div>
     </div>
   </section>
 
-  <!-- Events Calendar - New section with original colors -->
+  <!-- Events Calendar -->
   <section class="py-16 bg-white">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
       <h2 class="text-3xl sm:text-4xl font-bold text-center text-gray-900 mb-12">Upcoming Events</h2>
@@ -368,7 +317,7 @@
     </div>
   </section>
 
-  <!-- Emergency Banner - New section -->
+  <!-- Emergency Banner-->
   <section class="py-4 bg-red-600 text-white">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex flex-col md:flex-row items-center justify-between">
@@ -385,7 +334,7 @@
     </div>
   </section>
 
-  <!-- Newsletter - More rounded form -->
+  <!-- Newsletter-->
   <section class="py-16 bg-gray-50">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
       <div class="max-w-3xl mx-auto text-center bg-white p-8 rounded-3xl shadow-lg">
@@ -422,37 +371,75 @@
 <script>
 import Navbar from "@/components/Navbar.vue";
 import Footer from "@/components/Footer.vue";
+import PetCard from "@/components/PetCard.vue";
+
 export default {
   name: 'HomePage',
+
   components: {
-    Navbar, 
-    Footer
+    Navbar,
+    Footer,
+    PetCard
   },
+
   data() {
     return {
-      email: ''
+      email: '',
+      availablePets: [],
+      displayedPets: [],
+      intervalId: null
     }
   },
+
+  mounted() {
+    this.fetchAvailablePets();
+  },
+
+  beforeUnmount() {
+    clearInterval(this.intervalId);
+  },
+
   methods: {
     subscribeNewsletter() {
       alert('Thank you for subscribing!');
       this.email = '';
+    },
+    async fetchAvailablePets() {
+      try {
+        const response = await fetch(`http://localhost:8080/pets/available`);
+        const allPets = await response.json();
+        this.availablePets = allPets;
+        this.updateRandomPets();
+
+        this.intervalId = setInterval(() => {
+          this.updateRandomPets();
+        }, 30000);
+      } catch (error) {
+        console.error("Failed to fetch available pets:", error);
+      }
+    },
+    updateRandomPets() {
+      if (this.availablePets.length <= 3) {
+        this.displayedPets = this.availablePets;
+        return;
+      }
+      const shuffled = [...this.availablePets].sort(() => 0.5 - Math.random());
+      this.displayedPets = shuffled.slice(0, 3);
     }
   }
 }
 </script>
+
 
 <style>
 h1, img {
   user-select: none;
 }
 
-/* Smooth scroll behavior */
 html {
   scroll-behavior: smooth;
 }
 
-/* Animation for elements on page load */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
@@ -462,7 +449,6 @@ section {
   animation: fadeIn 0.8s ease-out forwards;
 }
 
-/* Hover effects for cards */
 .hover-scale {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -472,7 +458,6 @@ section {
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
-/* Custom button effects */
 button, a.inline-block {
   transition: all 0.3s ease;
 }
@@ -481,7 +466,6 @@ button:hover, a.inline-block:hover {
   transform: translateY(-2px);
 }
 
-/* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 10px;
 }

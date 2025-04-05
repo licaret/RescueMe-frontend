@@ -11,7 +11,7 @@
       <p class="text-gray-600 mt-6 max-w-2xl mx-auto">Browse through our network of shelters and find the pet that's waiting for you</p>
     </div>
 
-    <!-- Enhanced Error Message Display with Animation -->
+    <!--  Error Message  -->
     <transition
       enter-active-class="transform transition duration-500 ease-out"
       enter-from-class="opacity-0 scale-95 -translate-y-2"
@@ -83,7 +83,7 @@
             </div>
           </div>
 
-          <!-- Filters Toggle Button with Enhanced Badge -->
+          <!-- Filters Toggle Button -->
           <button 
             @click="showFilters = !showFilters"
             class="flex items-center gap-2 px-5 py-3.5 text-gray-700 bg-gray-50 border border-gray-200 rounded-xl hover:bg-gray-100 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 shadow-sm relative"
@@ -100,7 +100,7 @@
         </div>
       </div>
 
-      <!-- Enhanced Filters Section with Transitions and Better UI -->
+      <!--  Filters Section -->
       <transition 
         name="fade"
         enter-active-class="transition-all duration-300 ease-out"
@@ -137,7 +137,7 @@
           
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
             
-            <!-- Filter Fields with enhanced styling -->
+            <!-- Filter Fields  -->
             <div class="space-y-2">
               <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide ml-1">Species</label>
               <div class="relative">
@@ -154,7 +154,7 @@
               </div>
             </div>
 
-            <!-- Breed Dropdown with Tooltip on Hover -->
+            <!-- Breed Dropdown  -->
             <div class="space-y-2">
               <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide ml-1">Breed</label>
               <div class="relative group">
@@ -175,7 +175,6 @@
                   </svg>
                 </div>
 
-                <!-- Enhanced Tooltip message on hover -->
                 <div 
                   v-if="!filters.species" 
                   class="absolute left-0 -bottom-12 bg-gray-800 text-white px-4 py-2 rounded-lg text-sm z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-lg w-48"
@@ -299,7 +298,6 @@
                   </svg>
                 </div>
 
-                <!-- Enhanced Tooltip message on hover -->
                 <div 
                   v-if="!filters.county" 
                   class="absolute left-0 -bottom-12 bg-gray-800 text-white px-4 py-2 rounded-lg text-sm z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-lg w-48"
@@ -310,7 +308,7 @@
               </div>
             </div>
 
-            <!-- Checkboxes with Enhanced Styles -->
+            <!-- Checkboxes -->
             <div class="lg:col-span-3 flex flex-wrap gap-6 mt-4">
               <!-- Vaccinated -->
               <div class="flex items-center">
@@ -364,7 +362,7 @@
       </transition>
     </div>
     
-    <!-- Enhanced Loading Indicator -->
+    <!-- Loading Indicator -->
     <div v-if="loading" class="text-center py-20">
       <div class="inline-block relative">
         <div class="animate-spin rounded-full h-14 w-14 border-4 border-gray-200 border-t-red-500"></div>
@@ -373,7 +371,7 @@
       <p class="mt-6 text-gray-600 font-medium animate-pulse">Loading available pets...</p>
     </div>
     
-    <!-- Results Count Indicator with Animation -->
+    <!-- Results Count Indicator -->
     <div v-if="!loading && sheltersWithPets.length > 0" class="text-center my-8">
       <div class="inline-block px-6 py-3 bg-red-50 border border-red-100 rounded-full text-red-600 font-medium shadow-sm transform transition-all duration-300 hover:scale-105 hover:shadow-md">
         <span class="flex items-center">
@@ -392,7 +390,7 @@
           <!-- Shelter Header -->
           <div class="border-b border-gray-100 p-6 bg-gradient-to-r from-white to-red-50">
             <div class="flex flex-col md:flex-row md:items-center gap-6">
-              <!-- Shelter Image (Left side) -->
+              <!-- Shelter Image -->
               <div class="flex justify-center md:justify-start">
                 <div class="w-28 h-28 rounded-full overflow-hidden border-4 border-white ring-2 ring-gray-100 shadow-lg transition-transform duration-300 hover:scale-105">
                   <img 
@@ -409,7 +407,7 @@
                 </div>
               </div>
               
-              <!-- Shelter Info (Middle)-->
+              <!-- Shelter Info -->
               <div class="flex-1 text-center md:text-left">
                 <div class="flex flex-col md:flex-row md:items-center mb-2 gap-2">
                   <h2 class="text-2xl font-bold text-gray-800">{{ shelter.username }}</h2>
@@ -435,13 +433,13 @@
                   </div>
                 </div>
                 
-                <!-- Enhanced mission statement display -->
+                <!-- Mission statement display -->
                 <div class="border-l-4 border-red-500 pl-4 italic text-gray-700 bg-gray-50 p-3 rounded-r-lg shadow-sm">
                   {{ (shelter.mission && shelter.mission.length > 120) ? shelter.mission.substring(0, 120) + '...' : (shelter.mission || "This Shelter doesn't have a description yet.") }}
                 </div>
               </div>
               
-              <!-- View Profile Button (Right side) -->
+              <!-- View Profile Button -->
               <div class="flex justify-center md:block mt-4 md:mt-0">
                 <router-link 
                   :to="`/shelter/${shelter.id}`"
@@ -477,12 +475,12 @@
                 userType="public"
                 :favorited="isFavorited(pet.id)"
                 @favorite="toggleFavorite"
-                @adopt="adoptPet"
+                @adopt-pet="adoptPet"
                 class="w-full transition-transform duration-300 hover:-translate-y-1"
               />
             </div>
             
-            <!-- Enhanced Pagination controls -->
+            <!--  Pagination controls -->
             <div class="flex justify-center mt-10" v-if="shelter.pets.length > 4">
               <div class="inline-flex items-center bg-white rounded-lg shadow-md border border-gray-200 p-1">
                 <button 
@@ -524,7 +522,7 @@
             </div>
           </div>
 
-          <!-- Enhanced No Pets Message -->
+          <!--No Pets Message -->
           <div v-else class="text-center py-16">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-red-200 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
@@ -536,7 +534,7 @@
       </div>
     </div>
 
-    <!-- Enhanced No Results State -->
+    <!-- No Results State -->
     <div v-if="!loading && sheltersWithPets.length === 0" class="text-center py-20 max-w-xl mx-auto">
       <div class="bg-white p-8 rounded-2xl shadow-lg border border-gray-100">
         <div class="flex justify-center mb-6">
@@ -580,7 +578,7 @@ export default {
     const photoIndices = reactive({});
     const storyVisibility = reactive({});
     
-    // Pagination state
+    // pagination 
     const paginationState = reactive({});
     const PETS_PER_PAGE = 4;
 
@@ -605,11 +603,10 @@ export default {
       city: ""    // city filter
     });
 
-    // Computed property to get only active filters for display
+    
     const activeFilters = computed(() => {
       const result = {};
       for (const [key, value] of Object.entries(filters.value)) {
-        // Only include non-empty and non-false values
         if (value && value !== "" && value !== false) {
           result[key] = value;
         }
@@ -617,7 +614,8 @@ export default {
       return result;
     });
 
-    // Format filter labels for display
+
+
     const formatFilterLabel = (key) => {
       const labels = {
         name: "Name",
@@ -635,8 +633,8 @@ export default {
       };
       return labels[key] || key;
     };
+  
 
-    // Format filter values for display
     const formatFilterValue = (key, value) => {
       if (typeof value === 'boolean') {
         return value ? 'Yes' : 'No';
@@ -652,7 +650,7 @@ export default {
       return value;
     };
 
-    // Clear a single filter
+    
     const clearSingleFilter = (key) => {
       if (typeof filters.value[key] === 'boolean') {
         filters.value[key] = false;
@@ -661,10 +659,11 @@ export default {
       }
     };
 
-    // Count applied filters
+    
     const countAppliedFilters = () => {
       return Object.values(filters.value).filter(value => value !== "" && value !== false).length;
     };
+
 
     const resetFilters = () => {
       filters.value = {
@@ -683,17 +682,18 @@ export default {
       };
     };
 
+
     watch(() => filters.value.county, (newCounty) => {
-      // Reset city when county changes
       filters.value.city = "";
       console.log("County changed:", newCounty);
     });
 
+
     watch(() => filters.value.species, (newSpecies) => {
-      // Reset breed when species changes
       filters.value.breed = "";
       console.log("Species changed:", newSpecies);
     });
+
 
     const isAnyFilterApplied = computed(() => {
       return Object.values(filters.value).some(value => {
@@ -702,14 +702,9 @@ export default {
     });
 
 
-    //process location data
     const processLocationData = () => {
       try {
-        console.log("Processing judete data:", judete);
-        
-        // Transform the data for easier use in dropdowns
         counties.value = judete.judete.map(county => {
-          // Create mappings
           countyCodeToName[county.auto] = county.nume;
           countyNameToCode[county.nume] = county.auto;
           
@@ -719,9 +714,6 @@ export default {
           };
         });
         
-        console.log("Processed counties:", counties.value);
-        
-        // Create a mapping of counties to their cities
         const cityMap = {};
         judete.judete.forEach(county => {
           cityMap[county.auto] = county.localitati.map(city => 
@@ -730,7 +722,6 @@ export default {
         });
         
         citiesByCounty.value = cityMap;
-        console.log("Cities by county:", citiesByCounty.value);
         
       } catch (error) {
         console.error("Error processing location data:", error);
@@ -740,23 +731,17 @@ export default {
 
 
     const handleCountyChange = () => {
-      console.log("County changed to:", filters.value.county);
-      filters.value.city = ""; // Reset city selection
+      filters.value.city = ""; 
       
-      // Debug what cities are available for this county
       const cities = availableCities.value;
-      console.log("Available cities for this county:", cities);
       
-      // Debug how many shelters match this county
       const matchingShelters = shelters.value.filter(shelter => 
         shelter.county && shelter.county.toLowerCase() === filters.value.county.toLowerCase()
       );
-      console.log("Shelters matching this county:", matchingShelters.length);
       matchingShelters.forEach(s => console.log(" -", s.username, s.county));
     };
 
 
-    // Computed property to get all available counties
     const availableCounties = computed(() => {
       const counties = shelters.value
         .map(shelter => shelter.county)
@@ -765,18 +750,15 @@ export default {
     });
 
 
-    // Improved computed property to get cities based on selected county
     const availableCities = computed(() => {
       if (!filters.value.county) return [];
       
       const county = filters.value.county.toUpperCase();
       
-      // Try to get cities directly from the map using county code
       if (citiesByCounty.value[county]) {
         return citiesByCounty.value[county];
       }
       
-      // If not found directly, try to look it up via the county name
       const countyName = countyCodeToName[county];
       if (countyName) {
         const countyCode = countyNameToCode[countyName];
@@ -790,7 +772,6 @@ export default {
 
 
 
-    // Pagination controls
     const nextPage = (shelterId) => {
       if (!paginationState[shelterId]) {
         paginationState[shelterId] = { currentPage: 1 };
@@ -818,7 +799,6 @@ export default {
 
     
     const getPaginatedPets = (pets) => {
-      // Find shelter ID from the first pet, or fallback to parent component context
       const shelterId = pets[0]?.shelterId || (pets[0] ? pets[0].shelter?.id : null);
       
       if (!shelterId) {
@@ -833,12 +813,10 @@ export default {
       const currentPage = paginationState[shelterId].currentPage;
       const totalPages = Math.max(1, Math.ceil(pets.length / PETS_PER_PAGE));
       
-      // Ensure currentPage is valid
       if (currentPage > totalPages) {
         paginationState[shelterId].currentPage = totalPages;
       }
       
-      // Calculate start and end indices
       const startIndex = (paginationState[shelterId].currentPage - 1) * PETS_PER_PAGE;
       const endIndex = startIndex + PETS_PER_PAGE;
       
@@ -862,61 +840,51 @@ export default {
     };
 
 
-
-    // Improved filterPet function to correctly apply all filters
     const filterPet = (pet) => {
       if (!pet) return false;
       
-      // Name filter (case insensitive partial match)
       if (filters.value.name && pet.name) {
         if (!pet.name.toLowerCase().includes(filters.value.name.toLowerCase())) {
           return false;
         }
       }
       
-      // Species filter (case insensitive exact match)
       if (filters.value.species && pet.species) {
         if (pet.species.toLowerCase() !== filters.value.species.toLowerCase()) {
           return false;
         }
       }
       
-      // Breed filter (case insensitive exact match)
       if (filters.value.breed && pet.breed) {
         if (pet.breed.toLowerCase() !== filters.value.breed.toLowerCase()) {
           return false;
         }
       }
       
-      // Sex/Gender filter (case insensitive exact match)
       if (filters.value.sex && pet.sex) {
         if (pet.sex.toLowerCase() !== filters.value.sex.toLowerCase()) {
           return false;
         }
       }
       
-      // Size filter (case insensitive exact match)
       if (filters.value.size && pet.size) {
         if (pet.size.toLowerCase() !== filters.value.size.toLowerCase()) {
           return false;
         }
       }
       
-      // Health status filter (case insensitive exact match)
       if (filters.value.healthStatus && pet.healthStatus) {
         if (pet.healthStatus.toLowerCase() !== filters.value.healthStatus.toLowerCase()) {
           return false;
         }
       }
       
-      // Status filter (exact match, case sensitive)
       if (filters.value.status && pet.status) {
         if (pet.status !== filters.value.status) {
           return false;
         }
       }
       
-      // Boolean filters
       if (filters.value.vaccinated && !pet.vaccinated) {
         return false;
       }
@@ -929,12 +897,11 @@ export default {
         return false;
       }
       
-      // Pet passes all filters
       return true;
     };
     
 
-    // Apply sorting to filtered pets
+
     const sortPets = (pets) => {
       if (!sortBy.value) return pets;
       
@@ -944,10 +911,8 @@ export default {
         } else if (sortBy.value === 'age') {
           return (a.age || 0) - (b.age || 0);
         } else if (sortBy.value === 'timeSpentInShelter') {
-          // Parse the timeSpentInShelter value which might be a string
           const getTimeValue = (pet) => {
             if (!pet.timeSpentInShelter) return 0;
-            // Try to parse as number, default to 0 if it fails
             return parseInt(pet.timeSpentInShelter) || 0;
           };
           return getTimeValue(a) - getTimeValue(b);
@@ -957,9 +922,7 @@ export default {
     };
 
 
-    // Watch for filter changes to reset pagination
     watch(filters, () => {
-      // Reset pagination for all shelters when filters change
       Object.keys(paginationState).forEach(key => {
         if (paginationState[key]) {
           paginationState[key].currentPage = 1;
@@ -969,56 +932,41 @@ export default {
 
 
     
-    // Improved sheltersWithPets computed property
     const sheltersWithPets = computed(() => {
       console.log("Computing sheltersWithPets with filters:", JSON.stringify(filters.value));
       
-      // Step 1: Filter shelters by county and city criteria
       const filteredShelters = shelters.value.filter(shelter => {
-        // Skip null/undefined shelters
         if (!shelter) return false;
 
-        // County filtering
         if (filters.value.county && shelter.county) {
-          // Case insensitive comparison
           if (shelter.county.toLowerCase() !== filters.value.county.toLowerCase()) {
             return false;
           }
         }
 
-        // City filtering - only apply if county matched or no county filter
         if (filters.value.city && shelter.city) {
-          // Case insensitive comparison
           if (shelter.city.toLowerCase() !== filters.value.city.toLowerCase()) {
             return false;
           }
         }
 
-        // Shelter passes all location filters
         return true;
       });
 
-      // Step 2: Apply pet filters to each shelter
       const sheltersWithFilteredPets = filteredShelters.map(shelter => {
-        // Ensure shelter.pets exists
         const shelterPets = shelter.pets || [];
-        
-        // Apply filters to pets
         const filteredPets = shelterPets.filter(pet => filterPet(pet));
         
-        // Return shelter with filtered pets
         return {
           ...shelter,
           pets: filteredPets
         };
       });
 
-      // Step 3: Filter out shelters with no matching pets
       const finalShelters = sheltersWithFilteredPets.filter(shelter => 
         shelter.pets.length > 0
       );
       
-      // Sort shelters and their pets if needed
       if (sortBy.value) {
         finalShelters.forEach(shelter => {
           shelter.pets = sortPets(shelter.pets);
@@ -1029,25 +977,22 @@ export default {
     });
 
 
-    // Breed options based on selected species
+    
     const breedOptions = computed(() => {
       if (!filters.value.species) return [];
       
-      // Get all breeds for the selected species
       const allBreeds = shelters.value
         .flatMap(shelter => (shelter.pets || []))
         .filter(pet => pet && pet.species && 
                 pet.species.toLowerCase() === filters.value.species.toLowerCase())
         .map(pet => pet.breed)
-        .filter(breed => breed); // Filter out null/undefined
+        .filter(breed => breed); 
       
-      // Remove duplicates and sort
       return [...new Set(allBreeds)].sort();
     });
 
 
 
-    // Photo carousel navigation
     const getPetPhotoIndex = (petId) => {
       return photoIndices[petId] || 0;
     };
@@ -1069,12 +1014,9 @@ export default {
     };
 
 
-
-    // Story visibility functions
     const showStory = (petId) => {
       storyVisibility[petId] = true;
     };
-
 
 
     const hideStory = (petId) => {
@@ -1082,14 +1024,11 @@ export default {
     };
     
 
-
-    // Favorites functionality
     const toggleFavorite = (petId) => {
       const index = favorites.value.indexOf(petId);
       
       if (index === -1) {
         favorites.value.push(petId);
-        // Save to localStorage
         localStorage.setItem('favoritePets', JSON.stringify(favorites.value));
       } else {
         favorites.value.splice(index, 1);
@@ -1103,9 +1042,7 @@ export default {
     };
 
 
-    // Adoption functionality
     const adoptPet = (petId) => {
-      // Find the pet to get its name
       let petName = "this pet";
       let foundPet = null;
       
@@ -1118,10 +1055,7 @@ export default {
         }
       });
       
-      // Navigate to adoption form or start adoption process
       alert(`Starting adoption process for ${petName}!`);
-      // In a real app, you might change the pet's status to PENDING
-      // or navigate to an adoption form page
     };
 
 
@@ -1130,7 +1064,6 @@ export default {
         loading.value = true;
         errorMessage.value = '';
         
-        // Fetch shelters from backend
         const response = await fetch("http://localhost:8080/users/shelters");
         
         if (!response.ok) {
@@ -1140,9 +1073,7 @@ export default {
         const data = await response.json();
         shelters.value = data;
 
-        // Initialize photo indices, story visibility and pagination for each shelter and pet
         shelters.value.forEach(shelter => {
-          // Initialize pagination state for each shelter
           paginationState[shelter.id] = { currentPage: 1 };
           
           if (shelter.pets) {
@@ -1152,7 +1083,6 @@ export default {
               photoIndices[pet.id] = 0;
               storyVisibility[pet.id] = false;
               
-              // Make sure each pet has the minimum required fields
               pet.photos = pet.photos || [];
               pet.story = pet.story || "";
               pet.status = pet.status || "AVAILABLE";
@@ -1160,7 +1090,6 @@ export default {
           }
         });
 
-        // Load favorites from localStorage
         const savedFavorites = localStorage.getItem('favoritePets');
         if (savedFavorites) {
           favorites.value = JSON.parse(savedFavorites);
@@ -1168,7 +1097,6 @@ export default {
 
       } catch (error) {
         console.error("Error loading data:", error);
-        // Add user-visible error state
         errorMessage.value = "Could not load shelter data. Please try again later.";
       } finally {
         loading.value = false;
@@ -1180,7 +1108,6 @@ export default {
     onMounted(() => {
       loadData();
       processLocationData();
-      // Load favorites from localStorage
       const savedFavorites = localStorage.getItem('favoritePets');
       if (savedFavorites) {
         try {
@@ -1192,6 +1119,7 @@ export default {
       }
     });
 
+    
     return {
       shelters,
       sheltersWithPets,
@@ -1222,13 +1150,11 @@ export default {
       handleCountyChange,
       processLocationData,
       sortPets,
-      // Enhanced filter display
       activeFilters,
       formatFilterLabel,
       formatFilterValue,
       clearSingleFilter,
       countAppliedFilters,
-      // Pagination related
       paginationState,
       nextPage,
       prevPage,
@@ -1239,7 +1165,6 @@ export default {
 </script>
 
 <style scoped>
-/* Improved stylish filter inputs */
 .enhanced-filter-input {
   @apply appearance-none px-4 py-3 bg-white border border-gray-200 rounded-xl w-full shadow-sm transition duration-200 ease-in-out;
   @apply hover:border-red-300 focus:ring-2 focus:ring-red-500 focus:border-transparent focus:outline-none;
@@ -1249,7 +1174,6 @@ export default {
   @apply cursor-not-allowed bg-gray-100 text-gray-400;
 }
 
-/* Custom checkbox styles */
 [type="checkbox"] {
   @apply rounded border-gray-300 text-red-500 focus:ring-red-500 focus:ring-opacity-50 transition-all duration-200;
 }
@@ -1258,19 +1182,16 @@ export default {
   @apply bg-red-500 border-transparent;
 }
 
-/* Button styling */
 .primary-button {
   @apply shadow-sm hover:shadow-md transform transition-all duration-200 ease-in-out;
   @apply hover:-translate-y-0.5;
 }
 
-/* Card effects */
 .shelter-card {
   @apply transform transition duration-300 ease-in-out;
   @apply hover:-translate-y-1 hover:shadow-lg;
 }
 
-/* Pulse animations */
 @keyframes pulse-subtle {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.8; }

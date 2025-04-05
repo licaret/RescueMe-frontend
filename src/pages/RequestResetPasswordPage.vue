@@ -88,14 +88,18 @@
   </section>
 </template>
 
+
+
 <script>
 import IntroNavbar from "@/components/IntroNavbar.vue";
 import { requestPasswordReset } from "@/services/user_service";
 
 export default {
+
 components: {
   IntroNavbar, 
 },
+
 data() {
   return {
     email: '',
@@ -105,6 +109,7 @@ data() {
     isLoading: false
   }
 },
+
 methods: {
   navigateToLogin() {
     this.$router.push('/login'); 
@@ -144,6 +149,8 @@ methods: {
 }
 };
 </script>
+
+
 
 <style>
 section, section * {

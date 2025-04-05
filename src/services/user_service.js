@@ -81,7 +81,6 @@ async function login(email, password) {
     localStorage.setItem("Username", data.username);
     localStorage.setItem("Role", data.role);
     
-    //aici verific daca uns helter are nevoie sa si completeze profilul
     if (data.role === "SHELTER") {
       if (data.first_login_after_approval == true) {
         localStorage.setItem("firstLogin", "true");
@@ -127,7 +126,6 @@ async function checkEmailExists(email) {
     }
 
     const data = await response.json();
-    // console.log("Parsed data:", data);
     return data.emailExists;
   } catch (error) {
     console.error("Error in checkEmailExists:", error);
@@ -145,7 +143,6 @@ async function checkUsernameExists(username) {
     }
 
     const data = await response.json();
-    // console.log("Parsed data:", data);
     return data.usernameExists;
   } catch (error) {
     console.error("Error in checkUsernameExists:", error);
@@ -260,7 +257,6 @@ async function requestPasswordReset(email) {
       body: JSON.stringify({ email }),
     });
 
-    // Verifică dacă serverul a returnat JSON valid
     const contentType = response.headers.get("content-type");
     if (!contentType || !contentType.includes("application/json")) {
       throw new Error("Server returned an invalid response.");
@@ -344,13 +340,8 @@ async function changePassword(userId, currentPassword, newPassword) {
   }
 }
 
-/**
- * Uploads a document for a shelter
- * @param {string} Id - The ID of the shelter
- * @param {string} documentType - The type of document (taxCertificate, vetAuthorization, vetContract, idCard)
- * @param {File} file - The file to upload
- * @returns {Promise<Object>} - Response from the server
- */
+
+
 const uploadShelterDocument = async (Id, documentType, file) => {
   try {
     const formData = new FormData();

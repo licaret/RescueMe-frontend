@@ -13,7 +13,7 @@
         </p>
       </div>
   
-      <!-- Enhanced Error Message Display with Animation -->
+      <!--Error Message -->
       <transition
         enter-active-class="transform transition duration-500 ease-out"
         enter-from-class="opacity-0 scale-95 -translate-y-2"
@@ -85,7 +85,7 @@
               </div>
             </div>
   
-            <!-- Filters Toggle Button with Enhanced Badge -->
+            <!-- Filters Toggle Button -->
             <button 
               @click="showFilters = !showFilters"
               class="flex items-center gap-2 px-5 py-3.5 text-gray-700 bg-gray-50 border border-gray-200 rounded-xl hover:bg-gray-100 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 shadow-sm relative"
@@ -102,7 +102,7 @@
           </div>
         </div>
   
-        <!-- Enhanced Filters Section with Transitions and Better UI -->
+        <!-- Filters Section-->
         <transition 
           name="fade"
           enter-active-class="transition-all duration-300 ease-out"
@@ -139,7 +139,7 @@
             
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
               
-              <!-- Filter Fields with enhanced styling -->
+              <!-- Filter Fields -->
               <div class="space-y-2">
                 <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide ml-1">Species</label>
                 <div class="relative">
@@ -156,7 +156,7 @@
                 </div>
               </div>
   
-              <!-- Breed Dropdown with Tooltip on Hover -->
+              <!-- Breed Dropdown-->
               <div class="space-y-2">
                 <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide ml-1">Breed</label>
                 <div class="relative group">
@@ -177,7 +177,7 @@
                     </svg>
                   </div>
   
-                  <!-- Enhanced Tooltip message on hover -->
+                  <!--  Tooltip message on hover -->
                   <div 
                     v-if="!filters.species" 
                     class="absolute left-0 -bottom-12 bg-gray-800 text-white px-4 py-2 rounded-lg text-sm z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-lg w-48"
@@ -284,7 +284,7 @@
                     </svg>
                   </div>
   
-                  <!-- Enhanced Tooltip message on hover -->
+                  <!--  Tooltip message on hover -->
                   <div 
                     v-if="!filters.county" 
                     class="absolute left-0 -bottom-12 bg-gray-800 text-white px-4 py-2 rounded-lg text-sm z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-lg w-48"
@@ -295,7 +295,7 @@
                 </div>
               </div>
   
-              <!-- Checkboxes with Enhanced Styles -->
+              <!-- Checkboxes -->
               <div class="lg:col-span-3 flex flex-wrap gap-6 mt-4">
                 <!-- Vaccinated -->
                 <div class="flex items-center">
@@ -349,7 +349,7 @@
         </transition>
       </div>
     
-      <!-- Enhanced Loading Indicator -->
+      <!--  Loading Indicator -->
       <div v-if="loading" class="text-center py-20">
         <div class="inline-block relative">
           <div class="animate-spin rounded-full h-14 w-14 border-4 border-gray-200 border-t-red-500"></div>
@@ -358,7 +358,7 @@
         <p class="mt-6 text-gray-600 font-medium animate-pulse">Loading your favorites...</p>
       </div>
     
-      <!-- Results Count Indicator with Animation -->
+      <!-- Results Count Indicator -->
       <div v-if="!loading && sheltersWithFavorites.length > 0" class="text-center my-8">
         <div class="inline-block px-6 py-3 bg-red-50 border border-red-100 rounded-full text-red-600 font-medium shadow-sm transform transition-all duration-300 hover:scale-105 hover:shadow-md">
           <span class="flex items-center">
@@ -417,7 +417,7 @@
                     </div>
                   </div>
                   
-                  <!-- Enhanced mission statement display -->
+                  <!--Mission statement display -->
                   <div v-if="shelter.mission" class="border-l-4 border-red-500 pl-4 italic text-gray-700 bg-gray-50 p-3 rounded-r-lg shadow-sm">
                     {{ (shelter.mission.length > 120) ? shelter.mission.substring(0, 120) + '...' : shelter.mission }}
                   </div>
@@ -463,7 +463,7 @@
                 />
               </div>
               
-              <!-- Enhanced Pagination controls -->
+              <!--  Pagination controls -->
               <div class="flex justify-center mt-10" v-if="shelter.pets.length > petsPerPage">
                 <div class="inline-flex items-center bg-white rounded-lg shadow-md border border-gray-200 p-1">
                   <button 
@@ -508,7 +508,7 @@
         </div>
       </div>
   
-      <!-- Enhanced No Favorites State -->
+      <!--  No Favorites State -->
       <div v-if="!loading && sheltersWithFavorites.length === 0" class="text-center py-20 max-w-xl mx-auto">
         <div class="bg-white p-8 rounded-2xl shadow-lg border border-gray-100">
           <div class="flex justify-center mb-6">
@@ -552,9 +552,9 @@
       const errorMessage = ref('');
       const showFilters = ref(false);
       const sortBy = ref("");
-      const petsPerPage = 4; // Show 4 pets per page
+      const petsPerPage = 4; 
       
-      // Pagination state
+      // pagination state
       const paginationState = reactive({});
       
       //counties and cities
@@ -578,11 +578,10 @@
         city: ""
       });
   
-      // Computed property to get only active filters for display
+
       const activeFilters = computed(() => {
         const result = {};
         for (const [key, value] of Object.entries(filters.value)) {
-          // Only include non-empty and non-false values
           if (value && value !== "" && value !== false) {
             result[key] = value;
           }
@@ -590,7 +589,8 @@
         return result;
       });
   
-      // Format filter labels for display
+
+
       const formatFilterLabel = (key) => {
         const labels = {
           name: "Name",
@@ -609,7 +609,8 @@
         return labels[key] || key;
       };
   
-      // Format filter values for display
+
+      
       const formatFilterValue = (key, value) => {
         if (typeof value === 'boolean') {
           return value ? 'Yes' : 'No';
@@ -625,7 +626,8 @@
         return value;
       };
   
-      // Clear a single filter
+
+      
       const clearSingleFilter = (key) => {
         if (typeof filters.value[key] === 'boolean') {
           filters.value[key] = false;
@@ -634,11 +636,13 @@
         }
       };
   
-      // Count applied filters
+
+
       const countAppliedFilters = () => {
         return Object.values(filters.value).filter(value => value !== "" && value !== false).length;
       };
   
+
       const resetFilters = () => {
         filters.value = {
           name: "",
@@ -657,27 +661,25 @@
       };
   
       watch(() => filters.value.county, (newCounty) => {
-        // Reset city when county changes
         filters.value.city = "";
       });
+
   
       watch(() => filters.value.species, (newSpecies) => {
-        // Reset breed when species changes
         filters.value.breed = "";
       });
+
   
       const isAnyFilterApplied = computed(() => {
         return Object.values(filters.value).some(value => {
           return value !== "" && value !== false;
         });
       });
+
   
-      //process location data
       const processLocationData = () => {
         try {
-          // Transform the data for easier use in dropdowns
           counties.value = judete.judete.map(county => {
-            // Create mappings
             countyCodeToName[county.auto] = county.nume;
             countyNameToCode[county.nume] = county.auto;
             
@@ -687,7 +689,6 @@
             };
           });
           
-          // Create a mapping of counties to their cities
           const cityMap = {};
           judete.judete.forEach(county => {
             cityMap[county.auto] = county.localitati.map(city => 
@@ -701,23 +702,22 @@
           errorMessage.value = "Could not process location data: " + error.message;
         }
       };
+
+
   
       const handleCountyChange = () => {
-        filters.value.city = ""; // Reset city selection
+        filters.value.city = ""; 
       };
   
-      // Improved computed property to get cities based on selected county
+
       const availableCities = computed(() => {
         if (!filters.value.county) return [];
         
         const county = filters.value.county.toUpperCase();
-        
-        // Try to get cities directly from the map using county code
         if (citiesByCounty.value[county]) {
           return citiesByCounty.value[county];
         }
         
-        // If not found directly, try to look it up via the county name
         const countyName = countyCodeToName[county];
         if (countyName) {
           const countyCode = countyNameToCode[countyName];
@@ -729,7 +729,8 @@
         return [];
       });
   
-      // Pagination controls
+
+      
       const nextPage = (shelterId) => {
         if (!paginationState[shelterId]) {
           paginationState[shelterId] = { currentPage: 1 };
@@ -744,6 +745,7 @@
           paginationState[shelterId].currentPage++;
         }
       };
+
       
       const prevPage = (shelterId) => {
         if (!paginationState[shelterId] || paginationState[shelterId].currentPage <= 1) {
@@ -752,77 +754,69 @@
         
         paginationState[shelterId].currentPage--;
       };
+
+
   
-      // Breed options based on selected species
       const breedOptions = computed(() => {
         if (!filters.value.species) return [];
         
-        // Get all breeds for the selected species
         const allBreeds = shelters.value
           .flatMap(shelter => (shelter.pets || []))
           .filter(pet => pet && pet.species && 
                   pet.species.toLowerCase() === filters.value.species.toLowerCase())
           .map(pet => pet.breed)
-          .filter(breed => breed); // Filter out null/undefined
+          .filter(breed => breed); 
         
-        // Remove duplicates and sort
         return [...new Set(allBreeds)].sort();
       });
   
-      // Improved filterPet function to correctly apply all filters
+
+      
       const filterPet = (pet) => {
         if (!pet) return false;
         
-        // Name filter (case insensitive partial match)
         if (filters.value.name && pet.name) {
           if (!pet.name.toLowerCase().includes(filters.value.name.toLowerCase())) {
             return false;
           }
         }
         
-        // Species filter (case insensitive exact match)
         if (filters.value.species && pet.species) {
           if (pet.species.toLowerCase() !== filters.value.species.toLowerCase()) {
             return false;
           }
         }
         
-        // Breed filter (case insensitive exact match)
         if (filters.value.breed && pet.breed) {
           if (pet.breed.toLowerCase() !== filters.value.breed.toLowerCase()) {
             return false;
           }
         }
         
-        // Sex/Gender filter (case insensitive exact match)
         if (filters.value.sex && pet.sex) {
           if (pet.sex.toLowerCase() !== filters.value.sex.toLowerCase()) {
             return false;
           }
         }
         
-        // Size filter (case insensitive exact match)
         if (filters.value.size && pet.size) {
           if (pet.size.toLowerCase() !== filters.value.size.toLowerCase()) {
             return false;
           }
         }
         
-        // Health status filter (case insensitive exact match)
         if (filters.value.healthStatus && pet.healthStatus) {
           if (pet.healthStatus.toLowerCase() !== filters.value.healthStatus.toLowerCase()) {
             return false;
           }
         }
         
-        // Status filter (exact match, case sensitive)
         if (filters.value.status && pet.status) {
           if (pet.status !== filters.value.status) {
             return false;
           }
         }
         
-        // Boolean filters
         if (filters.value.vaccinated && !pet.vaccinated) {
           return false;
         }
@@ -835,11 +829,11 @@
           return false;
         }
         
-        // Pet passes all filters
         return true;
       };
       
-      // Apply sorting to filtered pets
+
+    
       const sortPets = (pets) => {
         if (!sortBy.value) return pets;
         
@@ -849,10 +843,8 @@
           } else if (sortBy.value === 'age') {
             return (a.age || 0) - (b.age || 0);
           } else if (sortBy.value === 'timeSpentInShelter') {
-            // Parse the timeSpentInShelter value which might be a string
             const getTimeValue = (pet) => {
               if (!pet.timeSpentInShelter) return 0;
-              // Try to parse as number, default to 0 if it fails
               return parseInt(pet.timeSpentInShelter) || 0;
             };
             return getTimeValue(a) - getTimeValue(b);
@@ -860,10 +852,10 @@
           return 0;
         });
       };
+
+
   
-      // Watch for filter changes to reset pagination
       watch(filters, () => {
-        // Reset pagination for all shelters when filters change
         Object.keys(paginationState).forEach(key => {
           if (paginationState[key]) {
             paginationState[key].currentPage = 1;
@@ -871,8 +863,9 @@
         });
       }, { deep: true });
       
+
+
       watch(sortBy, () => {
-        // Reset pagination for all shelters when sort option changes
         Object.keys(paginationState).forEach(key => {
           if (paginationState[key]) {
             paginationState[key].currentPage = 1;
@@ -880,21 +873,18 @@
         });
       });
   
-      // Group favorites by shelter and apply filters
+
+
       const sheltersWithFavorites = computed(() => {
-        // First, organize all favorites by shelter
         const shelterMap = new Map();
         
         shelters.value.forEach(shelter => {
           if (!shelter || !shelter.pets) return;
           
-          // For each shelter, filter to only include favorited pets
           const favoritePets = shelter.pets.filter(pet => pet && favoriteIds.value.includes(pet.id));
           
-          // Skip shelters with no favorite pets
           if (favoritePets.length === 0) return;
           
-          // Filter by county/city
           if (filters.value.county && shelter.county) {
             if (shelter.county.toLowerCase() !== filters.value.county.toLowerCase()) {
               return;
@@ -907,16 +897,12 @@
             }
           }
           
-          // Further filter the pets based on other criteria
           const filteredPets = favoritePets.filter(pet => filterPet(pet));
           
-          // Skip shelters with no favorite pets after filtering
           if (filteredPets.length === 0) return;
           
-          // Sort pets if needed
           const sortedPets = sortBy.value ? sortPets(filteredPets) : filteredPets;
           
-          // Create a new shelter object with only the filtered pets
           const shelterWithFilteredPets = {
             ...shelter,
             pets: sortedPets
@@ -925,11 +911,11 @@
           shelterMap.set(shelter.id, shelterWithFilteredPets);
         });
         
-        // Convert Map to array and return
         return Array.from(shelterMap.values());
       });
   
-      // Remove pet from favorites
+
+
       const removeFromFavorites = async (petId) => {
         try {
           const userId = localStorage.getItem('Id');
@@ -939,10 +925,8 @@
           
           await removeFavorite(userId, petId);
           
-          // Update local state
           favoriteIds.value = favoriteIds.value.filter(id => id !== petId);
           
-          // Reset pagination for affected shelter
           const affectedShelter = shelters.value.find(shelter => 
             shelter.pets && shelter.pets.some(pet => pet.id === petId)
           );
@@ -957,9 +941,9 @@
         }
       };
       
-      // Adopt pet
+
+
       const adoptPet = (petId) => {
-        // Find the pet to get its name
         let petName = "this pet";
         let foundPet = null;
         
@@ -972,25 +956,23 @@
           }
         });
         
-        // In a real app, you might navigate to an adoption form
         alert(`Starting adoption process for ${petName}!`);
       };
   
+
+
       const loadData = async () => {
         try {
           loading.value = true;
           errorMessage.value = '';
           
-          // Get user ID from localStorage
           const userId = localStorage.getItem('Id');
           if (!userId) {
             throw new Error('You must be logged in to view favorites');
           }
           
-          // Fetch favorite pet IDs
           favoriteIds.value = await getFavorites(userId);
           
-          // Fetch all shelters from backend
           const response = await fetch("http://localhost:8080/users/shelters");
           
           if (!response.ok) {
@@ -1000,7 +982,6 @@
           const data = await response.json();
           shelters.value = data;
   
-          // Initialize pagination state for each shelter
           shelters.value.forEach(shelter => {
             paginationState[shelter.id] = { currentPage: 1 };
           });
@@ -1013,31 +994,36 @@
         }
       };
   
-      // Handler for favorites-updated event
+
+
       const handleFavoritesUpdated = async () => {
         try {
           const userId = localStorage.getItem('Id');
           if (!userId) return;
           
-          // Refresh favorite IDs from backend
           favoriteIds.value = await getFavorites(userId);
         } catch (error) {
           console.error("Error updating favorites:", error);
         }
       };
       
+
+
       onMounted(() => {
         loadData();
         processLocationData();
         
-        // Listen for updates to favorites
         window.addEventListener('favorites-updated', handleFavoritesUpdated);
       });
       
+
+
       onUnmounted(() => {
         window.removeEventListener('favorites-updated', handleFavoritesUpdated);
       });
       
+
+
       return {
         sheltersWithFavorites,
         loading,
@@ -1069,7 +1055,6 @@
   </script>
   
   <style scoped>
-  /* Improved stylish filter inputs */
   .enhanced-filter-input {
     @apply appearance-none px-4 py-3 bg-white border border-gray-200 rounded-xl w-full shadow-sm transition duration-200 ease-in-out;
     @apply hover:border-red-300 focus:ring-2 focus:ring-red-500 focus:border-transparent focus:outline-none;
@@ -1079,7 +1064,6 @@
     @apply cursor-not-allowed bg-gray-100 text-gray-400;
   }
   
-  /* Custom checkbox styles */
   [type="checkbox"] {
     @apply rounded border-gray-300 text-red-500 focus:ring-red-500 focus:ring-opacity-50 transition-all duration-200;
   }
@@ -1088,13 +1072,11 @@
     @apply bg-red-500 border-transparent;
   }
   
-  /* Button styling */
   .primary-button {
     @apply shadow-sm hover:shadow-md transform transition-all duration-200 ease-in-out;
     @apply hover:-translate-y-0.5;
   }
   
-  /* Pulse animations */
   @keyframes pulse-subtle {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.8; }

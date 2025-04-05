@@ -129,100 +129,106 @@
     </section>
 </template>
   
-  <script>
-  import IntroNavbar from "@/components/IntroNavbar.vue";
-  import { resetPassword } from "@/services/user_service";
-  import { useRoute, useRouter } from "vue-router";
-  
-  export default {
-    components: {
-      IntroNavbar, 
+<script>
+import IntroNavbar from "@/components/IntroNavbar.vue";
+import { resetPassword } from "@/services/user_service";
+import { useRoute, useRouter } from "vue-router";
+
+export default {
+
+  components: {
+    IntroNavbar, 
+  },
+
+  data() {
+    return {
+      password: "",
+      confirmPassword: "",
+      message: "",
+      success: false,
+      showPassword: false,
+      showConfirmPassword: false,
+      passwordError: "",
+      confirmPasswordError: ""
+    };
+  },
+
+  mounted() {
+      const token = this.$route.query.token;
+      console.log("Component mounted. Token in URL:", token);
+      if (!token) {
+          this.message = "Missing reset token. Please use the link from your email.";
+          this.success = false;
+      }
+  },
+
+  setup() {
+    const route = useRoute();
+    const router = useRouter();
+    return { route, router };
+  },
+
+  methods: {
+    
+    validatePassword(password) {
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,20}$/;
+      if (!passwordRegex.test(password)) {
+        this.passwordError = "Password must be 8-20 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character.";
+      } else {
+        this.passwordError = "";
+      }
+      this.validateConfirmPassword();
     },
-    data() {
-      return {
-        password: "",
-        confirmPassword: "",
-        message: "",
-        success: false,
-        showPassword: false,
-        showConfirmPassword: false,
-        passwordError: "",
-        confirmPasswordError: ""
-      };
+
+    validateConfirmPassword() {
+      if (this.password !== this.confirmPassword) {
+        this.confirmPasswordError = "Passwords do not match.";
+      } else {
+        this.confirmPasswordError = "";
+      }
     },
-    mounted() {
-        const token = this.$route.query.token;
-        console.log("Component mounted. Token in URL:", token);
-        if (!token) {
-            this.message = "Missing reset token. Please use the link from your email.";
-            this.success = false;
-        }
-    },
-    setup() {
-      const route = useRoute();
-      const router = useRouter();
-      return { route, router };
-    },
-    methods: {
-      validatePassword(password) {
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,20}$/;
-        if (!passwordRegex.test(password)) {
-          this.passwordError = "Password must be 8-20 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character.";
-        } else {
-          this.passwordError = "";
-        }
-        this.validateConfirmPassword();
+
+    navigateToLogin() {
+      this.$router.push('/login'); 
       },
-  
-      validateConfirmPassword() {
-        if (this.password !== this.confirmPassword) {
-          this.confirmPasswordError = "Passwords do not match.";
-        } else {
-          this.confirmPasswordError = "";
-        }
-      },
 
-      navigateToLogin() {
-        this.$router.push('/login'); 
-        },
-  
-      async resetPassword(event) {
-        console.log("Form submission event:", event);
-        
-        if (this.passwordError || this.confirmPasswordError) {
-            console.log("Validation errors prevent submission");
-            return;
-        }
+    async resetPassword(event) {
+      console.log("Form submission event:", event);
+      
+      if (this.passwordError || this.confirmPasswordError) {
+          console.log("Validation errors prevent submission");
+          return;
+      }
 
-        try {
-            const token = this.$route.query.token;
-            console.log("About to call API with token:", token);
-            
-            if (!token) {
-            this.message = "Missing reset token. Please use the link from your email.";
-            this.success = false;
-            return;
-            }
-            
-            const response = await resetPassword(token, this.password);
-            console.log("API response:", response);
-            
-            if (response && response.message) {
-                this.message = response.message; 
-                this.success = true;
+      try {
+          const token = this.$route.query.token;
+          console.log("About to call API with token:", token);
+          
+          if (!token) {
+          this.message = "Missing reset token. Please use the link from your email.";
+          this.success = false;
+          return;
+          }
+          
+          const response = await resetPassword(token, this.password);
+          console.log("API response:", response);
+          
+          if (response && response.message) {
+              this.message = response.message; 
+              this.success = true;
 
-                setTimeout(() => this.$router.push("/login"), 3000);
-            } else {
-                this.message = "Unexpected response from server";
-                this.success = false;
-            }
-        } catch (error) {
-            console.error("Reset password error:", error);
-            console.log("Error response:", error.response);
-            this.message = error.response?.data?.message || "An error occurred. Please try again.";
-            this.success = false;
-        }
-        }
-    },
-  };
-  </script>
+              setTimeout(() => this.$router.push("/login"), 3000);
+          } else {
+              this.message = "Unexpected response from server";
+              this.success = false;
+          }
+      } catch (error) {
+          console.error("Reset password error:", error);
+          console.log("Error response:", error.response);
+          this.message = error.response?.data?.message || "An error occurred. Please try again.";
+          this.success = false;
+      }
+      }
+  },
+};
+</script>

@@ -10,15 +10,12 @@ async function fetchShelterPets(Id) {
       },
     });
 
-    //console.log("Response status:", response.status);
-
     if (!response.ok) {
       console.error("Failed to fetch pets. Response status:", response.status);
       throw new Error("Failed to fetch pets");
     }
 
     const data = await response.json();
-    //console.log("Raw pets data:", data);
 
     const processedData = data.map(pet => ({
       ...pet,
@@ -28,9 +25,6 @@ async function fetchShelterPets(Id) {
       })) : []
     }));
     
-    
-
-    //console.log("Processed pets data:", processedData);
     return processedData;
 
   } catch (error) {
@@ -38,8 +32,6 @@ async function fetchShelterPets(Id) {
     return [];
   }
 }
-
-
 
 
 
@@ -71,17 +63,14 @@ async function updatePet(Id, petId, petData, photos, photoIdsToDelete = []) {
 
     const formData = new FormData();
 
-    // 🔄 Adăugăm datele despre animal
     formData.append("petData", JSON.stringify(petData));
 
-    // 🖼️ Adăugăm noile poze dacă există
     if (photos && photos.length > 0) {
       photos.forEach((photo) => {
         formData.append("photos", photo);
       });
     }
 
-    // 🚨 Adăugăm ID-urile pozelor care trebuie șterse (dacă există)
     if (photoIdsToDelete.length > 0) {
       formData.append("photoIdsToDelete", JSON.stringify(photoIdsToDelete));
     }
@@ -110,6 +99,8 @@ async function updatePet(Id, petId, petData, photos, photoIdsToDelete = []) {
   }
 }
 
+
+
 const getPetCountByShelter = async (Id) => {
   const response = await fetch(`http://localhost:8080/pets/count/${Id}`);
   if (!response.ok) {
@@ -117,6 +108,8 @@ const getPetCountByShelter = async (Id) => {
   }
   return await response.json();
 };
+
+
 
 async function fetchShelterPetStats(Id) {
   try {
@@ -146,4 +139,48 @@ async function fetchShelterPetStats(Id) {
 }
 
 
-export { fetchShelterPets, deletePet, updatePet, getPetCountByShelter, fetchShelterPetStats };
+async function getPetById(petId) {
+  try {
+    console.log(`Fetching pet with ID: ${petId}`);
+
+    const response = await fetch(`http://localhost:8080/pets/${petId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+
+    if (!response.ok) {
+      console.error("Failed to fetch pet. Response status:", response.status);
+      throw new Error("Failed to fetch pet");
+    }
+
+    const data = await response.json();
+    
+    const processedData = {
+      ...data,
+      photos: data.photos ? data.photos.map(photo => ({
+        id: photo.id,
+        url: photo.url.startsWith("data:image") ? photo.url : `data:image/jpeg;base64,${photo.url}`
+      })) : []
+    };
+    
+    console.log("Processed pet data:", processedData);
+    return processedData;
+
+  } catch (error) {
+    console.error("Error occurred while fetching pet:", error);
+    throw error;
+  }
+}
+
+
+export { 
+  fetchShelterPets, 
+  deletePet, 
+  updatePet, 
+  getPetCountByShelter, 
+  fetchShelterPetStats, 
+  getPetById 
+};

@@ -759,15 +759,17 @@ import judete from "@/assets/judete.json";
 import blankPicture from "@/assets/blank_profile_picture.jpg";
 
 export default {
+
   name: 'ShelterProfileCompletion',
+
   data() {
     return {
       isToastVisible: false,
       successMessage: '',
       errorMessage: '',
-      profileSubmitted: false, // Flag to track if profile has been submitted
-      blankProfilePicture: blankPicture, // Default blank profile picture
-      profilePictureUrl: "", // Will be empty by default
+      profileSubmitted: false, 
+      blankProfilePicture: blankPicture, 
+      profilePictureUrl: "", 
       isSubmitting: false,
       isUploadingProfilePicture: false,
       isDeletingProfilePicture: false,
@@ -792,7 +794,7 @@ export default {
         hoursOfOperation: '',
         mission: '',
         status: 'NEW',
-        profilePicture: null // Added specifically to track profile picture status
+        profilePicture: null 
       },
       
       // Document status
@@ -831,39 +833,12 @@ export default {
         'Specialized Shelter (specific breeds/species)',
         'Emergency/Temporary Shelter'
       ],
-      counties: [], // To be populated from API
-      cities: [] // To be populated based on selected county
+      counties: [], 
+      cities: [] 
     }
   },
   
-  // async mounted() {
-  //   // First load the counties data
-  //   this.loadCounties();
-    
-  //   // Then load the shelter profile data
-  //   await this.loadShelterProfile();
-    
-  //   // Store the selected city temporarily
-  //   const selectedCity = this.shelterData.city;
-    
-  //   // Populate the cities dropdown based on selected county
-  //   if (this.shelterData.county) {
-  //     // This will reset the city selection temporarily
-  //     this.handleCountyChange();
-      
-  //     // Restore the selected city if it exists
-  //     if (selectedCity && this.cities.includes(selectedCity)) {
-  //       this.shelterData.city = selectedCity;
-  //     }
-  //   }
-    
-  //   await this.tryLoadProfilePicture();
-    
-  //   // Check if profile is already submitted and pending approval
-  //   if (this.shelterData.status === 'PENDING_APPROVAL') {
-  //     this.profileSubmitted = true;
-  //   }
-  // },
+  
 
   async mounted() {
     try {
@@ -877,24 +852,18 @@ export default {
         return;
       }
 
-      // First load shelter profile to check status first
       const profileData = await getShelterProfile(Id);
       
-      // Update status immediately 
       this.shelterData.status = profileData.status || 'NEW';
       
       if (this.shelterData.status === 'PENDING_APPROVAL' || this.shelterData.status === 'APPROVED') {
         console.log(`Profile is in ${this.shelterData.status} status, showing appropriate view`);
         this.profileSubmitted = true;
-        return; // Skip loading other data
+        return;
       }
       
-      // Only proceed with full data loading for other statuses
-      
-      // Load counties data
       this.loadCounties();
       
-      // Update shelter data with the retrieved profile
       this.shelterData = {
         username: profileData.username || '',
         email: profileData.email || '',
@@ -911,22 +880,17 @@ export default {
         profilePicture: profileData.profilePicture || null
       };
       
-      // Update document status
       if (profileData.documents) {
         this.documentStatus = profileData.documents;
       }
 
       this.initHoursFromString();
       
-      // Store the selected city temporarily
       const selectedCity = this.shelterData.city;
       
-      // Populate the cities dropdown based on selected county
       if (this.shelterData.county) {
-        // This will reset the city selection temporarily
         this.handleCountyChange();
         
-        // Restore the selected city if it exists
         if (selectedCity && this.cities.includes(selectedCity)) {
           this.shelterData.city = selectedCity;
         }
@@ -941,6 +905,7 @@ export default {
   },
   
   methods: {
+
     getStatusText() {
       const statusMap = {
         'NEW': 'Pending Completion',
@@ -953,16 +918,16 @@ export default {
       return statusMap[this.shelterData.status] || 'Pending Completion';
     },
 
+
     goToDashboard() {
-      // Check if router exists
       if (this.$router) {
         this.$router.push(`/shelter/dashboard`);
       } else {
-        // Fallback
         window.location.href = `/shelter/dashboard`;
       }
     },
     
+
     async loadShelterProfile() {
       try {
         const Id = this.getCurrentId();
@@ -977,7 +942,6 @@ export default {
         
         const profileData = await getShelterProfile(Id);
         
-        // Update shelter data with the retrieved profile
         this.shelterData = {
           username: profileData.username || '',
           email: profileData.email || '',
@@ -994,12 +958,10 @@ export default {
           profilePicture: profileData.profilePicture || null
         };
         
-        // Update document status
         if (profileData.documents) {
           this.documentStatus = profileData.documents;
         }
         
-        // If county is set, load the cities for that county
         if (this.shelterData.county) {
           this.handleCountyChange();
         }
@@ -1009,16 +971,13 @@ export default {
       }
     },
     
-    // Inițializează programul din string-ul existent
+
     initHoursFromString() {
       if (this.shelterData.hoursOfOperation) {
-        // Dacă avem deja date, activăm modul custom
         this.useCustomHours = true;
         
-        // Încercăm să parsăm formatul simplu "Mon-Fri: 9AM-5PM, Sat-Sun: 10AM-3PM"
         const hoursString = this.shelterData.hoursOfOperation;
         
-        // Căutăm programul pentru zilele săptămânii
         try {
           const weekdayMatch = hoursString.match(/Mon-Fri:\s*(\d+)(AM|PM)-(\d+)(AM|PM)/i);
           const weekendMatch = hoursString.match(/Sat-Sun:\s*(\d+)(AM|PM)-(\d+)(AM|PM)/i);
@@ -1035,7 +994,6 @@ export default {
             this.weekendClose = this.convertTo24Hour(closeHour, closeAmPm);
           }
           
-          // Dacă am reușit să parsăm, dezactivăm modul custom
           if (weekdayMatch && weekendMatch) {
             this.useCustomHours = false;
             this.updateHoursString();
@@ -1044,12 +1002,12 @@ export default {
           console.log('Nu s-a putut parsa formatul programului, folosim modul custom');
         }
       } else {
-        // Dacă nu avem date, inițializăm cu valori implicite
         this.updateHoursString();
       }
     },
 
-    // Convertește din format 12 ore în format 24 ore
+
+
     convertTo24Hour(hour, ampm) {
       hour = parseInt(hour);
       if (ampm.toUpperCase() === 'PM' && hour < 12) {
@@ -1060,7 +1018,7 @@ export default {
       return hour.toString().padStart(2, '0') + ':00';
     },
 
-    // Convertește din format 24 ore în format 12 ore cu AM/PM
+
     convertTo12Hour(time) {
       if (time === 'Closed') return 'Closed';
       
@@ -1071,11 +1029,10 @@ export default {
       return `${hour12}${minutes !== '00' ? ':' + minutes : ''}${ampm}`;
     },
 
-    // Actualizează string-ul orarului
+
     updateHoursString() {
       let parts = [];
       
-      // Adaugă programul zilelor săptămânii
       if (this.weekdayOpen === 'Closed') {
         parts.push('Mon-Fri: Closed');
       } else {
@@ -1084,7 +1041,6 @@ export default {
         parts.push(`Mon-Fri: ${weekdayOpenStr}-${weekdayCloseStr}`);
       }
       
-      // Adaugă programul de weekend
       if (this.weekendOpen === 'Closed') {
         parts.push('Sat-Sun: Closed');
       } else {
@@ -1093,24 +1049,21 @@ export default {
         parts.push(`Sat-Sun: ${weekendOpenStr}-${weekendCloseStr}`);
       }
       
-      // Formatul final
       this.formattedHours = parts.join(', ');
       
-      // Actualizează modelul principal dacă nu folosim modul custom
       if (!this.useCustomHours) {
         this.shelterData.hoursOfOperation = this.formattedHours;
       }
     },
+
 
     async tryLoadProfilePicture() {
       try {
         const Id = this.getCurrentId();
         if (!Id) return;
         
-        // Call the fetch profile picture function
         const imageUrl = await fetchProfilePicture(Id);
         
-        // Debug the returned URL
         console.log('Fetched profile picture URL:', imageUrl);
         
         if (imageUrl) {
@@ -1121,30 +1074,28 @@ export default {
         this.profilePictureUrl = "";
       }
     },
+
+
     
     async loadCounties() {
       this.counties = judete.judete;
     },
 
+
+
     handleCountyChange() {
-      // Save the current city value
       const currentCity = this.shelterData.city;
       
-      // Find the selected county object
       const selectedCountyObj = this.counties.find(county => county.auto === this.shelterData.county);
       
       if (selectedCountyObj) {
         this.shelterData.countyName = selectedCountyObj.nume;
         
-        // Populate the cities dropdown
         this.cities = selectedCountyObj.localitati.map(loc => loc.nume);
         
-        // Only reset the city if it's not in the new list of cities
         if (currentCity && this.cities.includes(currentCity)) {
-          // Keep the current city if it's valid for this county
           this.shelterData.city = currentCity;
         } else {
-          // Reset the city if it's not valid for this county
           this.shelterData.city = "";
         }
       } else {
@@ -1154,6 +1105,8 @@ export default {
       }
     },
   
+
+
     validateUsername() {
       if (!this.shelterData.username) {
         this.errors.username = 'Username is required';
@@ -1163,6 +1116,7 @@ export default {
         delete this.errors.username;
       }
     },
+
     
     validateEmail() {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -1175,19 +1129,18 @@ export default {
       }
     },
     
+
     async handleProfilePictureUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
       
       try {
-        // Validate file type
         const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
         if (!validImageTypes.includes(file.type)) {
           this.errors.profilePicture = 'Please upload a valid image file (JPEG, PNG, GIF, WEBP)';
           return;
         }
         
-        // Validate file size (max 5MB)
         if (file.size > 5 * 1024 * 1024) {
           this.errors.profilePicture = 'Image file size must be less than 5MB';
           return;
@@ -1199,14 +1152,12 @@ export default {
           return;
         }
         
-        // Set uploading state
         this.isUploadingProfilePicture = true;
         
-        // Upload profile picture
         const imageUrl = await uploadProfilePicture(Id, file);
         if (imageUrl) {
           this.profilePictureUrl = imageUrl;
-          this.shelterData.profilePicture = true; // Set flag that picture exists
+          this.shelterData.profilePicture = true; 
           this.showToast('Profile picture uploaded successfully');
         }
       } catch (error) {
@@ -1217,6 +1168,8 @@ export default {
       }
     },
     
+
+
     async removeProfilePicture() {
       try {
         const Id = this.getCurrentId();
@@ -1225,15 +1178,12 @@ export default {
           return;
         }
         
-        // Set deleting state
         this.isDeletingProfilePicture = true;
         
-        // Call service to delete profile picture
         await deleteProfilePicture(Id);
         
-        // Reset profile picture
         this.profilePictureUrl = "";
-        this.shelterData.profilePicture = null; // Set flag that no picture exists
+        this.shelterData.profilePicture = null; 
         
         this.showToast('Profile picture removed');
       } catch (error) {
@@ -1244,20 +1194,20 @@ export default {
       }
     },
 
+
+
     async handleDocumentUpload(documentType, event) {
       const file = event.target.files[0];
       if (!file) return;
       
       try {
-        // Validate file type
         const validDocTypes = ['application/pdf', 'image/jpeg', 'image/png'];
         if (!validDocTypes.includes(file.type)) {
           this.errors[documentType] = 'Please upload a valid document file (PDF, JPEG, PNG)';
           return;
         }
         
-        // Validate file size (max 2MB)
-        if (file.size > 2 * 1024 * 1024) { // 2MB
+        if (file.size > 2 * 1024 * 1024) { 
           this.errors[documentType] = 'Document file size must be less than 2MB';
           return;
         }
@@ -1268,16 +1218,12 @@ export default {
           return;
         }
         
-        // Set uploading state
         this.isUploading[documentType] = true;
         
-        // Upload document
         await uploadDocument(Id, documentType, file);
         
-        // Update document status
         this.documentStatus[documentType] = true;
         
-        // Clear any previous error
         delete this.errors[documentType];
         
         this.showToast(`${this.getDocumentTypeName(documentType)} uploaded successfully`);
@@ -1286,10 +1232,11 @@ export default {
         this.errors[documentType] = 'Failed to upload document. Please try again.';
         this.showToast(`Failed to upload ${this.getDocumentTypeName(documentType)}`, 'error');
       } finally {
-        // Reset uploading state
         this.isUploading[documentType] = false;
       }
     },
+
+
     
     async handleDocumentDelete(documentType) {
       try {
@@ -1299,13 +1246,10 @@ export default {
           return;
         }
         
-        // Set deleting state
         this.isDeleting[documentType] = true;
         
-        // Delete document
         await deleteDocument(Id, documentType);
         
-        // Update document status
         this.documentStatus[documentType] = false;
         
         this.showToast(`${this.getDocumentTypeName(documentType)} deleted successfully`);
@@ -1313,16 +1257,16 @@ export default {
         console.error(`Error deleting ${documentType} document:`, error);
         this.showToast(`Failed to delete ${this.getDocumentTypeName(documentType)}`);
       } finally {
-        // Reset deleting state
         this.isDeleting[documentType] = false;
       }
     },
     
+
+
     validateForm(validateDocuments = true) {
       let isValid = true;
       this.errors = {};
       
-      // Validate shelter data
       if (!this.shelterData.username) {
         this.errors.username = 'Username is required';
         isValid = false;
@@ -1391,11 +1335,7 @@ export default {
         isValid = false;
       }
       
-      // Profile picture is NOT required, so we don't validate it
-      
-      // Only validate documents for submission, not for draft
       if (validateDocuments) {
-        // Validate documents
         if (!this.documentStatus.taxCertificate) {
           this.errors.taxCertificate = 'Tax certificate is required';
           isValid = false;
@@ -1420,10 +1360,11 @@ export default {
       return isValid;
     },
     
+
+
+
     async saveAsDraft() {
-      // Skip document validation for draft
       if (!this.validateForm(false)) {
-        // Scroll to the first error
         const firstErrorElement = document.querySelector('.text-red-500');
         if (firstErrorElement) {
           firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1441,13 +1382,10 @@ export default {
           return;
         }
         
-        // Prepare data for saving
         const dataToSave = { ...this.shelterData };
         
-        // Save the profile data to backend
         await saveShelterProfileDraft(Id, dataToSave);
         
-        // Update local status
         this.shelterData.status = 'DRAFT';
         
         this.showToast('Profile saved as draft');
@@ -1458,11 +1396,11 @@ export default {
         this.isSubmitting = false;
       }
     },
+
+
     
     async completeProfile() {
-      // Full validation including documents for submission
       if (!this.validateForm(true)) {
-        // Scroll to the first error
         const firstErrorElement = document.querySelector('.text-red-500');
         if (firstErrorElement) {
           firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1480,22 +1418,16 @@ export default {
           return;
         }
         
-        // Prepare data for submission
         const dataToSubmit = { ...this.shelterData };
         
-        // Submit the profile data to backend
         await submitShelterProfile(Id, dataToSubmit);
         
-        // Update local status
         this.shelterData.status = 'PENDING_APPROVAL';
         
-        // Show success view
         this.profileSubmitted = true;
         
-        // Show success message
         this.showToast('Profile successfully submitted for approval!');
         
-        // Scroll to top to see the success message
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } catch (error) {
         console.error('Error submitting profile:', error);
@@ -1504,33 +1436,37 @@ export default {
         this.isSubmitting = false;
       }
     },
+
+
     
     showToast(message, type = 'success') {
       if (type === 'success') {
         this.successMessage = message;
-        this.errorMessage = ''; // Clear any error message
+        this.errorMessage = ''; 
         this.isToastVisible = true;
         
-        // Clear the toast after 3 seconds
         setTimeout(() => {
           this.isToastVisible = false;
         }, 3000);
       } else {
         this.errorMessage = message;
-        this.successMessage = ''; // Clear any success message
+        this.successMessage = ''; 
         this.isToastVisible = true;
         
-        // Clear the toast after 3 seconds
         setTimeout(() => {
           this.isToastVisible = false;
         }, 3000);
       }
     },
     
+
+
     getCurrentId() {
       return localStorage.getItem('Id') || localStorage.getItem('Id');
     },
     
+
+
     getDocumentTypeName(documentType) {
       const names = {
         'taxCertificate': 'Tax Certificate',
@@ -1542,19 +1478,18 @@ export default {
       return names[documentType] || documentType;
     },
     
-    // Make getDocumentUrl available in the template
+
     getDocumentUrl,
     
     goToDashboard() {
-      // Check if router exists
       if (this.$router) {
         this.$router.push('/shelter/dashboard');
       } else {
-        // Fallback
         window.location.href = '/shelter/dashboard';
       }
     },
     
+
     goBack() {
         this.$router.push('/');
         localStorage.clear();
@@ -1563,8 +1498,9 @@ export default {
 }
 </script>
 
+
+
 <style scoped>
-/* Optional custom styles can be added here */
 .fade-enter-active, .fade-leave-active {
   transition: opacity 0.5s ease;
 }

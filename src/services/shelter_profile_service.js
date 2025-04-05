@@ -47,7 +47,7 @@ async function checkWelcomeStatus(Id) {
 }
 
 
-// Acknowledge welcome page has been seen
+
 async function acknowledgeWelcome(Id) {
   try {
     const response = await fetch(`http://localhost:8080/api/v1/shelters/${Id}/acknowledge-welcome`, {
@@ -124,17 +124,14 @@ async function submitShelterProfile(Id, profileData) {
 
 
 async function uploadDocument(Id, documentType, file) {
-  // Validate inputs
   if (!Id || !documentType || !file) {
     throw new Error("Missing required parameters");
   }
   
-  // Validate file size (2MB max)
   if (file.size > 2 * 1024 * 1024) {
     throw new Error("File size exceeds maximum allowed (2MB)");
   }
   
-  // Validate file type
   const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
   if (!allowedTypes.includes(file.type)) {
     throw new Error("Invalid file type. Only PDF, JPEG, and PNG files are accepted");
@@ -152,7 +149,6 @@ async function uploadDocument(Id, documentType, file) {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${token}`
-        // Do NOT set Content-Type here - it will be set automatically
       },
       body: formData,
     });
@@ -222,6 +218,7 @@ async function getDocumentStatus(shelterId) {
 function getDocumentUrl(Id, documentType) {
   return `${API_BASE_URL}/shelters/${Id}/documents/${documentType}?t=${Date.now()}`;
 }
+
 
 export {
   getShelterProfile,

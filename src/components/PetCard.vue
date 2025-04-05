@@ -1,359 +1,576 @@
 <template>
-  <div 
-    class="overflow-hidden bg-white rounded-2xl border border-gray-200 shadow hover:shadow-md transition-all duration-300 flex flex-col relative"
-    v-if="pet"
-  >
-    <!-- Image Gallery -->
-    <div class="relative h-64 overflow-hidden bg-gray-100">
-      <!-- Pet Image -->
-      <img
-        v-if="pet.photos && pet.photos.length > 0"
-        :src="pet.photos[currentIndex]?.url"
-        alt="Pet Photo"
-        class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-      />
-      <div v-else class="w-full h-full flex items-center justify-center">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-        </svg>
-      </div>
-
-      <!-- Status Indicator -->
-      <div class="absolute top-0 left-0 right-0 z-10 p-3 flex justify-between items-center">
-        <div 
-          class="px-3 py-1 rounded-full text-xs font-medium shadow-sm backdrop-blur-sm"
-          :class="{
-            'bg-green-100/80 text-green-800 border border-green-200/60': pet.status === 'AVAILABLE',
-            'bg-yellow-100/80 text-yellow-800 border border-yellow-200/60': pet.status === 'PENDING',
-            'bg-gray-100/80 text-gray-800 border border-gray-200/60': pet.status === 'ADOPTED'
-          }"
-        >
-          {{ pet.status || '' }}
-        </div>
-        
-        <!-- Urgent Indicator -->
-        <div
-          v-if="pet.urgentAdoptionNeeded"
-          class="bg-red-100/80 border border-red-200/60 text-red-700 px-3 py-1 rounded-full text-xs font-medium shadow-sm backdrop-blur-sm flex items-center gap-1"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+  <div class="pet-card-container">
+    <!-- Compact Card View -->
+    <div 
+      class="overflow-hidden bg-white rounded-2xl border border-gray-200 shadow hover:shadow-lg transition-all duration-300 flex flex-col relative"
+      v-if="pet"
+    >
+      <!-- Image Gallery with Status Indicators -->
+      <div class="relative h-56 overflow-hidden bg-gray-100 rounded-t-2xl">
+        <!-- Pet Image -->
+        <img
+          v-if="pet.photos && pet.photos.length > 0"
+          :src="pet.photos[currentIndex]?.url"
+          alt="Pet Photo"
+          class="w-full h-full object-cover transition-transform duration-500"
+        />
+        <div v-else class="w-full h-full flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
-          Urgent
         </div>
-      </div>
 
-      <!-- Navigation Controls -->
-      <div v-if="pet.photos && pet.photos.length > 1" class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/30 to-transparent">
-        <div class="flex justify-between items-center p-3">
-          <div class="flex items-center gap-1.5">
-            <div 
-              v-for="(_, index) in pet.photos" 
-              :key="index"
-              @click="goToImage(index)"
-              class="h-1.5 rounded-full cursor-pointer transition-all duration-300"
-              :class="index === currentIndex ? 'w-5 bg-white' : 'w-1.5 bg-white/60'"
-            ></div>
+        <!-- Status Indicators -->
+        <div class="absolute top-3 left-0 right-0 z-10 px-3 flex justify-between items-center">
+          <div 
+            class="px-3 py-1 rounded-full text-xs font-medium shadow-sm backdrop-blur-sm"
+            :class="{
+              'bg-green-100/90 text-green-800 border border-green-200/60': pet.status === 'AVAILABLE',
+              'bg-yellow-100/90 text-yellow-800 border border-yellow-200/60': pet.status === 'PENDING',
+              'bg-gray-100/90 text-gray-800 border border-gray-200/60': pet.status === 'ADOPTED'
+            }"
+          >
+            {{ pet.status || '' }}
           </div>
           
-          <div class="flex gap-2">
-            <button
-              class="w-7 h-7 rounded-full bg-black/20 backdrop-blur-sm text-white flex items-center justify-center hover:bg-black/40 transition-all"
-              @click="prevImage"
-              aria-label="Previous image"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-            <button
-              class="w-7 h-7 rounded-full bg-black/20 backdrop-blur-sm text-white flex items-center justify-center hover:bg-black/40 transition-all"
-              @click="nextImage"
-              aria-label="Next image"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
+          <div
+            v-if="pet.urgentAdoptionNeeded"
+            class="bg-red-100/90 border border-red-200/60 text-red-700 px-3 py-1 rounded-full text-xs font-medium shadow-sm backdrop-blur-sm flex items-center gap-1"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            Urgent
           </div>
         </div>
+
+        <!-- View Details Button-->
+        <button 
+          @click.stop="toggleExpandedView"
+          class="absolute bottom-3 right-3 bg-white/90 text-gray-800 px-4 py-2 rounded-full text-sm font-medium flex items-center gap-1.5 shadow-md hover:bg-white hover:shadow-lg transition-all duration-300"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+          </svg>
+          Details
+        </button>
+      </div>
+
+      <!-- Essential Pet Information -->
+      <div class="p-4">
+        <div class="flex justify-between items-start">
+          <div>
+            <h3 class="text-lg font-bold text-gray-800">{{ pet.name || '' }}</h3>
+            <div class="flex items-center gap-1 text-sm text-gray-600 mt-0.5">
+              <span v-if="pet.species" class="font-medium">{{ pet.species }}</span>
+              <span v-if="pet.species && pet.breed" class="text-gray-400">•</span>
+              <span class="text-gray-500">{{ pet.breed || 'Mixed Breed' }}</span>
+            </div>
+          </div>
+          
+          <div class="flex items-center gap-3">
+            <!-- Age -->
+            <div class="flex flex-col items-center">
+              <span class="text-xs text-gray-500">Age</span>
+              <span class="text-sm font-medium text-gray-800">{{ formatAge(pet.age) }}</span>
+            </div>
+            
+            <!-- Sex -->
+            <div class="flex flex-col items-center">
+              <span class="text-xs text-gray-500">Sex</span>
+              <span class="text-sm font-medium text-gray-800">{{ pet.sex || 'Unknown' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="mt-auto border-t border-gray-100">
+        <div class="grid grid-cols-2 overflow-hidden">
+          <!-- Shelter: Edit & Remove -->
+          <template v-if="isShelter">
+            <button 
+              @click.stop="openEditForm"
+              class="py-3 flex items-center justify-center gap-1.5 text-gray-600 hover:bg-gray-50 transition-colors text-sm border-r border-gray-100"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+              </svg>
+              Edit
+            </button>
+            <button 
+              @click.stop="showDeleteModal"
+              class="py-3 text-red-600 hover:bg-red-50 transition-all duration-200 text-sm flex items-center justify-center gap-1.5"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+              Remove
+            </button>
+          </template>
+
+          <!-- Public: Save & Adopt -->
+          <template v-else>
+            <button 
+              @click.stop="toggleFavorite"
+              class="py-3 flex items-center justify-center gap-1.5 transition-all duration-200 text-sm"
+              :class="isFavorite ? 'text-red-600' : 'text-gray-600 hover:text-gray-800'"
+            >
+              <svg 
+                class="w-4 h-4" 
+                :class="isFavorite ? 'text-red-500 fill-red-500' : 'text-gray-400'" 
+                xmlns="http://www.w3.org/2000/svg" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor" 
+                fill="none" 
+                stroke-width="2"
+              >
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+              </svg>
+              {{ isFavorite ? 'Saved' : 'Save' }}
+            </button>
+
+            <button
+              v-if="pet.status === 'AVAILABLE'"
+              @click.stop="adoptPet"
+              class="py-3 text-red-600 hover:bg-red-50 transition-all duration-200 text-sm flex items-center justify-center gap-1.5 border-l border-gray-100"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+              Adopt
+            </button>
+            <button
+              v-else
+              disabled
+              class="py-3 text-gray-400 cursor-not-allowed flex items-center justify-center gap-1.5 text-sm border-l border-gray-100"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              Not Available
+            </button>
+          </template>
+        </div>
+
       </div>
     </div>
+  </div>
 
-    <!-- Pet Information -->
-    <div class="p-5">
-      <div class="flex justify-between items-start mb-4">
-        <div>
-          <h3 class="text-xl font-bold text-gray-800">{{ pet.name || '' }}</h3>
-          <div class="flex items-center gap-2 text-sm text-gray-600 mt-1">
-            <span v-if="pet.species" class="font-medium">{{ pet.species }}</span>
-            <span v-if="pet.species && pet.breed" class="text-gray-400">•</span>
-            <span class="text-gray-500">{{ pet.breed || 'Mixed Breed' }}</span>
-          </div>
-        </div>
-        
-        <!-- Story Button with Dropdown -->
-        <div class="relative group z-20">
-          <button
-            class="text-indigo-600 hover:text-indigo-700 text-sm font-medium flex items-center gap-1.5 bg-indigo-50/80 hover:bg-indigo-100 px-3 py-1.5 rounded-full transition-colors border border-indigo-100"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-            </svg>
-            <span>Read Story</span>
-          </button>
-          
-          <!-- Story Popup -->
-          <div class="absolute right-0 w-72 bg-white p-5 rounded-xl border border-gray-200 shadow-lg z-30 mt-2 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 transform scale-95 group-hover:scale-100 origin-top-right">
-            <div class="absolute right-3 -top-2 w-4 h-4 bg-white border-t border-l border-gray-200 transform rotate-45"></div>
-            <div class="flex items-center mb-3 text-indigo-600">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
-              <h4 class="font-medium text-gray-800">{{ pet.name }}'s Story</h4>
-            </div>
-            <p class="text-gray-700 text-sm leading-relaxed">
-              {{ pet.story || `${pet.name} doesn't have a story yet, but is excited to find a loving home!` }}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Pet Attributes -->
-      <div class="space-y-4">
-        <!-- Primary Attributes -->
-        <div class="grid grid-cols-3 gap-2">
-          <!-- Age -->
-          <div class="flex flex-col items-center p-2 bg-gray-50 rounded-lg">
-            <div class="text-amber-500 mb-1">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-            </div>
-            <span class="text-xs text-gray-500">Age</span>
-            <span class="text-sm font-medium text-gray-800">{{ formatAge(pet.age) }}</span>
-          </div>
-          
-          <!-- Sex -->
-          <div class="flex flex-col items-center p-2 bg-gray-50 rounded-lg">
-            <div class="text-purple-500 mb-1">
-              <svg v-if="pet.sex === 'Male'" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="10.5" cy="10.5" r="7.5" />
-                <line x1="21" y1="21" x2="16.5" y2="16.5" />
-                <line x1="21" y1="10.5" x2="16.5" y2="10.5" />
-                <line x1="18.75" y1="7.75" x2="18.75" y2="13.25" />
-              </svg>
-              <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="9.5" r="7.5" />
-                <line x1="12" y1="17" x2="12" y2="22" />
-                <line x1="9" y1="19.5" x2="15" y2="19.5" />
-              </svg>
-            </div>
-            <span class="text-xs text-gray-500">Sex</span>
-            <span class="text-sm font-medium text-gray-800">{{ pet.sex || 'Unknown' }}</span>
-          </div>
-          
-          <!-- Size -->
-          <div class="flex flex-col items-center p-2 bg-gray-50 rounded-lg">
-            <div class="text-blue-500 mb-1">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
-              </svg>
-            </div>
-            <span class="text-xs text-gray-500">Size</span>
-            <span class="text-sm font-medium text-gray-800">{{ pet.size || 'Unknown' }}</span>
-          </div>
-        </div>
-        
-        <!-- Health Status -->
-        <div class="flex items-center px-3 py-2 rounded-lg" 
-             :class="pet.healthStatus === 'Healthy' ? 'bg-green-50' : pet.healthStatus === 'Minor Issues' ? 'bg-yellow-50' : 'bg-red-50'">
-          <div :class="pet.healthStatus === 'Healthy' ? 'text-green-500' : pet.healthStatus === 'Minor Issues' ? 'text-yellow-500' : 'text-red-500'" class="mr-3">
+  <!-- Expanded View Modal -->
+  <Teleport to="body">
+    <div 
+      v-if="isExpanded" 
+      class="fixed inset-0 bg-black/70 flex items-center justify-center z-[9999] p-4 overflow-y-auto backdrop-blur-sm"
+      @click="handleBackdropClick"
+    >
+      <div 
+        class="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl transform transition-all duration-300 modal-content"
+        @click.stop
+      >
+        <!-- Modal Header -->
+        <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+          <h2 class="text-xl font-bold text-gray-800">{{ pet.name }}'s Profile</h2>
+          <button @click="toggleExpandedView" class="text-gray-400 hover:text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-full p-2 transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
-          </div>
-          <div>
-            <div class="text-xs text-gray-500">Health Status</div>
-            <div class="text-sm font-medium"
-                 :class="pet.healthStatus === 'Healthy' ? 'text-green-700' : pet.healthStatus === 'Minor Issues' ? 'text-yellow-700' : 'text-red-700'">
-              {{ pet.healthStatus || 'Unknown' }}
-            </div>
-          </div>
-          <div class="ml-auto flex gap-4">
-            <!-- Vaccinated -->
-            <div class="flex flex-col items-center">
-              <div class="text-xs text-gray-500">Vaccinated</div>
-              <div class="flex items-center justify-center">
-                <svg v-if="pet.vaccinated" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-                <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
+          </button>
+        </div>
+        
+        <!-- Modal Content -->
+        <div class="overflow-y-auto flex-1 p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Image Gallery -->
+            <div class="relative">
+              <div class="h-80 overflow-hidden bg-gray-100 rounded-lg">
+                <img
+                  v-if="pet.photos && pet.photos.length > 0"
+                  :src="pet.photos[currentIndex]?.url"
+                  alt="Pet Photo"
+                  class="w-full h-full object-cover"
+                />
+                <div v-else class="w-full h-full flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+              </div>
+              
+              <!-- Navigation Controls -->
+              <div v-if="pet.photos && pet.photos.length > 1" class="flex justify-center mt-4 gap-2">
+                <button
+                  class="w-8 h-8 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center hover:bg-gray-300 transition-all"
+                  @click.stop="prevImage"
+                  aria-label="Previous image"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                
+                <!-- Thumbnails -->
+                <div class="flex items-center gap-2 overflow-x-auto px-2 max-w-xs">
+                  <div 
+                    v-for="(photo, index) in pet.photos" 
+                    :key="index"
+                    @click.stop="goToImage(index)"
+                    class="h-8 w-8 rounded-md overflow-hidden cursor-pointer transition-all duration-300"
+                    :class="index === currentIndex ? 'ring-2 ring-indigo-500' : ''"
+                  >
+                    <img :src="photo.url" alt="Thumbnail" class="w-full h-full object-cover" />
+                  </div>
+                </div>
+                
+                <button
+                  class="w-8 h-8 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center hover:bg-gray-300 transition-all"
+                  @click.stop="nextImage"
+                  aria-label="Next image"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
               </div>
             </div>
             
-            <!-- Neutered -->
-            <div class="flex flex-col items-center">
-              <div class="text-xs text-gray-500">Neutered</div>
-              <div class="flex items-center justify-center">
-                <svg v-if="pet.neutered" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-                <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
+            <!-- Pet Details -->
+            <div class="space-y-6">
+              <div>
+                <h3 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                  {{ pet.name }}
+                  <span 
+                    class="px-2 py-0.5 text-xs rounded-full"
+                    :class="{
+                      'bg-green-100 text-green-800': pet.status === 'AVAILABLE',
+                      'bg-yellow-100 text-yellow-800': pet.status === 'PENDING',
+                      'bg-gray-100 text-gray-800': pet.status === 'ADOPTED'
+                    }"
+                  >
+                    {{ pet.status }}
+                  </span>
+                  <span v-if="pet.urgentAdoptionNeeded" class="bg-red-100 text-red-700 px-2 py-0.5 rounded-full text-xs font-medium">
+                    Urgent
+                  </span>
+                </h3>
+                <div class="flex items-center gap-2 text-gray-600 mt-1">
+                  <span class="font-medium">{{ pet.species }}</span>
+                  <span>•</span>
+                  <span>{{ pet.breed || 'Mixed Breed' }}</span>
+                </div>
+              </div>
+              
+              <!-- Primary Attributes -->
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                <!-- Age -->
+                <div class="bg-gray-50 p-3 rounded-lg">
+                  <div class="text-amber-500 mb-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <span class="text-xs text-gray-500 block">Age</span>
+                  <span class="text-sm font-medium text-gray-800">{{ formatAge(pet.age) }}</span>
+                </div>
+                
+                <!-- Sex -->
+                <div class="bg-gray-50 p-3 rounded-lg">
+                  <div class="text-purple-500 mb-1">
+                    <svg v-if="pet.sex === 'Male'" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="10.5" cy="10.5" r="7.5" />
+                      <line x1="21" y1="21" x2="16.5" y2="16.5" />
+                      <line x1="21" y1="10.5" x2="16.5" y2="10.5" />
+                      <line x1="18.75" y1="7.75" x2="18.75" y2="13.25" />
+                    </svg>
+                    <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="9.5" r="7.5" />
+                      <line x1="12" y1="17" x2="12" y2="22" />
+                      <line x1="9" y1="19.5" x2="15" y2="19.5" />
+                    </svg>
+                  </div>
+                  <span class="text-xs text-gray-500 block">Sex</span>
+                  <span class="text-sm font-medium text-gray-800">{{ pet.sex || 'Unknown' }}</span>
+                </div>
+                
+                <!-- Size -->
+                <div class="bg-gray-50 p-3 rounded-lg">
+                  <div class="text-blue-500 mb-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                    </svg>
+                  </div>
+                  <span class="text-xs text-gray-500 block">Size</span>
+                  <span class="text-sm font-medium text-gray-800">{{ pet.size || 'Unknown' }}</span>
+                </div>
+              </div>
+              
+              <!-- Health Status -->
+              <div class="flex items-center p-4 rounded-lg" 
+                   :class="pet.healthStatus === 'Healthy' ? 'bg-green-50' : pet.healthStatus === 'Minor Issues' ? 'bg-yellow-50' : 'bg-red-50'">
+                <div :class="pet.healthStatus === 'Healthy' ? 'text-green-500' : pet.healthStatus === 'Minor Issues' ? 'text-yellow-500' : 'text-red-500'" class="mr-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <div class="text-xs text-gray-500">Health Status</div>
+                  <div class="text-sm font-medium"
+                       :class="pet.healthStatus === 'Healthy' ? 'text-green-700' : pet.healthStatus === 'Minor Issues' ? 'text-yellow-700' : 'text-red-700'">
+                    {{ pet.healthStatus || 'Unknown' }}
+                  </div>
+                </div>
+                <div class="ml-auto flex gap-4">
+                  <!-- Vaccinated -->
+                  <div class="flex flex-col items-center">
+                    <div class="text-xs text-gray-500">Vaccinated</div>
+                    <div class="flex items-center justify-center">
+                      <svg v-if="pet.vaccinated" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                      <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </div>
+                  </div>
+                  
+                  <!-- Neutered -->
+                  <div class="flex flex-col items-center">
+                    <div class="text-xs text-gray-500">Neutered</div>
+                    <div class="flex items-center justify-center">
+                      <svg v-if="pet.neutered" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                      <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Shelter Time -->
+              <div class="flex items-center p-4 bg-blue-50 rounded-lg">
+                <div class="text-blue-500 mr-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <div>
+                  <div class="text-xs text-gray-500">Time in Shelter</div>
+                  <div class="text-sm font-medium text-blue-700">{{ formatShelterTime(pet.timeSpentInShelter) }}</div>
+                </div>
+              </div>
+              
+              <!-- Story -->
+              <div class="bg-gray-50 p-4 rounded-lg">
+                <div class="flex items-center mb-2 text-indigo-600">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                  </svg>
+                  <h4 class="font-medium text-gray-800">{{ pet.name }}'s Story</h4>
+                </div>
+                <p class="text-gray-700 text-sm leading-relaxed">
+                  {{ pet.story || `${pet.name} doesn't have a story yet, but is excited to find a loving home!` }}
+                </p>
               </div>
             </div>
           </div>
         </div>
         
-        <!-- Shelter Time -->
-        <div class="flex items-center px-3 py-2 bg-blue-50 rounded-lg">
-          <div class="text-blue-500 mr-3">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
+        <!-- Modal Footer -->
+        <div class="px-6 py-4 border-t border-gray-100 flex justify-between">
+          <!-- Shelter buttons -->
+          <template v-if="isShelter">
+            <div>
+              <button
+                @click.stop="showDeleteModal"
+                class="flex items-center gap-1.5 bg-red-50 text-red-600 px-4 py-2 rounded-md text-sm font-medium hover:bg-red-100 transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                Remove
+              </button>
+            </div>
+            <div class="flex gap-3">
+              <button 
+                @click.stop="openEditForm"
+                class="flex items-center gap-1.5 bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                </svg>
+                Edit Pet
+              </button>
+            </div>
+          </template>
+
+          <!-- Public/Adopter buttons -->
+          <template v-else>
+            <div></div>
+            <div class="flex gap-3">
+              <!-- Save -->
+              <button 
+                @click.stop="toggleFavorite"
+                class="flex items-center gap-1.5 bg-gray-100 px-4 py-2 rounded-md text-sm font-medium"
+                :class="isFavorite ? 'text-red-600 hover:bg-red-50' : 'text-gray-600 hover:bg-gray-200'"
+              >
+                <svg 
+                  class="w-4 h-4" 
+                  :class="isFavorite ? 'text-red-500 fill-red-500' : 'text-gray-500'" 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor" 
+                  fill="none" 
+                  stroke-width="2"
+                >
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                </svg>
+                {{ isFavorite ? 'Saved' : 'Save' }}
+              </button>
+
+              <!-- Adopt or Not Available -->
+              <button
+                v-if="pet.status === 'AVAILABLE'"
+                @click.stop="adoptPet"
+                class="flex items-center gap-1.5 bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                </svg>
+                Adopt Now
+              </button>
+              <button
+                v-else
+                disabled
+                class="bg-gray-100 text-gray-400 cursor-not-allowed flex items-center justify-center gap-1.5 px-4 py-2 rounded-md text-sm"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Not Available
+              </button>
+            </div>
+          </template>
+        </div>
+
+      </div>
+    </div>
+  </Teleport>
+
+  <!-- Confirmation Modal -->
+  <Teleport to="body" v-if="showModal">
+    <div class="fixed inset-0 z-[10000] bg-black/30 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:max-w-lg w-full">
+        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+          <div class="sm:flex sm:items-start">
+            <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+              <svg class="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+              <h3 class="text-lg leading-6 font-medium text-gray-900">Delete Pet</h3>
+              <div class="mt-2">
+                <p class="text-sm text-gray-500">Are you sure you want to delete this pet? This action cannot be undone.</p>
+              </div>
+            </div>
           </div>
-          <div>
-            <div class="text-xs text-gray-500">Time in Shelter</div>
-            <div class="text-sm font-medium text-blue-700">{{ formatShelterTime(pet.timeSpentInShelter) }}</div>
-          </div>
+        </div>
+        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+          <button 
+            type="button" 
+            @click.stop="deletePet"
+            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+            Yes, delete it
+          </button>
+          <button 
+            type="button" 
+            @click.stop="showModal = false"
+            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+            Cancel
+          </button>
         </div>
       </div>
     </div>
+  </Teleport>
 
-    <!-- Action Buttons -->
-    <div class="mt-auto pt-4">
-      <!-- Shelter Actions -->
-      <div v-if="isShelter" class="grid grid-cols-2 border-t border-gray-100 mt-2">
-        <button 
-          @click="openEditForm"
-          class="py-3.5 flex items-center justify-center gap-2 text-gray-600 hover:bg-gray-50 transition-colors text-sm"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-          </svg>
-          Edit
-        </button>
-        <button
-          @click="showModal = true"
-          class="py-3.5 flex items-center justify-center gap-2 text-gray-600 hover:bg-gray-50 transition-colors text-sm border-l border-gray-100"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-          </svg>
-          Remove
-        </button>
-      </div>
-      
-      <!-- Adopter Actions -->
-      <div v-else class="grid grid-cols-2 border-t border-gray-100 mt-2 overflow-hidden rounded-b-2xl">
-        <!-- Save Button -->
-        <button 
-          @click="toggleFavorite"
-          class="py-3.5 flex items-center justify-center gap-1.5 transition-all duration-200 text-sm"
-          :class="isFavorite ? 'text-red-600' : 'text-gray-600 hover:text-gray-800'"
-        >
-          <svg 
-            class="w-4 h-4" 
-            :class="isFavorite ? 'text-red-500 fill-red-500' : 'text-gray-400'" 
-            xmlns="http://www.w3.org/2000/svg" 
-            viewBox="0 0 24 24" 
-            stroke="currentColor" 
-            fill="none" 
-            stroke-width="2"
-          >
-            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-          </svg>
-          {{ isFavorite ? 'Saved' : 'Save' }}
-        </button>
-        
-        <!-- Adopt Button -->
-        <button
-          v-if="pet.status === 'AVAILABLE'"
-          @click="adoptPet"
-          class="py-3.5 text-red-600 hover:bg-red-50 transition-all duration-200 text-sm flex items-center justify-center gap-1.5"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-          </svg>
-          Adopt Now
-        </button>
-        <button
-          v-else
-          disabled
-          class="py-3.5 text-gray-400 cursor-not-allowed flex items-center justify-center gap-1.5 text-sm"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
-          Not Available
-        </button>
-      </div>
+
+  <!-- Edit Form Modal -->
+  <Teleport to="body" v-if="showEditForm">
+    <div class="fixed inset-0 z-[10001] bg-black/10 backdrop-blur-sm flex items-center justify-center p-4">
+      <AddEditPetForm 
+        :pet-to-edit="pet" 
+        @close="showEditForm = false" 
+        @pet-updated="updatePet" 
+      />
     </div>
+  </Teleport>
 
-    <!-- Confirmation Modal -->
-    <ConfirmationModal
-      v-if="showModal"
-      :isOpen="showModal"
-      title="Delete Pet"
-      description="Are you sure you want to delete this pet? This action cannot be undone."
-      confirmButtonText="Yes, delete it"
-      cancelButtonText="Cancel"
-      @confirm="deletePet"
-      @cancel="showModal = false"
-      @update:isOpen="showModal = $event"
-    />
-
-    <!-- Edit Form Modal -->
-    <AddPetForm 
-      v-if="showEditForm" 
-      :petToEdit="pet" 
-      @close="showEditForm = false" 
-      @pet-updated="updatePet" 
-    />
-  </div>
 </template>
 
 <script>
-import { ref, computed, onMounted } from "vue";
-import { deletePet } from "../services/pet_service"; 
+import { ref, computed, onMounted, watch } from "vue";
+import { useRouter } from 'vue-router';
+import { deletePet as deletePetService } from "../services/pet_service"; 
 import { addToFavorites, removeFromFavorites, checkIfFavorite } from "../services/favorite_service";
-import ConfirmationModal from "@/components/ConfirmationModal.vue";
-import AddPetForm from "@/components/AddPetForm.vue";
+import { setCurrentAdoptionPet } from '../services/adoption_state_service';
+import AddEditPetForm from './AddEditPetForm.vue';
 
 export default {
   name: "PetCard",
   components: {
-    ConfirmationModal,
-    AddPetForm,
+    AddEditPetForm
   },
-  
   props: {
     pet: {
       type: Object,
       required: true,
+    },
+    favorited: {
+      type: Boolean,
+      default: false
+    },
+    userType: {
+      type: String,
+      default: "public"
     }
   },
 
-  emits: ["pet-updated", "pet-deleted", "adopt-pet"],
+  emits: ["pet-updated", "pet-deleted", "adopt-pet", "toggleFavorite"],
 
   setup(props, { emit }) {
+    const router = useRouter();
+
     const currentIndex = ref(0);
     const showModal = ref(false);
     const showEditForm = ref(false);
-    const isFavorite = ref(false);
+    const isFavorite = ref(props.favorited);
+    const isExpanded = ref(false);
+    const modalMounted = ref(false);
 
     const isShelter = computed(() => {
       const userRole = localStorage.getItem('Role');
       return userRole === 'SHELTER';
     });
 
+
+    // Reset current index when pet changes
+    watch(() => props.pet, () => {
+      currentIndex.value = 0;
+    });
+
+
+    // Watch the favorited prop for external changes
+    watch(() => props.favorited, (newValue) => {
+      isFavorite.value = newValue;
+    });
+
+
     // Check if pet is in user's favorites when component is mounted
     onMounted(async () => {
-      if (!isShelter.value) {
+      if (!isShelter.value && !props.favorited) {
         const userId = localStorage.getItem('Id');
         if (userId && props.pet.id) {
           try {
@@ -366,10 +583,34 @@ export default {
       }
     });
 
-    const toggleFavorite = async () => {
+
+    const toggleExpandedView = () => {
+      isExpanded.value = !isExpanded.value;
+      if (isExpanded.value) {
+        currentIndex.value = 0;
+        
+        if (isExpanded.value) {
+          document.body.style.overflow = 'hidden';
+        }
+      } else {
+        document.body.style.overflow = '';
+      }
+    };
+
+
+    const handleBackdropClick = (event) => {
+      if (event.target === event.currentTarget) {
+        toggleExpandedView();
+      }
+    };
+
+
+
+    const toggleFavorite = async (event) => {
+      if (event) event.stopPropagation();
+      
       const userId = localStorage.getItem('Id');
       if (!userId) {
-        // Redirect to login or show login modal
         console.error("User not logged in");
         return;
       }
@@ -381,39 +622,80 @@ export default {
           await addToFavorites(userId, props.pet.id);
         }
         
-        // Toggle the local state
         isFavorite.value = !isFavorite.value;
+        
+        emit("toggleFavorite", props.pet.id);
+        
+        window.dispatchEvent(new CustomEvent('favorites-updated'));
+        
       } catch (error) {
         console.error("Error toggling favorite:", error);
       }
     };
 
-    const adoptPet = () => {
-      emit("adopt-pet", props.pet.id);
+
+
+    const adoptPet = (event) => {
+      if (event) event.stopPropagation();
+      
+      console.log("Adopt button clicked for pet:", props.pet);
+      
+      const userId = localStorage.getItem('Id');
+      const userRole = localStorage.getItem('Role');
+      
+      if (!userId) {
+        router.push('/login?redirect=adoption&petId=' + props.pet.id);
+        return;
+      }
+      
+      if (userRole !== 'ADOPTER') {
+        alert('Only adopters can submit adoption requests.');
+        return;
+      }
+
+      setCurrentAdoptionPet(props.pet);
+      
+      router.push(`/adopt/${props.pet.id}`);
     };
 
-    const openEditForm = () => {
+
+
+    const openEditForm = (event) => {
+      if (event) event.stopPropagation();
       showEditForm.value = true;
     };
+
+
 
     const updatePet = (updatedPet) => {
       emit("pet-updated", updatedPet);
       showEditForm.value = false;
     };
 
+
+
+    const showDeleteModal = () => {
+      showModal.value = true;
+    };
+
+
     const prevImage = () => {
       if (!props.pet.photos || props.pet.photos.length <= 1) return;
       currentIndex.value = (currentIndex.value - 1 + props.pet.photos.length) % props.pet.photos.length;
     };
+
+
 
     const nextImage = () => {
       if (!props.pet.photos || props.pet.photos.length <= 1) return;
       currentIndex.value = (currentIndex.value + 1) % props.pet.photos.length;
     };
     
+
     const goToImage = (index) => {
       currentIndex.value = index;
     };
+
 
     const formatAge = (age) => {
       if (!age && age !== 0) return 'Unknown';
@@ -426,6 +708,7 @@ export default {
       }
     };
 
+
     const formatShelterTime = (time) => {
       if (!time) return 'New arrival';
       
@@ -437,6 +720,17 @@ export default {
         return `${shelterTimeInMonths} ${shelterTimeInMonths === 1 ? 'month' : 'months'} in shelter`;
       }
     };
+
+
+    // Clean up when component is unmounted
+    onMounted(() => {
+      return () => {
+        if (isExpanded.value) {
+          document.body.style.overflow = '';
+        }
+      };
+    });
+
 
     return {
       currentIndex,
@@ -452,7 +746,12 @@ export default {
       isShelter,
       isFavorite,
       formatAge,
-      formatShelterTime
+      formatShelterTime,
+      isExpanded,
+      toggleExpandedView,
+      handleBackdropClick,
+      showDeleteModal,
+      modalMounted
     };
   },
 
@@ -462,9 +761,11 @@ export default {
       const petId = this.pet.id;
 
       try {
-        await deletePet(Id, petId);
+        await deletePetService(Id, petId);
         this.$emit("pet-deleted", petId); 
-        this.showModal = false; 
+        this.showModal = false;
+        this.isExpanded = false;
+        document.body.style.overflow = '';
       } catch (error) {
         console.error("Error deleting pet:", error);
       }
@@ -474,15 +775,56 @@ export default {
 </script>
 
 <style scoped>
-/* Optional custom animations and transitions */
+.pet-card-container {
+  position: relative;
+}
+
 .fade-enter-active,
 .fade-leave-active {
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
   transform: translateY(-10px);
+}
+
+@keyframes modal-appear {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.modal-content {
+  animation: modal-appear 0.2s ease-out forwards;
+}
+
+.pet-card-container:hover img {
+  transform: scale(1.03);
+}
+
+.overflow-y-auto {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+}
+
+.overflow-y-auto::-webkit-scrollbar {
+  width: 6px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.5);
+  border-radius: 10px;
+  border: 2px solid transparent;
 }
 </style>

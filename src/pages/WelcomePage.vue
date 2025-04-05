@@ -1,7 +1,6 @@
-<!-- WelcomePage.vue -->
 <template>
   <section class="bg-gray-50 min-h-screen flex flex-col items-center justify-center py-12 px-4">
-    <!-- Loading state with improved spinner -->
+    <!-- Loading state with spinner -->
     <div v-if="loading" class="text-center py-10">
       <div class="flex flex-col items-center">
         <div class="relative">
@@ -12,7 +11,7 @@
       </div>
     </div>
     
-    <!-- Show approval message with enhanced design -->
+    <!-- Show approval message -->
     <div v-else-if="showWelcome" class="bg-white rounded-3xl shadow-xl p-8 md:p-12 max-w-3xl w-full mx-auto transition-all duration-500 transform hover:shadow-2xl">
       <div class="text-center">
         <!-- Success icon with animation -->
@@ -109,17 +108,21 @@
   </section>
 </template>
 
+
+
 <script>
 import { checkWelcomeStatus, acknowledgeWelcome } from '@/services/shelter_profile_service.js';
 
 export default {
   name: 'WelcomePage',
+
   data() {
     return {
       loading: true,
       showWelcome: false
     }
   },
+
   async mounted() {
     try {
       const Id = this.getCurrentId();
@@ -129,13 +132,11 @@ export default {
         return;
       }
       
-      // Check if welcome should be shown
       const response = await checkWelcomeStatus(Id);
       this.showWelcome = response.showWelcome;
       
       this.loading = false;
       
-      // If welcome shouldn't be shown, redirect to dashboard
       if (!this.showWelcome) {
         this.goToDashboard();
       }
@@ -145,7 +146,10 @@ export default {
       this.goToDashboard();
     }
   },
+
+
   methods: {
+
     async acknowledgeAndGoToDashboard() {
       try {
         const Id = this.getCurrentId();
@@ -156,9 +160,11 @@ export default {
       
       this.goToDashboard();
     },
+
     goToDashboard() {
       this.$router.push('/shelter-dashboard/');
     },
+
     getCurrentId() {
       return localStorage.getItem('Id') || localStorage.getItem('Id');
     }
@@ -166,8 +172,9 @@ export default {
 }
 </script>
 
+
+
 <style scoped>
-/* Add some basic animations */
 @keyframes pulse {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.05); }
@@ -210,13 +217,11 @@ export default {
   }
 }
 
-/* Make sure all elements are non-selectable */
 section, section * {
   user-select: none;
   -webkit-user-drag: none;
 }
 
-/* Make all clickable elements have a pointer cursor */
 button, a {
   cursor: pointer;
 }

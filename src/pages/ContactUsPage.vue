@@ -211,9 +211,7 @@
     },
     methods: {
       handleSubmit() {
-        // Handle form submission logic here
         console.log('Form submitted:', this.form)
-        // Reset form
         this.form = {
           fullName: '',
           email: '',
@@ -225,14 +223,14 @@
       }
     }
   }
-  </script>
+</script>
+
+
 
 <style>
-
 * {
   user-select: none; 
 }
-
 
 input, textarea {
   user-select: text; 
@@ -245,7 +243,6 @@ button {
   cursor: pointer; 
 }
 
-
 img {
   pointer-events: none; 
 }
@@ -255,7 +252,6 @@ a {
   pointer-events: auto; 
   cursor: pointer; 
 }
-
 </style>
 
 

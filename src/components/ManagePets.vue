@@ -1,5 +1,6 @@
 <template>
   <div class="bg-gradient-to-b from-gray-90 to-gray-100 min-h-screen p-4 pl-2 mt-4 space-y-4">
+
     <!-- Header Section -->
     <div class="max-w-full">
       <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
@@ -8,7 +9,7 @@
           <p class="text-gray-600 mt-1">Add, edit and manage your pets</p>
         </div>
         <button 
-          @click="showAddPetForm = true" 
+          @click="showAddEditPetForm = true" 
           class="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-full flex items-center gap-2 shadow-md transition-all duration-200 hover:translate-y-[-2px]"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -242,7 +243,7 @@
           />
         </div>
         
-        <!-- Professional Pagination Component -->
+        <!-- Pagination Component -->
         <div v-if="totalPages > 1" class="flex justify-center py-5">
           <nav class="inline-flex -space-x-px" aria-label="Pagination">
             <!-- First page -->
@@ -342,7 +343,7 @@
         <h2 class="text-xl font-bold text-gray-800 mb-2">No pets available</h2>
         <p class="text-gray-600 mb-4">You haven't added any pets yet. Start by clicking the button below.</p>
         <button 
-          @click="showAddPetForm = true" 
+          @click="showAddEditPetForm = true" 
           class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-lg shadow-md transition-all duration-200 hover:translate-y-[-2px]"
         >
           Add Your First Pet
@@ -350,37 +351,41 @@
       </div>
     </div>
 
-    <AddPetForm 
-      v-if="showAddPetForm" 
-      @close="showAddPetForm = false"
-      @pet-added="handlePetAdded"
-      :key="formKey"
-    />
+    <Teleport to="body" v-if="showAddEditPetForm">
+      <div class="fixed inset-0 z-[10001] bg-black/10 backdrop-blur-sm flex items-center justify-center p-4">
+        <AddEditPetForm 
+          @close="showAddEditPetForm = false"
+          @pet-added="handlePetAdded"
+          :key="formKey"
+        />
+      </div>
+    </Teleport>
+
   </div>
 </template>
 
 <script>
 import { ref, computed, onMounted, watch } from 'vue';
 import { fetchShelterPets } from "@/services/pet_service.js";
-import AddPetForm from '@/components/AddPetForm.vue';
+import AddEditPetForm from '@/components/AddEditPetForm.vue';
 import PetCard from '@/components/PetCard.vue';
 
 export default {
   name: 'ManagePets',
   components: {
     PetCard,
-    AddPetForm
+    AddEditPetForm
   },
 
   setup() {
     const pets = ref([]);
     const searchQuery = ref("");
     const Id = localStorage.getItem("Id");
-    const showAddPetForm = ref(false);
+    const showAddEditPetForm = ref(false);
     const formKey = ref(0);
     const showBreedMessage = ref(false);
 
-    // Pagination
+    // pagination
     const itemsPerPage = 20;
     const currentPage = ref(1);
 
@@ -414,7 +419,7 @@ export default {
         timeSpentInShelter: "",
         status: "",
       };
-      currentPage.value = 1; // Reset to first page when filters change
+      currentPage.value = 1; // reset to first page when filters change
     };
 
     const sortBy = ref(""); 
@@ -424,12 +429,16 @@ export default {
     const filteredBreeds = ref([]);
     const showDropdown = ref(false);
 
+
+
     const isAnyFilterApplied = computed(() => {
       return Object.values(filters.value).some(value => 
         value !== "" && value !== false && value !== null && value !== undefined
       );
     });
     
+
+
     const loadPets = async () => {
       if (!Id) {
         console.error("No shelter ID found");
@@ -455,15 +464,21 @@ export default {
       }
     };
 
+
+
     const handlePetAdded = async (newPet) => {   
       await new Promise(resolve => setTimeout(resolve, 1000)); 
       await loadPets(); 
     };
+
+
     
     const removePetFromList = (petId) => {
       pets.value = pets.value.filter((pet) => pet.id !== petId);
       console.log(`Pet with ID ${petId} removed from local list`);
     };
+
+
 
     const updatePetInList = (updatedPet) => {
       const index = pets.value.findIndex((p) => p.id === updatedPet.id);
@@ -483,6 +498,8 @@ export default {
         ];
       }
     };
+
+
 
     const filteredPets = computed(() => {
       if (!pets.value || pets.value.length === 0) {
@@ -553,13 +570,18 @@ export default {
         });
     });
 
-    // Pagination calculations
+
+
+
+    // pagination calculations
     const totalPages = computed(() => {
       if (!filteredPets.value || filteredPets.value.length === 0) {
         return 0;
       }
       return Math.ceil(filteredPets.value.length / itemsPerPage);
     });
+
+
 
     const paginatedPets = computed(() => {
       if (!filteredPets.value || filteredPets.value.length === 0) {
@@ -571,46 +593,41 @@ export default {
       return filteredPets.value.slice(startIndex, endIndex);
     });
 
-    // Logic for pagination display
+
+
+    // pagination display
     const displayedPages = computed(() => {
       if (!totalPages.value || totalPages.value <= 0) {
         return [];
       }
 
       if (totalPages.value <= 7) {
-        // If we have 7 or fewer pages, show all page numbers
         return Array.from({ length: totalPages.value }, (_, i) => i + 1);
       }
 
-      // Always show first page, last page, and pages around current page
       const pages = [1];
       
-      // Calculate range around current page
       let startPage = Math.max(2, currentPage.value - 1);
       let endPage = Math.min(totalPages.value - 1, currentPage.value + 1);
       
-      // Add ellipsis if needed before the range
       if (startPage > 2) {
         pages.push('...');
       } else if (startPage === 2) {
         pages.push(2);
       }
       
-      // Add the range around current page
       for (let i = startPage; i <= endPage; i++) {
         if (i !== 1 && i !== totalPages.value) {
           pages.push(i);
         }
       }
       
-      // Add ellipsis if needed after the range
       if (endPage < totalPages.value - 1) {
         pages.push('...');
       } else if (endPage === totalPages.value - 1) {
         pages.push(totalPages.value - 1);
       }
       
-      // Add the last page
       if (totalPages.value > 1) {
         pages.push(totalPages.value);
       }
@@ -618,12 +635,15 @@ export default {
       return pages;
     });
 
-    // Navigation methods
+
+
     const goToPage = (page) => {
       if (page >= 1 && page <= totalPages.value) {
         currentPage.value = page;
       }
     };
+
+
 
     const fetchBreeds = async () => {
       if (!filters.value.species) {
@@ -655,10 +675,14 @@ export default {
       }
     };
 
-    // Reset to first page when filters change
+
+
+    // reset to first page when filters change
     watch(() => [filters.value, sortBy.value], () => {
       currentPage.value = 1;
     }, { deep: true });
+
+
 
     watch(() => filters.value.species, async (newSpecies) => {
       console.log("Species changed to:", newSpecies);
@@ -670,13 +694,15 @@ export default {
       }
     });
 
+
+
     onMounted(loadPets);
     
     return { 
       searchQuery, 
       pets, 
       filteredPets,
-      showAddPetForm, 
+      showAddEditPetForm, 
       handlePetAdded, 
       removePetFromList, 
       updatePetInList, 
@@ -691,7 +717,6 @@ export default {
       filteredBreeds, 
       showDropdown, 
       showBreedMessage,
-      // Pagination
       currentPage,
       totalPages,
       paginatedPets,
@@ -719,7 +744,6 @@ export default {
   @apply cursor-not-allowed;
 }
 
-/* Color checkboxes */
 [type="checkbox"] {
   @apply rounded border-gray-300;
 }

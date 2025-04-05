@@ -152,12 +152,11 @@
                 <p v-if="passwordError" class="text-sm text-red-600 mt-2">{{ passwordError }}</p>
               </div>
               
-              <!-- Phone number field with Romania indicator -->
+              <!-- Phone numbe -->
               <div>
                 <label for="phone-number" class="block mb-2 text-sm font-medium text-gray-700 dark:text-white">Phone Number</label>
                 <div class="relative">
                   <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <!-- Romania country code instead of flag -->
                     <span class="text-gray-500 font-medium">+40</span>
                   </div>
                   <input 
@@ -330,12 +329,11 @@
                 <p v-if="passwordError" class="text-sm text-red-600 mt-2">{{ passwordError }}</p>
               </div>
               
-              <!-- Phone number field with Romania indicator -->
+              <!-- Phone number field -->
               <div>
                 <label for="phone-number" class="block mb-2 text-sm font-medium text-gray-700 dark:text-white">Phone Number</label>
                 <div class="relative">
                   <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <!-- Romania country code instead of flag -->
                     <span class="text-gray-500 font-medium">+40</span>
                   </div>
                   <input 
@@ -356,7 +354,7 @@
                 <p v-if="phoneNumberError" class="text-sm text-red-600 mt-2">{{ phoneNumberError }}</p>
               </div>
               
-              <!-- Shelter Type with custom arrow position -->
+              <!-- Shelter Type -->
               <div>
                 <label for="shelter-type" class="block mb-2 text-sm font-medium text-gray-700 dark:text-white">Shelter Type</label>
                 <div class="relative">
@@ -376,7 +374,6 @@
                       {{ type }}
                     </option>
                   </select>
-                  <!-- Custom arrow with adjusted positioning -->
                   <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-gray-700 dark:text-gray-300">
                     <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                       <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>

@@ -1,3 +1,11 @@
+<template>
+  <div class="login-page">
+    <IntroNavbar />
+    <Login />
+  </div>
+</template>
+
+
 <script>
 import IntroNavbar from "@/components/IntroNavbar.vue";
 import Login from "@/components/Login.vue";
@@ -11,10 +19,4 @@ export default {
 };
 </script>
 
-<template>
-  <div class="login-page">
-    <IntroNavbar />
-    <Login />
-  </div>
-</template>
 

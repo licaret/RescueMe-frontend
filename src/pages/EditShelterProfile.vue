@@ -56,7 +56,7 @@
             </div>
           </div>
           
-          <!-- Profile information with proper spacing to account for the profile image -->
+          <!-- Profile information-->
           <div class="mt-16 md:mt-12 md:ml-36">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between">
               <div>
@@ -73,7 +73,7 @@
               </div>
             </div>
             
-            <!-- Contact and location information with icons -->
+            <!-- Contact and location information -->
             <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-y-2 gap-x-6">
               <div class="flex items-center text-gray-600">
                 <svg class="h-5 w-5 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -381,7 +381,7 @@
           
         </div>
         
-        <!-- Mission statement field with character limit -->
+        <!-- Mission statement field -->
         <div class="mb-6">
           <label class="block text-sm font-medium mb-1">
             Mission statement<span class="text-red-500">*</span>
@@ -780,7 +780,7 @@
         </div>
       </div>
 
-      <!-- Password Tab with Fixed Error Display -->
+      <!-- Password Tab-->
       <div v-if="activeTab === 'password'" class="bg-white rounded-lg shadow p-6 mb-8">
         <h2 class="text-xl font-bold mb-6">Password</h2>
         
@@ -898,7 +898,7 @@
                 Enter your password details to make changes
               </p>
               
-              <!-- Display validation error message if needed -->
+              <!--Validation error message if needed -->
               <p v-if="validationAttempted && Object.keys(errors).some(key => errors[key])" class="text-red-500 text-sm mt-3">
                 Please correct the errors before saving.
               </p>
@@ -973,11 +973,9 @@ export default {
     const toastTimeout = ref(null);
     const blankProfilePicture = ref(blankPicture);
     const validationAttempted = ref(false);
-    
-    // Proprietăți pentru telefonul cu prefix +40
-    const phoneInput = ref("");  // Partea din numărul de telefon fără prefix
-    const phoneError = ref("");  // Mesaj de eroare pentru validarea telefonului
-    const isValidPhone = ref(false);  // Flag pentru validare corectă
+    const phoneInput = ref("");  
+    const phoneError = ref("");  
+    const isValidPhone = ref(false); 
     
     // Shelter data
     const shelter = reactive({
@@ -1017,17 +1015,15 @@ export default {
       length: false,
       lowercase: false,
       special: false,
-      different: true // Assume it's different by default
+      different: true 
     });
 
     const errors = reactive({
       currentPassword: '',
       newPassword: '',
       confirmPassword: '',
-      // Other fields...
     });
     
-    // Document states
     const documentStatus = reactive({
       taxCertificate: false,
       vetAuthorization: false,
@@ -1063,7 +1059,7 @@ export default {
     const cities = ref([]);
     const citiesLoading = ref(false);
     
-    // Options
+
     const shelterTypes = [
       'Municipal Shelter',
       'Private Shelter',
@@ -1075,6 +1071,8 @@ export default {
       'Emergency/Temporary Shelter'
     ];
     
+
+
     // Computed properties
     const accountHasChanges = computed(() => {
       const accountFields = ['username', 'email', 'phoneNumber', 'shelterType'];
@@ -1082,6 +1080,7 @@ export default {
         shelter[field] !== initialShelterData[field]
       );
     });
+
     
     const detailsHasChanges = computed(() => {
       const detailsFields = ['county', 'city', 'fullAddress', 'zipCode', 'yearFounded', 'hoursOfOperation', 'mission'];
@@ -1090,12 +1089,10 @@ export default {
       );
     });
     
-    // Validare telefon românesc
+    
     const validatePhoneOnInput = () => {
-      // Curăță input-ul de caractere non-numerice (păstrează doar cifrele)
       phoneInput.value = phoneInput.value.replace(/[^\d]/g, "");
       
-      // Validează formatul
       if (phoneInput.value.length === 0) {
         phoneError.value = "";
         isValidPhone.value = false;
@@ -1111,20 +1108,20 @@ export default {
       } else {
         phoneError.value = "";
         isValidPhone.value = true;
-        // Actualizează proprietatea shelter.phoneNumber cu numărul complet
         shelter.phoneNumber = "+40" + phoneInput.value;
       }
     };
 
+
+
     const validateRomanianPhone = (phoneDigits) => {
-      // Validare pentru număr românesc (doar partea numerică, fără prefix)
-      // Primul digit trebuie să fie 7 pentru mobile sau 2/3 pentru fix
       const firstDigit = phoneDigits.charAt(0);
       return firstDigit === '7' || firstDigit === '2' || firstDigit === '3';
     };
 
+
+
     const initPhoneInput = () => {
-      // Inițializează phoneInput cu partea numerică din shelter.phoneNumber dacă există
       if (shelter.phoneNumber) {
         if (shelter.phoneNumber.startsWith('+40')) {
           phoneInput.value = shelter.phoneNumber.substring(3);
@@ -1134,15 +1131,14 @@ export default {
           phoneInput.value = shelter.phoneNumber;
         }
         
-        // Curăță orice caracter non-numeric
         phoneInput.value = phoneInput.value.replace(/[^\d]/g, "");
         
-        // Validează telefonul inițial
         validatePhoneOnInput();
       }
     };
     
-    // Methods
+
+    
     const loadShelterData = async () => {
       try {
         if (!shelter.id) {
@@ -1153,55 +1149,48 @@ export default {
         const response = await getShelterProfile(shelter.id);
         console.log('Shelter profile response:', response);
         
-        // Update shelter data
         Object.keys(response).forEach(key => {
           if (key in shelter) {
             shelter[key] = response[key];
           }
         });
         
-        // Convert county code to full name
         if (shelter.county) {
-          const countyCode = shelter.county; // Store original code
+          const countyCode = shelter.county; 
           const countyObj = counties.value.find(county => county.auto === countyCode);
           if (countyObj) {
-            shelter.countyCode = countyCode; // Store original code for later
-            shelter.county = countyObj.nume; // Set the display name
+            shelter.countyCode = countyCode; 
+            shelter.county = countyObj.nume;
           }
         }
         
-        // Get document status
         if (response.documents) {
           Object.keys(response.documents).forEach(key => {
             documentStatus[key] = response.documents[key];
           });
           console.log('Document status loaded:', documentStatus);
         } else {
-          // Fetch document status separately if not included
           await loadDocumentStatus();
         }
         
-
-        // Try to load profile picture
         shelter.profilePictureUrl = await fetchProfilePicture(shelter.id);
         
-        // Store initial data for comparison
         Object.keys(shelter).forEach(key => {
           initialShelterData[key] = shelter[key];
         });
         
-        // Load cities if county is set
         if (shelter.county) {
           fetchCities();
         }
         
-        // Inițializează câmpul de telefon după încărcarea datelor
         initPhoneInput();
       } catch (error) {
         console.error('Error loading shelter data:', error);
         displayErrorToast('Failed to load shelter profile data.');
       }
     };
+
+
 
     const loadDocumentStatus = async () => {
       try {
@@ -1220,11 +1209,15 @@ export default {
         displayErrorToast('Failed to load document status.');
       }
     };
+
+
     
     const loadCounties = () => {
       counties.value = judete.judete;
     };
     
+
+
     const fetchCities = () => {
       citiesLoading.value = true;
       cities.value = [];
@@ -1252,6 +1245,8 @@ export default {
         citiesLoading.value = false;
       }
     };
+
+
     
     const validateAccount = () => {
       const newErrors = {};
@@ -1271,7 +1266,6 @@ export default {
       if (!shelter.phoneNumber) {
         newErrors.phoneNumber = 'Phone number is required';
       } else if (phoneError.value) {
-        // Folosim phoneError în loc de o validare separată
         newErrors.phoneNumber = phoneError.value;
       }
       
@@ -1283,6 +1277,8 @@ export default {
       return Object.keys(newErrors).length === 0;
     };
     
+
+
     const validateDetails = () => {
       const newErrors = {};
       
@@ -1323,17 +1319,17 @@ export default {
       errors.value = newErrors;
       return Object.keys(newErrors).length === 0;
     };
+
+
     
     const validatePassword = () => {
       let isValid = true;
       
-      // Current password validation
       if (!passwordData.currentPassword) {
         errors.currentPassword = 'Current password is required';
         isValid = false;
       }
       
-      // New password validation
       if (!passwordData.newPassword) {
         errors.newPassword = 'New password is required';
         isValid = false;
@@ -1351,7 +1347,6 @@ export default {
         isValid = false;
       }
       
-      // Confirm password validation
       if (!passwordData.confirmPassword) {
         errors.confirmPassword = 'Please confirm your password';
         isValid = false;
@@ -1363,22 +1358,20 @@ export default {
       return isValid;
     };
     
-    // Helper methods for password functionality
-    // Simplified password requirements checker
+
+
     const checkPasswordRequirements = () => {
       const password = passwordData.newPassword;
       
-      // Check length requirement
       passwordRequirements.length = password.length >= 10 && password.length <= 100;
       
-      // Check lowercase requirement
       passwordRequirements.lowercase = /[a-z]/.test(password);
       
-      // Check special character requirement
       passwordRequirements.special = /[!@#?]/.test(password);
     };
 
-    // Simplified password match checker
+
+
     const checkPasswordMatch = () => {
       if (passwordData.newPassword && passwordData.confirmPassword) {
         if (passwordData.newPassword !== passwordData.confirmPassword) {
@@ -1388,14 +1381,17 @@ export default {
         }
       }
     };
+
+
     
     const validateEmail = (email) => {
       const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
       return re.test(String(email).toLowerCase());
     };
     
+
+
     const validateZipCode = (zipCode) => {
-      // Romanian postal code format
       const re = /^[0-9]{6}$/;
       return re.test(zipCode);
     };
@@ -1406,14 +1402,12 @@ export default {
         shelter.mission = shelter.mission.substring(0, 500);
       }
       
-      // Clear mission error when user types
       if (errors.mission) {
         errors.mission = '';
       }
     };
 
     
-    // 1. First, modify the saveChanges function to remove the password section
     const saveChanges = async (section) => {
       try {
         if (!shelter.id) {
@@ -1421,7 +1415,6 @@ export default {
           return;
         }
         
-        // Validate section data
         let isValid = false;
         
         if (section === 'account') {
@@ -1433,7 +1426,6 @@ export default {
           
           isSaving.value = true;
           
-          // Prepare account data to update
           const accountData = {
             phoneNumber: shelter.phoneNumber,
             shelterType: shelter.shelterType
@@ -1441,7 +1433,6 @@ export default {
           
           await updateUser(shelter.id, accountData);
           
-          // Update initial data to match current data
           Object.keys(accountData).forEach(key => {
             initialShelterData[key] = shelter[key];
           });
@@ -1456,9 +1447,8 @@ export default {
           
           isSaving.value = true;
 
-          let countyCode = shelter.countyCode; // Use stored code if available
+          let countyCode = shelter.countyCode; 
       
-          // If county changed or code not stored, find it
           if (!countyCode || initialShelterData.county !== shelter.county) {
             const countyObj = counties.value.find(county => county.nume === shelter.county);
             if (countyObj) {
@@ -1466,7 +1456,6 @@ export default {
             }
           }
           
-          // Prepare shelter details data to update
           const detailsData = {
             county: countyCode,
             city: shelter.city,
@@ -1481,11 +1470,9 @@ export default {
           
           shelter.countyCode = countyCode;
 
-          // Update initial data to match current data
           initialShelterData.county = shelter.county;
           initialShelterData.countyCode = shelter.countyCode;
           
-          // Update other fields
           const fieldNames = ['city', 'fullAddress', 'zipCode', 'yearFounded', 'hoursOfOperation', 'mission'];
           fieldNames.forEach(key => {
             initialShelterData[key] = shelter[key];
@@ -1493,7 +1480,6 @@ export default {
           
           displaySuccessToast('Shelter details updated successfully!');
         }
-        // Removed the password section entirely - this is now handled by savePassword
       } catch (error) {
         console.error(`Error saving ${section} changes:`, error);
         
@@ -1509,18 +1495,17 @@ export default {
       }
     };
 
+
+
     const savePassword = async () => {
-      // Set validation attempted flag
       validationAttempted.value = true;
       
-      // Clear any previous error messages
       errors.currentPassword = '';
       errors.newPassword = '';
       errors.confirmPassword = '';
       
-      // Validate before saving
       if (!validatePassword()) {
-        return; // Exit early if validation fails
+        return; 
       }
       
       isChangingPassword.value = true;
@@ -1532,17 +1517,14 @@ export default {
           passwordData.newPassword
         );
         
-        // Reset password fields after successful change
         passwordData.currentPassword = '';
         passwordData.newPassword = '';
         passwordData.confirmPassword = '';
         
-        // Reset password requirements
         passwordRequirements.length = false;
         passwordRequirements.lowercase = false;
         passwordRequirements.special = false;
         
-        // Reset validation attempted flag
         validationAttempted.value = false;
 
         displaySuccessToast('Password changed successfully!');
@@ -1552,11 +1534,9 @@ export default {
         console.log("Error message:", error.message);
         console.log("Error toString:", error.toString());
         
-        // Simplificăm gestionarea erorii și ne concentrăm pe mesajul de eroare
         const errorMessage = error.message || "An unexpected error occurred";
         console.log("Error message processed:", errorMessage);
         
-        // Verificăm mesajul și setăm eroarea în câmpul potrivit
         if (errorMessage.includes("Current password is incorrect")) {
           errors.currentPassword = "Current password is incorrect";
           console.log("Set error for currentPassword:", errors.currentPassword);
@@ -1573,6 +1553,8 @@ export default {
         isChangingPassword.value = false;
       }
     };
+
+
     
     const discardAccountChanges = () => {
       const accountFields = ['phoneNumber', 'shelterType'];
@@ -1580,12 +1562,13 @@ export default {
         shelter[field] = initialShelterData[field];
       });
       
-      // Resetăm și câmpul de telefon
       initPhoneInput();
       
       errors.value = {};
     };
     
+
+
     const discardDetailsChanges = () => {
       const detailsFields = ['county', 'city', 'fullAddress', 'zipCode', 'yearFounded', 'hoursOfOperation', 'mission'];
       detailsFields.forEach(field => {
@@ -1593,25 +1576,24 @@ export default {
       });
       errors.value = {};
       
-      // Fetch cities if county was reverted
       if (shelter.county) {
         console.log('County is set:', shelter.county);
         fetchCities();
       }
     };
     
+
+
     const handleProfilePictureUpload = async (event) => {
       const file = event.target.files[0];
       if (!file || !shelter.id) return;
       
-      // Validate file type and size
       const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
       if (!validTypes.includes(file.type)) {
         displayErrorToast('Please upload a JPEG or PNG image.');
         return;
       }
       
-      // 5MB limit
       const maxSize = 5 * 1024 * 1024;
       if (file.size > maxSize) {
         displayErrorToast('Image size must be less than 5MB.');
@@ -1623,7 +1605,6 @@ export default {
         
         await uploadProfilePicture(shelter.id, file);
         
-        // Wait a moment for the server to process the image
         setTimeout(async () => {
           shelter.profilePictureUrl = await fetchProfilePicture(shelter.id);
           displaySuccessToast('Profile picture updated successfully!');
@@ -1635,6 +1616,8 @@ export default {
         isUploadingProfilePicture.value = false;
       }
     };
+
+
     
     const removeProfilePicture = async () => {
       if (!shelter.id || !shelter.profilePictureUrl) return;
@@ -1654,21 +1637,20 @@ export default {
       }
     };
     
+
+
     const handleDocumentUpload = async (documentType, event) => {
       const file = event.target.files[0];
       if (!file || !shelter.id) return;
       
-      // Reset file input to ensure onChange fires even with the same file
       event.target.value = null;
       
-      // Validate file type and size
       const validDocTypes = ['application/pdf', 'image/jpeg', 'image/png'];
       if (!validDocTypes.includes(file.type)) {
         displayErrorToast('Please upload a PDF, JPEG or PNG document.');
         return;
       }
       
-      // 2MB limit
       const maxSize = 2 * 1024 * 1024;
       if (file.size > maxSize) {
         displayErrorToast('Document size must be less than 2MB.');
@@ -1679,8 +1661,7 @@ export default {
         isUploading[documentType] = true;
         
         await uploadDocument(shelter.id, documentType, file);
-        
-        // Update document status
+
         documentStatus[documentType] = true;
         
         displaySuccessToast(`${getDocumentTypeName(documentType)} uploaded successfully!`);
@@ -1696,6 +1677,8 @@ export default {
       }
     };
     
+
+
     const handleDocumentDelete = async (documentType) => {
       if (!shelter.id || !documentStatus[documentType]) return;
       
@@ -1704,7 +1687,6 @@ export default {
         
         await deleteDocument(shelter.id, documentType);
         
-        // Update document status
         documentStatus[documentType] = false;
         
         displaySuccessToast(`${getDocumentTypeName(documentType)} deleted successfully!`);
@@ -1720,19 +1702,23 @@ export default {
       }
     };
 
+
+
     const viewDocument = (documentType) => {
       if (!shelter.id || !documentStatus[documentType]) return;
       
-      // Instead of showing a modal with iframe, open in new tab
       const url = getDocumentUrl(shelter.id, documentType);
       window.open(url, '_blank');
     };
+
 
     
     const getDocumentUrl = (shelterId, documentType) => {
       return `http://localhost:8080/api/v1/shelters/${shelterId}/documents/${documentType}`;
     };
     
+
+
     const getDocumentTypeName = (documentType) => {
       const typeNames = {
         taxCertificate: 'Tax Registration Certificate',
@@ -1743,6 +1729,8 @@ export default {
       
       return typeNames[documentType] || documentType;
     };
+
+
     
     const displaySuccessToast = (message) => {
       if (toastTimeout.value) {
@@ -1759,6 +1747,8 @@ export default {
       }, 3000);
     };
     
+
+
     const displayErrorToast = (message) => {
       if (toastTimeout.value) {
         clearTimeout(toastTimeout.value);
@@ -1773,6 +1763,8 @@ export default {
         showErrorToast.value = false;
       }, 3000);
     };
+
+
     
     const goBack = () => {
       if (window.history.length > 1) {
@@ -1782,12 +1774,14 @@ export default {
       }
     };
     
-    // Lifecycle hooks
+
+
     onMounted(async () => {
       loadCounties();
       await loadShelterData();
     });
     
+
     return {
       // State
       activeTab,
@@ -1820,7 +1814,6 @@ export default {
       accountHasChanges,
       detailsHasChanges,
       
-      // Proprietăți pentru telefonul cu prefix +40
       phoneInput, 
       phoneError,
       isValidPhone,
@@ -1852,7 +1845,6 @@ export default {
 </script>
 
 <style scoped>
-/* Custom styles */
 :deep(.border-red-500) {
   border-color: #f56565;
 }

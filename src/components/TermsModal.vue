@@ -1,6 +1,5 @@
 <template>
     <div>
-      <!-- Modal trigger is handled by the parent, this component is for the modal only -->
       <div v-if="modelValue" class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none focus:outline-none">
         <!-- Background overlay -->
         <div class="fixed inset-0 bg-black opacity-50" @click="$emit('update:modelValue', false)"></div>

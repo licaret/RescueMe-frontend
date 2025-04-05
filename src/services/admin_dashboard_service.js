@@ -1,12 +1,6 @@
-// src/services/admin_dashboard_service.js
-
 const API_URL = 'http://localhost:8080/api/v1/admin';
 
 
-/**
- * Retrieve the total number of shelters
- * @returns {Promise<number>} Total shelter count
- */
 async function getTotalShelterCount() {
     const token = localStorage.getItem('token');
     
@@ -24,6 +18,8 @@ async function getTotalShelterCount() {
 
     return await response.json();
 }
+
+
 
 async function getPendingShelterCount() {
     const token = localStorage.getItem('token');
@@ -43,6 +39,8 @@ async function getPendingShelterCount() {
     return await response.json();
 }
 
+
+
 async function getTotalUserCount() {
     const token = localStorage.getItem('token');
     
@@ -60,6 +58,8 @@ async function getTotalUserCount() {
 
     return await response.json();
 }
+
+
 
 async function getTotalAnimalCount() {
     const token = localStorage.getItem('token');
@@ -79,6 +79,8 @@ async function getTotalAnimalCount() {
     return await response.json();
 }
 
+
+
 const getPendingShelters = async () => {
     try {
         const response = await fetch('http://localhost:8080/api/v1/admin/shelters/pending');
@@ -91,6 +93,8 @@ const getPendingShelters = async () => {
         throw error;
     }
 };
+
+
 
 const getApprovedShelters = async () => {
   try {
@@ -105,23 +109,22 @@ const getApprovedShelters = async () => {
   }
 };
 
+
+
 const getShelterDetails = async (Id) => {
     try {
-      // Fetch shelter profile
       const profileResponse = await fetch(`http://localhost:8080/api/v1/shelters/${Id}/profile`);
       if (!profileResponse.ok) {
         throw new Error('Failed to fetch shelter profile');
       }
       const profileData = await profileResponse.json();
       
-      // Fetch document status
       const documentsResponse = await fetch(`http://localhost:8080/api/v1/shelters/${Id}/documents/status`);
       if (!documentsResponse.ok) {
         throw new Error('Failed to fetch document status');
       }
       const documentsData = await documentsResponse.json();
       
-      // Combine the data
       return {
         ...profileData,
         documents: documentsData
@@ -132,19 +135,15 @@ const getShelterDetails = async (Id) => {
     }
   };
 
-  // Image utility functions for your application
 
-/**
- * Converts a byte array to a base64 image URL
- * Works with various image formats but defaults to JPEG
- */
-export const byteArrayToImageUrl = (byteArray, mimeType = 'image/jpeg') => {
+
+
+const byteArrayToImageUrl = (byteArray, mimeType = 'image/jpeg') => {
     if (!byteArray || !byteArray.length) {
         return null;
     }
     
     try {
-        // Convert byte array to base64 string
         let binary = '';
         const bytes = new Uint8Array(byteArray);
         for (let i = 0; i < bytes.byteLength; i++) {
@@ -152,7 +151,6 @@ export const byteArrayToImageUrl = (byteArray, mimeType = 'image/jpeg') => {
         }
         const base64String = btoa(binary);
         
-        // Return as data URL with appropriate mime type
         return `data:${mimeType};base64,${base64String}`;
     } catch (error) {
         console.error('Error converting byte array to base64:', error);
@@ -169,4 +167,5 @@ export {
     getPendingShelters,
     getApprovedShelters,
     getShelterDetails,
+    byteArrayToImageUrl
 };

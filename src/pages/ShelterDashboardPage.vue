@@ -194,7 +194,6 @@
   
       <!-- Main Content -->
       <div class="p-4 sm:ml-64 pt-20 min-h-screen bg-gray-50 dark:bg-gray-900">
-        <!-- NEW CONTENT STARTS HERE -->
         <div v-if="route.path === '/shelter-dashboard/'">
           <!-- Dashboard Summary Cards -->
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
@@ -514,11 +513,11 @@
           </div>
         </div>
       </div>
-      <!-- NEW CONTENT ENDS HERE -->
 
       <transition name="fade" mode="out-in">
         <router-view></router-view>
       </transition>
+
     </div>
   </div>
 </template>
@@ -531,14 +530,16 @@ import PetAdoptionPieChart from '@/components/PetAdoptionPieChart.vue';
 
 export default {
   name: 'ShelterDashboardLayout',
+
   components: {
     PetAdoptionPieChart
   },
+
   setup() {
     const router = useRouter();
     const route = useRoute();
     const shelterUsername = ref("Shelter");
-    const sidebarOpen = ref(window.innerWidth >= 768); // Default open on desktop
+    const sidebarOpen = ref(window.innerWidth >= 768); 
     const showNotifications = ref(false);
     const unreadNotifications = ref(3);
     
@@ -573,7 +574,6 @@ export default {
       }
     };
     
-    // Sample notifications
     const notifications = ref([
       {
         message: "New adoption request for Max",
@@ -604,7 +604,7 @@ export default {
       }
     ]);
 
-    // Check if the route matches the given path
+
     const isActive = (path) => {
       if (path === '/shelter-dashboard/' && route.path === '/shelter-dashboard/') {
         return true;
@@ -612,35 +612,35 @@ export default {
       return path !== '/shelter-dashboard/' && route.path.startsWith(path);
     };
 
-    // Toggle sidebar (especially important for mobile)
+
     const toggleSidebar = () => {
       sidebarOpen.value = !sidebarOpen.value;
     };
 
-    // Toggle notifications
+
     const toggleNotifications = () => {
       showNotifications.value = !showNotifications.value;
     };
 
-    // Block back button to prevent going back to login page
+
     const blockBackButton = () => {
       history.pushState(null, "", location.href);
     };
 
-    // Handle logout
+
     const handleLogout = () => {
       localStorage.clear();
       router.push("/login");
     };
 
-    // Close dropdowns when clicking outside
+
     const handleClickOutside = (event) => {
       if (showNotifications.value && !event.target.closest('.notifications-container')) {
         showNotifications.value = false;
       }
     };
 
-    // Adjust sidebar based on screen size
+
     const handleResize = () => {
       if (window.innerWidth < 768) {
         sidebarOpen.value = false;
@@ -650,7 +650,6 @@ export default {
     };
 
     onMounted(() => {
-      // Get user data from localStorage
       const username = localStorage.getItem("Username");
       if (username) {
         shelterUsername.value = username;
@@ -658,23 +657,22 @@ export default {
         console.error("Username not found in localStorage.");
       }
 
-      // Prevent navigation back to login
       window.history.pushState(null, "", window.location.href);
       window.addEventListener("popstate", blockBackButton);
       
-      // Close dropdown menus when clicking outside
       document.addEventListener('click', handleClickOutside);
       
-      // Adjust sidebar for responsive design
       window.addEventListener('resize', handleResize);
       handleResize();
     });
+
 
     onUnmounted(() => {
       window.removeEventListener("popstate", blockBackButton);
       document.removeEventListener('click', handleClickOutside);
       window.removeEventListener('resize', handleResize);
     });
+
 
     return {
       shelterUsername,
@@ -694,6 +692,7 @@ export default {
 };
 </script>
 
+
 <style scoped>
 .fade-enter-active,
 .fade-leave-active {
@@ -705,13 +704,11 @@ export default {
   opacity: 0;
 }
 
-/* Ensures content min-height fills the screen */
 .dashboard-container {
   min-height: 100vh;
   background-color: #f9fafb;
 }
 
-/* Custom scrollbar for notifications */
 .overflow-y-auto::-webkit-scrollbar {
   width: 4px;
 }

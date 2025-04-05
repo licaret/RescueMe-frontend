@@ -252,11 +252,14 @@
 import { ref, watch } from 'vue';
 
 export default {
-  name: 'AddPetForm',
+  name: 'AddEditPetForm',
+  
   props: {
     petToEdit: Object,
   },
+
   emits: ['close', 'pet-added', 'pet-updated'],
+  
   setup(props, { emit }) {
     const petData = ref({
       name: '',

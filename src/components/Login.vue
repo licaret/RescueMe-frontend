@@ -239,7 +239,7 @@ export default {
                       this.$router.push("/welcome");
                     }, 2000);
                   } else {
-                    // No welcome needed
+                    // no welcome needed
                     this.successMessage = "Login successful! Redirecting to dashboard...";
                     setTimeout(() => {
                       this.$router.push("/shelter-dashboard/");
@@ -247,14 +247,14 @@ export default {
                   }
                 } catch (welcomeError) {
                   console.error("Error checking welcome status:", welcomeError);
-                  // Fallback to dashboard
+                  // fallback to dashboard
                   this.successMessage = "Login successful! Redirecting to dashboard...";
                   setTimeout(() => {
                     this.$router.push("/shelter-dashboard/");
                   }, 2000);
                 }
               } else {
-              // Default case - go to dashboard
+              // default case - go to dashboard
               this.successMessage = "Login successful! Redirecting to dashboard...";
               setTimeout(() => {
                 this.$router.push("/shelter-dashboard/");
@@ -262,7 +262,7 @@ export default {
             }
           } catch (profileError) {
             console.error("Error fetching shelter profile:", profileError);
-            // Default to profile completion on error
+            // default to profile completion on error
             this.successMessage = "Login successful! Redirecting...";
             setTimeout(() => {
               this.$router.push("/shelter-profile-completion");

@@ -8,7 +8,6 @@
               <h1 class="text-3xl font-bold text-gray-900">RescueMe Admin Dashboard</h1>
             </div>
             <div class="flex items-center">
-              <!-- <span class="text-gray-700 mr-4">{{ adminName }}</span> -->
               <button 
                 @click="logout" 
                 class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium"
@@ -1309,7 +1308,7 @@ export default {
 
     // Pagination for Pending Shelters
     const pendingCurrentPage = ref(1);
-    const pendingItemsPerPage = 10; // Same as approved shelters
+    const pendingItemsPerPage = 10; 
     
     // Confirmation Modal Data
     const confirmationTitle = ref('');
@@ -1335,16 +1334,18 @@ export default {
       avgSessionDuration: 0,
       sessionDurationChange: 0
     });
+
     
     const sortPendingShelters = (ascending = false) => {
       pendingShelters.value.sort((a, b) => {
         const dateA = new Date(a.createdAt);
         const dateB = new Date(b.createdAt);
         return ascending 
-          ? dateA - dateB  // crescător (cele mai vechi primul)
-          : dateB - dateA; // descrescător (cele mai noi primul)
+          ? dateA - dateB  // crescător
+          : dateB - dateA; // descrescător
       });
     };
+
 
     const formatRelativeTime = (dateString) => {
       const date = new Date(dateString);
@@ -1375,7 +1376,6 @@ export default {
 
     
 
-    // Computed Properties
     const filteredApprovedShelters = computed(() => {
       if (!searchQuery.value) return approvedShelters.value;
       
@@ -1388,12 +1388,15 @@ export default {
         shelter.shelterType.toLowerCase().includes(query)
       );
     });
+
+
     
     const paginatedShelters = computed(() => {
       const start = (currentPage.value - 1) * itemsPerPage;
       const end = start + itemsPerPage;
       return filteredApprovedShelters.value.slice(start, end);
     });
+
 
     // Pagination for Pending Shelters
     const paginatedPendingShelters = computed(() => {
@@ -1402,9 +1405,13 @@ export default {
       return pendingShelters.value.slice(start, end);
     });
 
+
+
     const pendingTotalPages = computed(() => {
       return Math.ceil(pendingShelters.value.length / pendingItemsPerPage);
     });
+
+
     
     const pendingPaginationPages = computed(() => {
       const pages = [];
@@ -1424,10 +1431,14 @@ export default {
       
       return pages;
     });
+
+
     
     const totalPages = computed(() => {
       return Math.ceil(filteredApprovedShelters.value.length / itemsPerPage);
     });
+
+
     
     const paginationPages = computed(() => {
       const pages = [];
@@ -1447,6 +1458,8 @@ export default {
       
       return pages;
     });
+
+
     
     const filteredUsers = computed(() => {
       let result = users.value;
@@ -1471,16 +1484,22 @@ export default {
       
       return result;
     });
+
+
     
     const paginatedUsers = computed(() => {
       const start = (userPage.value - 1) * userItemsPerPage;
       const end = start + userItemsPerPage;
       return filteredUsers.value.slice(start, end);
     });
+
+
     
     const userTotalPages = computed(() => {
       return Math.ceil(filteredUsers.value.length / userItemsPerPage);
     });
+
+
     
     const userPaginationPages = computed(() => {
       const pages = [];
@@ -1500,6 +1519,8 @@ export default {
       
       return pages;
     });
+
+
     
     const viewShelterDocument = (Id, documentType) => {
         // Create the document URL
@@ -1508,6 +1529,8 @@ export default {
         // Open document in a new tab
         window.open(documentUrl, '_blank');
     };
+
+
 
     // Functions
     const fetchDashboardData = async () => {
@@ -1541,39 +1564,37 @@ export default {
               profilePicture: shelter.profilePicture ? `data:image/jpeg;base64,${shelter.profilePicture}` : null
             }));
             
-            // Fetch approved shelters
-            // Fetch approved shelters
-          const approvedSheltersData = await getApprovedShelters();
-          approvedShelters.value = await Promise.all(
-              approvedSheltersData.map(async (shelter) => {
-                  let animalCount = 0;
-                  try {
-                      const response = await fetch(`http://localhost:8080/pets/count/${shelter.id}`);
-                      if (response.ok) {
-                          animalCount = await response.json();
-                      }
-                  } catch (error) {
-                      console.error(`Failed to fetch animal count for shelter ${shelter.id}:`, error);
-                  }
+            const approvedSheltersData = await getApprovedShelters();
+            approvedShelters.value = await Promise.all(
+                approvedSheltersData.map(async (shelter) => {
+                    let animalCount = 0;
+                    try {
+                        const response = await fetch(`http://localhost:8080/pets/count/${shelter.id}`);
+                        if (response.ok) {
+                            animalCount = await response.json();
+                        }
+                    } catch (error) {
+                        console.error(`Failed to fetch animal count for shelter ${shelter.id}:`, error);
+                    }
 
-                  return {
-                      id: shelter.id,
-                      username: shelter.username,
-                      email: shelter.email,
-                      phoneNumber: shelter.phoneNumber,
-                      shelterType: shelter.shelterType,
-                      county: shelter.county,
-                      city: shelter.city,
-                      fullAddress: shelter.fullAddress,
-                      status: shelter.status,
-                      approvedAt: shelter.approvedAt || new Date().toISOString(),
-                      animalCount: animalCount,
-                      profilePicture: shelter.profilePicture 
-                          ? `data:image/jpeg;base64,${shelter.profilePicture}` 
-                          : null
-                  };
-              })
-          );
+                    return {
+                        id: shelter.id,
+                        username: shelter.username,
+                        email: shelter.email,
+                        phoneNumber: shelter.phoneNumber,
+                        shelterType: shelter.shelterType,
+                        county: shelter.county,
+                        city: shelter.city,
+                        fullAddress: shelter.fullAddress,
+                        status: shelter.status,
+                        approvedAt: shelter.approvedAt || new Date().toISOString(),
+                        animalCount: animalCount,
+                        profilePicture: shelter.profilePicture 
+                            ? `data:image/jpeg;base64,${shelter.profilePicture}` 
+                            : null
+                    };
+                })
+            );
             
             isLoading.value = false;
         } catch (error) {
@@ -1583,11 +1604,13 @@ export default {
         }
     };
     
+
+
+
     const fetchUsers = async () => {
       try {
         isLoadingUsers.value = true;
-        
-        // In a real implementation, fetch from API
+      
         const usersResponse = await mockFetchUsers();
         users.value = usersResponse;
         
@@ -1598,17 +1621,20 @@ export default {
         showToastMessage('Failed to load users. Please try again later.');
       }
     };
+
+
     
     const viewShelterDetails = (Id) => {
         fetchShelterDetails(Id);
     };
+
+
     
     const viewUserDetails = async (userId) => {
       try {
         showUserModal.value = true;
         isLoadingUserDetails.value = true;
         
-        // In a real implementation, fetch from API
         const user = await mockFetchUserDetails(userId);
         selectedUser.value = user;
         userNotes.value = user.adminNotes || '';
@@ -1620,6 +1646,8 @@ export default {
         showToastMessage('Failed to load user details. Please try again later.');
       }
     };
+
+
     
     const approveShelter = (Id, fromModal = false) => {
       if (fromModal) {
@@ -1634,6 +1662,8 @@ export default {
       confirmationCallback.value = () => performShelterAction(Id, 'approve');
       showConfirmationModal.value = true;
     };
+
+
     
     const rejectShelter = (Id, fromModal = false) => {
       if (fromModal) {
@@ -1648,6 +1678,8 @@ export default {
       confirmationCallback.value = () => performShelterAction(Id, 'reject');
       showConfirmationModal.value = true;
     };
+
+
     
     const suspendShelter = (Id, fromModal = false) => {
       if (fromModal) {
@@ -1662,10 +1694,11 @@ export default {
       confirmationCallback.value = () => performShelterAction(Id, 'suspend');
       showConfirmationModal.value = true;
     };
+
+
     
     const performShelterAction = async (Id, action) => {
       try {
-          // Call the real API endpoint
           let response;
           
           if (action === 'approve') {
@@ -1674,7 +1707,6 @@ export default {
                   headers: {
                       'Content-Type': 'application/json'
                   },
-                  // Make sure to send an empty object if no body is needed
                   body: JSON.stringify({})
               });
           } else if (action === 'reject') {
@@ -1733,6 +1765,8 @@ export default {
           showToastMessage(`Failed to ${action} shelter. Please try again.`);
       }
   };
+
+
     
     const suspendUser = (userId, fromModal = false) => {
       if (fromModal) {
@@ -1748,6 +1782,8 @@ export default {
       showConfirmationModal.value = true;
     };
     
+
+
     const activateUser = (userId, fromModal = false) => {
       if (fromModal) {
         performUserAction(userId, 'activate');
@@ -1761,6 +1797,8 @@ export default {
       confirmationCallback.value = () => performUserAction(userId, 'activate');
       showConfirmationModal.value = true;
     };
+
+
     
     const deleteUser = (userId, fromModal = false) => {
       if (fromModal) {
@@ -1775,10 +1813,11 @@ export default {
       confirmationCallback.value = () => performUserAction(userId, 'delete');
       showConfirmationModal.value = true;
     };
+
+
     
     const performUserAction = async (userId, action) => {
       try {
-        // In a real implementation, call API to perform action
         await mockPerformUserAction(userId, action);
         
         if (showUserModal.value) {
@@ -1814,6 +1853,8 @@ export default {
         showToastMessage(`Failed to ${action} user. Please try again.`);
       }
     };
+
+
     
     const saveUserNotes = async () => {
       try {
@@ -1827,6 +1868,8 @@ export default {
       }
     };
     
+
+
     const generateReport = async () => {
       try {
         // Validate dates
@@ -1843,7 +1886,6 @@ export default {
           return;
         }
         
-        // In a real implementation, call API to get report data
         const reportData = await mockGenerateReport(reportStartDate.value, reportEndDate.value);
         reportStats.value = reportData;
         
@@ -1853,23 +1895,31 @@ export default {
         showToastMessage('Failed to generate report. Please try again.');
       }
     };
+
+
     
     const exportReport = (format) => {
       // In a real implementation, call API to export data
       showToastMessage(`Report exported in ${format.toUpperCase()} format.`);
     };
     
+
+
     const scheduleReport = () => {
       // This would show a form or modal for scheduling reports
       showToastMessage('Report scheduling feature is not implemented in this demo.');
     };
     
+
+
     const confirmAction = () => {
       if (confirmationCallback.value) {
         confirmationCallback.value();
       }
       showConfirmationModal.value = false;
     };
+
+
     
     const showToastMessage = (message) => {
       toastMessage.value = message;
@@ -1878,6 +1928,8 @@ export default {
         showToast.value = false;
       }, 3000);
     };
+
+
     
     const formatDate = (dateString) => {
       if (!dateString) return '';
@@ -1889,6 +1941,8 @@ export default {
         day: 'numeric'
       });
     };
+
+
     
     const getDocumentTypeName = (documentType) => {
       const names = {
@@ -1900,11 +1954,15 @@ export default {
       
       return names[documentType] || documentType;
     };
+
+
     
     const getDocumentUrl = (Id, documentType) => {
         // Generate the actual API URL for the document
         return `/api/v1/shelters/${Id}/documents/${documentType}`;
     };
+
+
     
     const logout = () => {
       // In a real implementation, call API to logout
@@ -1912,16 +1970,22 @@ export default {
       localStorage.clear();
       router.push("/");
     };
+
+
     
     // Reset pagination when filters change
     watch(searchQuery, () => {
       currentPage.value = 1;
     });
+
+
     
     watch([userSearchQuery, userRole, userStatus], () => {
       userPage.value = 1;
     });
     
+
+
     // Watch tab changes to load data when needed
     watch(activeTab, (newTab) => {
       if (newTab === 'users' && users.value.length === 0) {
@@ -1929,6 +1993,8 @@ export default {
       }
     });
     
+
+
     // Initialize data on mount
     onMounted(() => {
       fetchDashboardData();
@@ -1942,99 +2008,7 @@ export default {
       reportStartDate.value = lastMonth.toISOString().split('T')[0];
     });
     
-    // Mock API Functions (for demonstration purposes)
-    // In a real application, these would be API calls
-    
-    const mockFetchDashboardData = () => {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({
-            stats: {
-              totalShelters: 24,
-              pendingApprovals: 5,
-              totalUsers: 342,
-              totalAnimals: 1287
-            },
-            pendingShelters: [
-              {
-                id: 'p1',
-                username: 'HappyPaws',
-                email: 'contact@happypaws.org',
-                phoneNumber: '+40755123456',
-                shelterType: 'Private Shelter',
-                county: 'București',
-                city: 'Sector 3',
-                fullAddress: 'Strada Exemplu 123',
-                createdAt: '2025-03-10T14:00:00Z',
-                profilePicture: null
-              },
-              {
-                id: 'p2',
-                username: 'SecondChance',
-                email: 'info@secondchance.org',
-                phoneNumber: '+40755987654',
-                shelterType: 'Rescue Organization',
-                county: 'Cluj',
-                city: 'Cluj-Napoca',
-                fullAddress: 'Strada Speranței 45',
-                createdAt: '2025-03-12T10:30:00Z',
-                profilePicture: null
-              },
-              {
-                id: 'p3',
-                username: 'AnimalFriends',
-                email: 'contact@animalfriends.ro',
-                phoneNumber: '+40756789012',
-                shelterType: 'Municipal Shelter',
-                county: 'Timiș',
-                city: 'Timișoara',
-                fullAddress: 'Bulevardul Animalelor 78',
-                createdAt: '2025-03-15T09:15:00Z',
-                profilePicture: null
-              },
-              {
-                id: 'p4',
-                username: 'PawsitiveCare',
-                email: 'office@pawsitivecare.ro',
-                phoneNumber: '+40758765432',
-                shelterType: 'Foster-based Rescue',
-                county: 'Iași',
-                city: 'Iași',
-                fullAddress: 'Strada Veterinarilor 32',
-                createdAt: '2025-03-18T16:45:00Z',
-                profilePicture: null
-              },
-              {
-                id: 'p5',
-                username: 'FurEverHome',
-                email: 'shelter@fureverhome.org',
-                phoneNumber: '+40751234567',
-                shelterType: 'Private Shelter',
-                county: 'Brașov',
-                city: 'Brașov',
-                fullAddress: 'Aleea Căței 15',
-                createdAt: '2025-03-20T11:20:00Z',
-                profilePicture: null
-              }
-            ],
-            approvedShelters: Array.from({ length: 19 }, (_, i) => ({
-              id: `a${i+1}`,
-              username: `ApprovedShelter${i+1}`,
-              email: `shelter${i+1}@example.com`,
-              phoneNumber: `+4075${100000 + i}`,
-              shelterType: ['Municipal Shelter', 'Private Shelter', 'Rescue Organization', 'Foster-based Rescue', 'Sanctuary'][i % 5],
-              county: ['București', 'Cluj', 'Timiș', 'Iași', 'Brașov', 'Constanța'][i % 6],
-              city: ['Sector 1', 'Cluj-Napoca', 'Timișoara', 'Iași', 'Brașov', 'Constanța'][i % 6],
-              fullAddress: `Address ${i+1}`,
-              status: 'APPROVED',
-              approvedAt: new Date(2025, 2, i+1).toISOString(),
-              animalCount: Math.floor(Math.random() * 100) + 10,
-              profilePicture: null
-            }))
-          });
-        }, 1000);
-      });
-    };
+
 
     // Function to format long text with line breaks
     const formatLongText = (text, charsPerLine = 10) => {
@@ -2065,6 +2039,8 @@ export default {
         return formattedText;
     };
     
+
+
     // In the fetchShelterDetails function, add this code:
     const fetchShelterDetails = async (Id) => {
       try {
@@ -2142,6 +2118,7 @@ export default {
       }
   };
     
+
     
     const mockFetchUsers = () => {
       return new Promise((resolve) => {
@@ -2164,6 +2141,8 @@ export default {
         }, 800);
       });
     };
+
+
     
     const mockFetchUserDetails = (userId) => {
       return new Promise((resolve) => {
@@ -2194,22 +2173,8 @@ export default {
       });
     };
     
-    const mockPerformShelterAction = (Id, action) => {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          // Find the shelter
-          const shelter = pendingShelters.value.find(s => s.id === Id) || 
-                          approvedShelters.value.find(s => s.id === Id);
-          
-          if (shelter) {
-            resolve(shelter);
-          } else {
-            throw new Error('Shelter not found');
-          }
-        }, 800);
-      });
-    };
-    
+
+
     const mockPerformUserAction = (userId, action) => {
       return new Promise((resolve) => {
         setTimeout(() => {
@@ -2224,6 +2189,8 @@ export default {
         }, 600);
       });
     };
+
+
     
     const mockSaveUserNotes = (userId, notes) => {
       return new Promise((resolve) => {
@@ -2241,6 +2208,8 @@ export default {
       });
     };
     
+
+
     const mockGenerateReport = (startDate, endDate) => {
       return new Promise((resolve) => {
         setTimeout(() => {
@@ -2261,6 +2230,8 @@ export default {
         }, 1000);
       });
     };
+
+    
     
     return {
       // Data and State

@@ -1,3 +1,19 @@
+<template>
+  <section class="hero">
+    <h1 class="hero-title">
+      AD<span class="highlight invisible-o">O</span>PT
+    </h1>
+    <img src="@/assets/dog.png" alt="Dog" class="hero-image" />
+    <div class="button-container">
+      <button class="action-button" @click="navigateToSignUp" :disabled="isLoading">
+        <span v-if="!isLoading">JOIN US</span>
+        <span v-else class="spinner"></span>
+      </button>
+    </div>
+  </section>
+</template>
+
+
 <script>
 export default {
   data() {
@@ -19,20 +35,6 @@ export default {
 };
 </script>
 
-<template>
-  <section class="hero">
-    <h1 class="hero-title">
-      AD<span class="highlight invisible-o">O</span>PT
-    </h1>
-    <img src="@/assets/dog.png" alt="Dog" class="hero-image" />
-    <div class="button-container">
-      <button class="action-button" @click="navigateToSignUp" :disabled="isLoading">
-        <span v-if="!isLoading">JOIN US</span>
-        <span v-else class="spinner"></span>
-      </button>
-    </div>
-  </section>
-</template>
 
 <style scoped>
 h1, img, .hero {

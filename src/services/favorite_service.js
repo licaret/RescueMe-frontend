@@ -1,7 +1,7 @@
-// Favorite Service - handles all API calls related to favorites functionality
-const API_URL = 'http://localhost:8080/api/v1/favorites'; // Updated API endpoint
+const API_URL = 'http://localhost:8080/api/v1/favorites'; 
 
-export const getFavorites = async (userId) => {
+
+const getFavorites = async (userId) => {
   try {
     const response = await fetch(`${API_URL}/${userId}`);
     if (!response.ok) {
@@ -14,7 +14,9 @@ export const getFavorites = async (userId) => {
   }
 };
 
-export const addToFavorites = async (userId, petId) => {
+
+
+const addToFavorites = async (userId, petId) => {
   try {
     const response = await fetch(`${API_URL}/${userId}/${petId}`, {
       method: 'POST',
@@ -26,7 +28,6 @@ export const addToFavorites = async (userId, petId) => {
       throw new Error(`Error: ${response.status} ${response.statusText}`);
     }
     
-    // Dispatch event to notify NavBar to update favorites count
     window.dispatchEvent(new Event('favorites-updated'));
     
     return await response.json();
@@ -36,7 +37,9 @@ export const addToFavorites = async (userId, petId) => {
   }
 };
 
-export const removeFromFavorites = async (userId, petId) => {
+
+
+const removeFromFavorites = async (userId, petId) => {
   try {
     const response = await fetch(`${API_URL}/${userId}/${petId}`, {
       method: 'DELETE'
@@ -45,7 +48,6 @@ export const removeFromFavorites = async (userId, petId) => {
       throw new Error(`Error: ${response.status} ${response.statusText}`);
     }
     
-    // Dispatch event to notify NavBar to update favorites count
     window.dispatchEvent(new Event('favorites-updated'));
     
     return await response.json();
@@ -55,7 +57,9 @@ export const removeFromFavorites = async (userId, petId) => {
   }
 };
 
-export const checkIfFavorite = async (userId, petId) => {
+
+
+const checkIfFavorite = async (userId, petId) => {
   try {
     const response = await fetch(`${API_URL}/check/${userId}/${petId}`);
     if (!response.ok) {
@@ -69,7 +73,9 @@ export const checkIfFavorite = async (userId, petId) => {
   }
 };
 
-export const getFavoritesCount = async (userId) => {
+
+
+const getFavoritesCount = async (userId) => {
   try {
     const response = await fetch(`${API_URL}/count/${userId}`);
     if (!response.ok) {
@@ -81,4 +87,14 @@ export const getFavoritesCount = async (userId) => {
     console.error('Error getting favorites count:', error);
     return 0;
   }
+};
+
+
+
+export { 
+  getFavorites,
+  addToFavorites,
+  removeFromFavorites,
+  checkIfFavorite,
+  getFavoritesCount
 };
