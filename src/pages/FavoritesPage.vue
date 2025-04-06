@@ -427,7 +427,7 @@
                 <div class="flex justify-center md:block mt-4 md:mt-0">
                   <router-link 
                     :to="`/shelter/${shelter.id}`"
-                    class="primary-button px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-all duration-300 flex items-center gap-2 shadow-md hover:shadow-lg"
+                    class="primary-button px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-2xl transition-all duration-300 flex items-center gap-2 shadow-md hover:shadow-lg"
                   >
                     View Profile
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

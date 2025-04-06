@@ -1,6 +1,9 @@
 <template>
-    <IntroNavbar/>
-    <div class="max-w-6xl mx-auto px-4 py-12">
+
+    <Navbar v-if="isLoggedIn" />
+    <IntroNavbar v-else />
+    
+    <div class="max-w-6xl mx-auto px-4 py-12 mt-28">
       <!-- Header Section -->
       <div class="text-center mb-12">
         <h1 class="text-gray-800 text-3xl font-bold mb-4">Connect with Our Team</h1>
@@ -161,11 +164,15 @@
   
   <script>
   import IntroNavbar from '@/components/IntroNavbar.vue';
+  import Navbar from '@/components/Navbar.vue';
+  import IntroFooter from '@/components/IntroFooter.vue';
   import Footer from '@/components/Footer.vue';
 
   export default {
     components: {
         IntroNavbar,
+        Navbar,
+        IntroFooter,
         Footer
     },
     data() {
@@ -210,6 +217,7 @@
       }
     },
     methods: {
+
       handleSubmit() {
         console.log('Form submitted:', this.form)
         this.form = {
@@ -218,8 +226,13 @@
           message: ''
         }
       },
+
       toggleFaq(index) {
         this.faqs[index].isOpen = !this.faqs[index].isOpen
+      },
+
+      isLoggedIn() {
+        return !!localStorage.getItem('Id'); // sau 'Token' / altceva în funcție de cum salvezi autentificarea
       }
     }
   }

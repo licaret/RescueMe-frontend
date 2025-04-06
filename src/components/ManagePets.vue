@@ -322,15 +322,30 @@
       </div>
       
       <!-- No Results from Filters -->
-      <div v-else-if="isAnyFilterApplied" class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 text-center max-w-3xl ml-0">
-        <img src="../assets/empty-state.png" alt="No Matching Pets" class="mx-auto w-32 h-32 mb-4" />
-        <h2 class="text-xl font-bold text-gray-800 mb-2">No pets match your filters</h2>
-        <p class="text-gray-600 max-w-md mx-auto mb-4">We couldn't find any pets matching your current filters. Try adjusting your filters to see more pets.</p>
+      <div v-else-if="isAnyFilterApplied && filteredPets.length === 0" class="w-full py-16 text-center">
+        <!-- Text content -->
+        <h2 class="text-2xl font-bold text-gray-800 mb-3">No matching pets found</h2>
+        <p class="text-gray-600 mb-6 max-w-md mx-auto">
+          We couldn't find any pets that match your current filters. Try adjusting or clearing your filters to see more pets.
+        </p>
+        
+        <!-- Applied filters summary -->
+        <div class="bg-gray-50 rounded-lg p-4 mb-6 w-full max-w-md mx-auto">
+          <h3 class="text-sm font-medium text-gray-500 mb-2">Applied filters:</h3>
+          <div class="flex flex-wrap gap-2 justify-center">
+            <div v-for="(value, key) in getActiveFilters()" :key="key" 
+                class="bg-white border border-gray-200 rounded-full px-3 py-1 text-sm text-gray-700 flex items-center">
+              <span>{{ formatFilterName(key) }}: {{ formatFilterValue(value) }}</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Call to action button -->
         <button 
           @click="resetFilters" 
-          class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-lg shadow-md flex items-center gap-2 mx-auto transition-all duration-200 hover:translate-y-[-2px]"
+          class="group bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-full font-medium shadow-md hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] flex items-center gap-2 mx-auto"
         >
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
           Clear All Filters
@@ -338,17 +353,25 @@
       </div>
       
       <!-- No Pets at All -->
-      <div v-else-if="pets.length === 0" class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 text-center max-w-3xl ml-0">
-        <img src="../assets/empty-state.png" alt="No Pets" class="mx-auto w-32 h-32 mb-4" />
-        <h2 class="text-xl font-bold text-gray-800 mb-2">No pets available</h2>
-        <p class="text-gray-600 mb-4">You haven't added any pets yet. Start by clicking the button below.</p>
+      <div v-if="pets.length === 0" class="w-full py-16 text-center">
+        <!-- Text content -->
+        <h2 class="text-2xl font-bold text-gray-800 mb-3">Add your first pet</h2>
+        <p class="text-gray-600 mb-6 max-w-md mx-auto">
+          You haven't added any pets yet. Start building your adoption catalog and help animals find their forever homes.
+        </p>
+        
+        <!-- Call to action button -->
         <button 
           @click="showAddEditPetForm = true" 
-          class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-lg shadow-md transition-all duration-200 hover:translate-y-[-2px]"
+          class="group bg-gradient-to-br from-red-500 to-red-600 text-white px-8 py-3 rounded-full font-medium shadow-md hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] flex items-center gap-2 mx-auto"
         >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transition-transform duration-300 group-hover:rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
           Add Your First Pet
         </button>
       </div>
+
     </div>
 
     <Teleport to="body" v-if="showAddEditPetForm">
@@ -437,6 +460,41 @@ export default {
       );
     });
     
+
+    function getActiveFilters() {
+      const active = {};
+      for (const [key, value] of Object.entries(this.filters)) {
+        if (value !== "" && value !== false && value !== null && value !== undefined) {
+          active[key] = value;
+        }
+      }
+      return active;
+    }
+
+
+    function formatFilterName(key) {
+      // Convert camelCase to Title Case with spaces
+      const formatted = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+      
+      // Special cases
+      switch (key) {
+        case 'urgentAdoptionNeeded': return 'Urgent Adoption';
+        default: return formatted;
+      }
+    }
+
+    function formatFilterValue(value) {
+      if (typeof value === 'boolean') {
+        return value ? 'Yes' : 'No';
+      }
+      
+      // For status values
+      if (value === 'AVAILABLE') return 'Available';
+      if (value === 'PENDING') return 'Pending';
+      if (value === 'ADOPTED') return 'Adopted';
+      
+      return value;
+    }
 
 
     const loadPets = async () => {
@@ -722,6 +780,9 @@ export default {
       paginatedPets,
       goToPage,
       displayedPages,
+      getActiveFilters,
+      formatFilterName,
+      formatFilterValue
     };
     },
   };

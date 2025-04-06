@@ -9,6 +9,7 @@ import ResetPasswordPage from '@/pages/ResetPasswordPage.vue';
 import ContactUsPage from '@/pages/ContactUsPage.vue';
 import AboutUsPage from '@/pages/AboutUsPage.vue';
 import ManagePets from '@/components/ManagePets.vue';
+import ShelterAdoptionRequests from '@/components/ShelterAdoptionRequests.vue';
 import EditShelterProfileVue from '@/pages/EditShelterProfile.vue';
 import AvailablePetsPage from '@/pages/AvailablePetsPage.vue';
 import ShelterProfilePage from '@/pages/ShelterProfilePage.vue';
@@ -88,6 +89,14 @@ const router = createRouter({
           path: 'manage-pets',
           name: 'ManagePets',
           component: ManagePets
+        },
+        {
+          path: 'adoption-requests',
+          name: 'ShelterAdoptionRequests',
+          component: ShelterAdoptionRequests,
+          props: route => ({ 
+            shelterId: parseInt(localStorage.getItem('Id')) 
+          })
         },
         {
           path: 'edit-profile',

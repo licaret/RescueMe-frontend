@@ -1,590 +1,492 @@
 <template>
-    <div class="adoption-container">
-      <h1 class="page-title">Adopt {{ pet ? pet.name : 'a Pet' }}</h1>
-      
-      <div v-if="loading" class="loading-spinner">
-        <div class="spinner"></div>
-        <p>Loading...</p>
+  <Navbar />
+  <div class="container mx-auto px-4 sm:px-6 lg:px-20 py-20 min-h-screen p-3 md:p-5 lg:p-6 mt-28 space-y-12">
+    
+    <div class="text-center mb-12">
+      <h1 class="text-3xl md:text-4xl font-medium text-gray-800 relative inline-block">
+        <span class="relative z-10">My Adoption Requests</span>
+      </h1>
+      <p class="text-gray-600 mt-6 max-w-2xl mx-auto">
+        Track and manage your pet adoption journey
+      </p>
+    </div>
+
+    <div class="rounded-2xl bg-blue-50 border border-blue-200 text-blue-700 text-sm p-4 mb-6 text-center">
+      If you encounter any issues with your requests, please contact the shelter directly or email us at <span class="underline">rescueme.care@gmail.com</span>.
+    </div>
+
+    <!-- Filters and Sorting -->
+    <div class="mb-6 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
+      <div class="flex space-x-4 w-full sm:w-auto">
+        <select 
+          v-model="statusFilter" 
+          class="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300"
+        >
+          <option value="">All Statuses</option>
+          <option value="PENDING">Pending</option>
+          <option value="APPROVED">Approved</option>
+          <option value="REJECTED">Rejected</option>
+          <option value="CANCELED">Canceled</option>
+        </select>
+
+        <select 
+          v-model="sortBy" 
+          class="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300"
+        >
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+        </select>
       </div>
-      
-      <div v-else-if="errorMessage" class="error-message">
-        <p>{{ errorMessage }}</p>
-        <button @click="$router.push('/')" class="btn btn-secondary">Back to Home</button>
-      </div>
-      
-      <div v-else-if="successMessage" class="success-message">
-        <h2>Thank You!</h2>
-        <p>{{ successMessage }}</p>
-        <div class="action-buttons">
-          <button @click="$router.push('/my-adoptions')" class="btn btn-primary">View My Adoption Requests</button>
-          <button @click="$router.push('/')" class="btn btn-secondary">Back to Home</button>
-        </div>
-      </div>
-      
-      <div v-else-if="pet" class="adoption-form-container">
-        <div class="pet-preview">
-          <div class="pet-image" v-if="pet.photos && pet.photos.length > 0">
-            <img :src="pet.photos[0].url" :alt="pet.name">
-          </div>
-          <div class="pet-details">
-            <h2>{{ pet.name }}</h2>
-            <p><strong>Species:</strong> {{ pet.species }}</p>
-            <p><strong>Breed:</strong> {{ pet.breed }}</p>
-            <p><strong>Age:</strong> {{ pet.age }} years</p>
-            <p><strong>Sex:</strong> {{ pet.sex }}</p>
-            <p><strong>Size:</strong> {{ pet.size }}</p>
-            <p><strong>Time in Shelter:</strong> {{ pet.timeSpentInShelter }}</p>
-            <p v-if="pet.story"><strong>Story:</strong> {{ pet.story }}</p>
-          </div>
-        </div>
-        
-        <form @submit.prevent="submitAdoptionRequest" class="adoption-form">
-          <h3>Your Information</h3>
-          
-          <div class="form-group">
-            <label for="name">Full Name</label>
-            <input 
-              type="text" 
-              id="name" 
-              v-model="formData.contactInfo.name" 
-              required
-              :disabled="isSubmitting"
-            >
-          </div>
-          
-          <div class="form-group">
-            <label for="email">Email</label>
-            <input 
-              type="email" 
-              id="email" 
-              v-model="formData.contactInfo.email" 
-              required
-              :disabled="isSubmitting"
-            >
-          </div>
-          
-          <div class="form-group">
-            <label for="phone">Phone Number</label>
-            <input 
-              type="tel" 
-              id="phone" 
-              v-model="formData.contactInfo.phone" 
-              required
-              :disabled="isSubmitting"
-            >
-          </div>
-          
-          <div class="form-row">
-            <div class="form-group half">
-              <label for="county">County</label>
-              <input 
-                type="text" 
-                id="county" 
-                v-model="formData.contactInfo.county" 
-                required
-                :disabled="isSubmitting"
-              >
-            </div>
-            
-            <div class="form-group half">
-              <label for="city">City</label>
-              <input 
-                type="text" 
-                id="city" 
-                v-model="formData.contactInfo.city" 
-                required
-                :disabled="isSubmitting"
-              >
-            </div>
-          </div>
-          
-          <h3>Experience & Expectations</h3>
-          
-          <div class="form-group">
-            <label for="experience">Describe your experience with pets</label>
-            <select 
-              id="experience" 
-              v-model="formData.experience" 
-              required
-              :disabled="isSubmitting"
-            >
-              <option value="professional">Professional experience (vet, trainer, etc.)</option>
-              <option value="experienced">Experienced pet owner</option>
-              <option value="moderate">Some experience with pets</option>
-              <option value="first-time">First-time pet owner</option>
-            </select>
-          </div>
-          
-          <div class="form-group">
-            <label for="activityLevel">How active is your lifestyle?</label>
-            <select 
-              id="activityLevel" 
-              v-model="formData.activityLevel" 
-              required
-              :disabled="isSubmitting"
-            >
-              <option value="sedentary">Mostly sedentary</option>
-              <option value="moderate">Moderately active</option>
-              <option value="active">Very active</option>
-            </select>
-          </div>
-          
-          <div class="form-group">
-            <label for="hoursAlone">How many hours will the pet be alone during a typical day?</label>
-            <select 
-              id="hoursAlone" 
-              v-model="formData.hoursAlone" 
-              required
-              :disabled="isSubmitting"
-            >
-              <option value="0-2">0-2 hours</option>
-              <option value="3-5">3-5 hours</option>
-              <option value="6-8">6-8 hours</option>
-              <option value="8+">More than 8 hours</option>
-            </select>
-          </div>
-          
-          <div class="form-group">
-            <label for="reason">Why do you want to adopt this pet?</label>
-            <textarea 
-              id="reason" 
-              v-model="formData.reason" 
-              rows="4" 
-              required
-              :disabled="isSubmitting"
-            ></textarea>
-          </div>
-          
-          <div class="form-group">
-            <label for="additionalInfo">Is there anything else you'd like to share with the shelter?</label>
-            <textarea 
-              id="additionalInfo" 
-              v-model="formData.additionalInfo" 
-              rows="4"
-              :disabled="isSubmitting"
-            ></textarea>
-          </div>
-          
-          <div class="form-group checkbox">
-            <input 
-              type="checkbox" 
-              id="agreeTerms" 
-              v-model="agreeTerms" 
-              required
-              :disabled="isSubmitting"
-            >
-            <label for="agreeTerms">
-              I agree to the terms and conditions
-              <div class="terms-detail">
-                I confirm that all information provided is accurate and complete. I understand that providing false information may result in my application being rejected.
-              </div>
-            </label>
-          </div>
-          
-          <div class="form-actions">
-            <button 
-              type="button" 
-              class="btn btn-secondary" 
-              @click="$router.go(-1)"
-              :disabled="isSubmitting"
-            >
-              Cancel
-            </button>
-            <button 
-              type="submit" 
-              class="btn btn-primary" 
-              :disabled="!agreeTerms || isSubmitting"
-            >
-              <span v-if="isSubmitting">Processing...</span>
-              <span v-else>Submit Adoption Request</span>
-            </button>
-          </div>
-        </form>
+
+      <div class="text-sm text-gray-600 self-end sm:self-auto">
+        Total Requests: {{ filteredRequests.length }}
       </div>
     </div>
-  </template>
-  
-  <script>
-  export default {
-    name: 'AdoptionRequestView',
-    // Get petId from route params if not provided directly
-    props: {
-      petId: {
-        type: [Number, String],
-        default: null
-      }
-    },
-    data() {
-      return {
-        pet: null,
-        loading: true,
-        isSubmitting: false,
-        errorMessage: '',
-        successMessage: '',
-        agreeTerms: false,
-        formData: {
-          contactInfo: {
-            name: '',
-            email: '',
-            phone: '',
-            city: '',
-            county: ''
-          },
-          experience: 'moderate',
-          activityLevel: 'moderate',
-          hoursAlone: '3-5',
-          reason: '',
-          additionalInfo: ''
-        }
-      };
-    },
-    computed: {
-      // Safely extract petId from props or route params
-      currentPetId() {
-        return this.petId || (this.$route && this.$route.params && this.$route.params.petId);
-      }
-    },
-    async created() {
-      // Ensure we have a petId to work with
-      if (!this.currentPetId) {
-        this.loading = false;
-        this.errorMessage = 'No pet specified for adoption. Please select a pet first.';
-        return;
-      }
+
+    <!-- Loading State -->
+    <div v-if="loading" class="flex flex-col items-center justify-center py-16">
+      <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-indigo-600"></div>
+      <p class="mt-4 text-gray-600 text-lg">Loading your adoption requests...</p>
+    </div>
+
+    <!-- Error State -->
+    <div v-else-if="error" class="bg-red-50 border border-red-200 rounded-2xl p-8 text-center shadow-md">
+      <div class="mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-20 w-20 mx-auto text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+      </div>
+      <h3 class="text-2xl font-semibold text-red-800 mb-2">Connection Error</h3>
+      <p class="text-red-600 mb-6">{{ error }}</p>
+      <button 
+        @click="fetchRequests" 
+        class="px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors flex items-center justify-center mx-auto space-x-2 shadow-md hover:shadow-lg"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        <span>Try Again</span>
+      </button>
+    </div>
+
+    <!-- Empty State -->
+    <div v-else-if="filteredRequests.length === 0" class="bg-gray-50 border border-gray-200 rounded-2xl p-12 text-center shadow-md">
+      <div class="mb-6">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+      </div>
+      <h3 class="text-2xl font-semibold text-gray-800 mb-3">No Adoption Requests</h3>
+      <p class="text-gray-600 mb-8 max-w-md mx-auto">You haven't submitted any adoption requests yet. Start your journey to find a furry friend!</p>
+      <router-link 
+        to="/available-pets" 
+        class="px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors inline-flex items-center space-x-2 shadow-md hover:shadow-lg"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+        </svg>
+        <span>Find a Pet to Adopt</span>
+      </router-link>
+    </div>
+
+    <!-- Requests List -->
+    <div v-else class="space-y-6">
+      <div 
+        v-for="request in paginatedRequests" 
+        :key="request.id" 
+        class="request-card bg-white rounded-2xl border border-gray-200 shadow-md hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 overflow-hidden relative"
+      >
+        <!-- Status indicator in top-right corner -->
+        <span 
+          class="absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-medium uppercase z-10"
+          :class="{
+            'bg-yellow-100 text-yellow-800': request.status === 'PENDING',
+            'bg-green-100 text-green-800': request.status === 'APPROVED',
+            'bg-red-100 text-red-800': request.status === 'REJECTED',
+            'bg-gray-100 text-gray-800': request.status === 'CANCELED'
+          }"
+        >
+          {{ formatStatus(request.status) }}
+        </span>
+        
+        <div class="p-6 grid grid-cols-1 md:grid-cols-12 gap-6">
+          <!-- Pet Image - Consistent sizing with aspect ratio -->
+          <div class="md:col-span-3 flex items-center justify-center">
+            <div class="w-full h-48 md:h-48 relative overflow-hidden rounded-2xl">
+              <img 
+                :src="request.petPhotoUrl || '/default-pet-placeholder.png'" 
+                alt="Pet Photo" 
+                class="w-full h-full object-cover absolute inset-0"
+              />
+            </div>
+          </div>
+
+          <!-- Request Details -->
+          <div class="md:col-span-5 space-y-3 flex flex-col justify-between">
+            <div>
+              <div class="mb-2">
+                <h3 class="text-xl font-bold text-gray-800">
+                  Request for {{ request.petName }}
+                </h3>
+              </div>
+              
+              <p class="text-gray-600 text-sm">
+                <span class="font-medium">Submitted on:</span> {{ formatDate(request.requestDate) }}
+              </p>
+              
+              <div class="mt-3 text-sm text-gray-600">
+                <p v-if="request.pet && request.pet.species">
+                  <span class="font-medium">Pet type:</span> {{ request.pet.species }} ({{ request.pet.breed }})
+                </p>
+                <p v-if="request.pet && request.pet.age">
+                  <span class="font-medium">Age:</span> {{ request.pet.age }} years
+                </p>
+              </div>
+            </div>
+
+            <!-- Shelter Response (if any) -->
+            <div v-if="request.notes" class="bg-gray-50 rounded-xl p-3 border border-gray-200 text-sm">
+              <h4 class="font-medium text-gray-700 mb-1 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Shelter Response
+              </h4>
+              <p class="text-gray-600">{{ request.notes }}</p>
+            </div>
+          </div>
+
+          <!-- Shelter Information -->
+          <div class="md:col-span-4 flex flex-col">
+            <!-- Empty space to push the shelter info lower -->
+            <div class="flex-grow mb-4"></div>
+            
+            <!-- Shelter Information Card - now positioned lower -->
+            <div class="bg-gray-50 rounded-2xl p-4 border border-gray-200">
+              <h4 class="text-sm font-bold text-gray-700 mb-3 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+                SHELTER INFORMATION
+              </h4>
+              <div class="text-sm text-gray-600 space-y-2">
+                <div class="flex items-start">
+                  <span class="font-medium w-20 flex-shrink-0">Name:</span>
+                  <span class="text-indigo-700">{{ request.shelter?.username || request.shelterName }}</span>
+                </div>
+                <div class="flex items-start">
+                  <span class="font-medium w-20 flex-shrink-0">Location:</span>
+                  <span>{{ request.shelter?.city || 'City' }}, {{ request.shelter?.county || 'County' }}</span>
+                </div>
+                <div class="flex items-start">
+                  <span class="font-medium w-20 flex-shrink-0">Phone:</span>
+                  <a 
+                    :href="`tel:${request.shelter?.phoneNumber || request.shelterPhone}`" 
+                    class="text-indigo-600 hover:text-indigo-800 transition duration-300"
+                  >
+                    {{ request.shelter?.phoneNumber || request.shelterPhone }}
+                  </a>
+                </div>
+                <div class="flex items-start">
+                  <span class="font-medium w-20 flex-shrink-0">Email:</span>
+                  <a 
+                    :href="`mailto:${request.shelter?.email || ''}`" 
+                    class="text-indigo-600 hover:text-indigo-800 transition duration-300 break-all"
+                  >
+                    {{ request.shelter?.email || 'Contact shelter' }}
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Action Buttons - Separated from the shelter details -->
+        <div class="px-6 pb-6 grid grid-cols-3 gap-4">
+          <router-link 
+            :to="`/adoption-requests/${request.id}`" 
+            class="text-center bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium rounded-2xl py-2.5 transition duration-200 border border-gray-300"
+          >
+            View Details
+          </router-link>
+          
+          <button 
+            v-if="request.status === 'PENDING'"
+            @click="cancelRequest(request.id)"
+            class="text-center bg-white hover:bg-red-50 text-red-600 font-medium rounded-2xl py-2.5 transition duration-200 border border-red-400"
+          >
+            Cancel Request
+          </button>
+          <button 
+            v-else
+            disabled
+            class="text-center bg-gray-100 text-gray-400 font-medium rounded-2xl py-2.5 cursor-not-allowed border border-gray-200"
+          >
+            Cancel Request
+          </button>
+          
+          <button 
+            @click="messageShelter(request.shelter?.email || request.shelterEmail)"
+            class="text-center bg-white hover:bg-green-50 text-green-600 font-medium rounded-2xl py-2.5 transition duration-200 border border-green-400"
+          >
+            Message Shelter
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div v-if="totalPages > 1" class="mt-8 flex justify-center">
+      <nav class="inline-flex rounded-xl shadow-md" aria-label="Pagination">
+        <button 
+          @click="currentPage--" 
+          :disabled="currentPage === 1"
+          class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 rounded-l-xl disabled:opacity-50 transition duration-300"
+        >
+          Previous
+        </button>
+        <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+          Page {{ currentPage }} of {{ totalPages }}
+        </span>
+        <button 
+          @click="currentPage++" 
+          :disabled="currentPage === totalPages"
+          class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 rounded-r-xl disabled:opacity-50 transition duration-300"
+        >
+          Next
+        </button>
+      </nav>
+    </div>
+  </div>
+</template>
+
+<script>
+import { ref, onMounted, computed, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import { getUserAdoptionRequests, cancelAdoptionRequest } from '../services/adoption_service';
+import { getShelterByPetId } from '../services/user_service';
+import Navbar from '@/components/Navbar.vue';
+
+export default {
+  name: 'AdoptionRequestsView',
+  components: {
+    Navbar,
+  },
+  setup() {
+    const router = useRouter();
+    const requests = ref([]);
+    const loading = ref(true);
+    const error = ref(null);
+    
+    // Filtering and Sorting
+    const statusFilter = ref('');
+    const sortBy = ref('newest');
+    const currentPage = ref(1);
+    const itemsPerPage = ref(10);
+
+
+    
+    const fetchRequests = async () => {
+      loading.value = true;
+      error.value = null;
       
-      // Load pet details
       try {
-        await this.loadPetData();
-        await this.loadUserData();
-      } catch (error) {
-        console.error('Error loading adoption data:', error);
-        this.errorMessage = 'Unable to load pet information. Please try again later.';
-      } finally {
-        this.loading = false;
-      }
-    },
-    methods: {
-      async loadPetData() {
-        try {
-          // Using the consistent URL format from your API
-          const response = await fetch(`/pets/${this.currentPetId}`);
-          
-          if (!response.ok) {
-            // Log the full response text if not JSON
-            const text = await response.text();
-            console.error('API response is not OK:', text);
-            throw new Error(`Failed to load pet data: ${response.status} ${response.statusText}`);
-          }
-          
-          const data = await response.json();
-          this.pet = data;
-          
-          // Check if pet is available for adoption
-          if (this.pet.status !== 'AVAILABLE') {
-            throw new Error(`This pet is not available for adoption. Current status: ${this.pet.status}`);
-          }
-        } catch (error) {
-          console.error('Pet data fetch error:', error);
-          throw error;
-        }
-      },
-      
-      async loadUserData() {
-        if (!this.$store || !this.$store.state.user) {
+        const userId = localStorage.getItem('Id');
+        if (!userId) {
+          router.push('/login');
           return;
         }
         
-        const user = this.$store.state.user;
-        this.formData.contactInfo = {
-          name: user.username || '',
-          email: user.email || '',
-          phone: user.phoneNumber || '',
-          city: user.city || '',
-          county: user.county || ''
-        };
-      },
-      
-      async submitAdoptionRequest() {
-        if (!this.agreeTerms) {
-          this.errorMessage = 'You must agree to the terms and conditions.';
-          return;
-        }
+        const data = await getUserAdoptionRequests(userId);
         
-        if (!this.currentPetId) {
-          this.errorMessage = 'Pet ID is missing. Please try again.';
-          return;
-        }
-        
-        this.isSubmitting = true;
-        this.errorMessage = '';
-        
-        try {
-          const userId = this.$store?.state?.user?.id;
-          if (!userId) {
-            throw new Error('You must be logged in to submit an adoption request');
-          }
+        const requestsWithDetails = await Promise.all(data.map(async (request) => {
+          const petPhotoUrl = await getPetPhotoUrl(request);
           
-          // Create a simplified request object to avoid circular references
-          const requestData = {
-            userId: userId,
-            petId: parseInt(this.currentPetId),
-            requestDetails: {
-              contactInfo: this.formData.contactInfo,
-              experience: this.formData.experience,
-              activityLevel: this.formData.activityLevel,
-              hoursAlone: this.formData.hoursAlone,
-              reason: this.formData.reason,
-              additionalInfo: this.formData.additionalInfo || ''
+          let shelterDetails = null;
+          if (request.pet && request.pet.id) {
+            try {
+              shelterDetails = await getShelterByPetId(request.pet.id);
+            } catch (err) {
+              console.warn('Could not fetch shelter details:', err);
             }
+          }
+          
+          return {
+            ...request,
+            petPhotoUrl,
+            shelter: shelterDetails 
           };
+        }));
+        
+        requests.value = requestsWithDetails;
+      } catch (err) {
+        console.error('Error fetching adoption requests:', err);
+        error.value = 'Failed to load your adoption requests. Please check your connection and try again.';
+      } finally {
+        loading.value = false;
+      }
+    };
+    
+
+
+
+    const cancelRequest = async (requestId) => {
+      const confirmCancel = window.confirm('Are you sure you want to cancel this adoption request? This action cannot be undone.');
+      
+      if (!confirmCancel) return;
+      
+      try {
+        await cancelAdoptionRequest(requestId);
+        const requestIndex = requests.value.findIndex(req => req.id === requestId);
+        if (requestIndex !== -1) {
+          requests.value[requestIndex].status = 'CANCELED';
+        }
+      } catch (err) {
+        console.error('Error canceling adoption request:', err);
+        window.alert('Failed to cancel the request. Please try again later.');
+      }
+    };
+    
+
+
+    const filteredRequests = computed(() => {
+      let filtered = requests.value;
+      
+      if (statusFilter.value) {
+        filtered = filtered.filter(req => req.status === statusFilter.value);
+      }
+      
+      if (sortBy.value === 'newest') {
+        filtered = filtered.sort((a, b) => new Date(b.requestDate) - new Date(a.requestDate));
+      } else {
+        filtered = filtered.sort((a, b) => new Date(a.requestDate) - new Date(b.requestDate));
+      }
+      
+      return filtered;
+    });
+
+
+
+    // Pagination
+    const totalPages = computed(() => Math.ceil(filteredRequests.value.length / itemsPerPage.value));
+    
+
+
+    watch([statusFilter, sortBy], () => {
+      currentPage.value = 1;
+    });
+
+
+
+    const paginatedRequests = computed(() => {
+      const start = (currentPage.value - 1) * itemsPerPage.value;
+      const end = start + itemsPerPage.value;
+      return filteredRequests.value.slice(start, end);
+    });
+    
+
+
+    const formatStatus = (status) => {
+      if (!status) return 'Unknown';
+      
+      const statusMap = {
+        'PENDING': 'Pending Review',
+        'APPROVED': 'Approved',
+        'REJECTED': 'Declined',
+        'CANCELED': 'Canceled'
+      };
+      
+      return statusMap[status] || status;
+    };
+    
+
+    
+    const formatDate = (dateString) => {
+      if (!dateString) return 'Unknown date';
+      
+      try {
+        const options = { 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        };
+        return new Date(dateString).toLocaleDateString(undefined, options);
+      } catch (e) {
+        console.error('Error formatting date:', e);
+        return dateString;
+      }
+    };
+    
+
+
+    onMounted(() => {
+      fetchRequests();
+    });
+    
+
+
+
+    const getPetPhotoUrl = async (request) => {
+      if (request.pet && request.pet.photoIds && request.pet.photoIds.length > 0) {
+        try {
+          const photoId = request.pet.photoIds[0];
+          const response = await fetch(`http://localhost:8080/pet-photos/${photoId}`);
+          const photoData = await response.json();
           
-          console.log('Submitting adoption request:', JSON.stringify(requestData));
-          
-          const response = await fetch('/api/v1/adoptions/requests', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${this.$store.state.token || ''}`
-            },
-            body: JSON.stringify(requestData)
-          });
-          
-          if (!response.ok) {
-            const contentType = response.headers.get('content-type');
-            if (contentType && contentType.includes('application/json')) {
-              const errorData = await response.json();
-              throw new Error(errorData.message || 'Failed to submit adoption request');
-            } else {
-              const text = await response.text();
-              console.error('API error response:', text);
-              throw new Error(`Server error: ${response.status} ${response.statusText}`);
-            }
-          }
-          
-          this.successMessage = `Your adoption request for ${this.pet.name} has been submitted successfully! The shelter will review your application and contact you soon.`;
-          
+          return photoData.url;
         } catch (error) {
-          console.error('Error submitting adoption request:', error);
-          this.errorMessage = error.message || 'An error occurred while submitting your request. Please try again.';
-        } finally {
-          this.isSubmitting = false;
+          console.error('Eroare la preluarea pozei:', error);
         }
       }
-    }
+      
+      return '/default-pet-placeholder.png';
+    };
+
+
+
+    return {
+      // Data
+      requests,
+      loading,
+      error,
+      statusFilter,
+      sortBy,
+      currentPage,
+      
+      // Computed
+      filteredRequests,
+      totalPages,
+      paginatedRequests,
+      
+      // Methods
+      fetchRequests,
+      cancelRequest,
+      formatStatus,
+      formatDate,
+      getPetPhotoUrl
+    };
   }
-  </script>
-  
-  <style scoped>
-  .adoption-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 2rem 1rem;
+};
+</script>
+
+
+
+<style scoped>
+.request-card {
+  transition: all 0.3s ease;
+}
+
+.request-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
   }
-  
-  .page-title {
-    text-align: center;
-    margin-bottom: 2rem;
-    color: #333;
-  }
-  
-  .loading-spinner {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 200px;
-  }
-  
-  .spinner {
-    width: 50px;
-    height: 50px;
-    border: 3px solid rgba(0, 0, 0, 0.1);
-    border-radius: 50%;
-    border-top-color: #4f46e5;
-    animation: spin 1s ease-in-out infinite;
-    margin-bottom: 1rem;
-  }
-  
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
-  
-  .error-message, .success-message {
-    background-color: #fef2f2;
-    border: 1px solid #f87171;
-    color: #b91c1c;
-    padding: 1.5rem;
-    border-radius: 0.5rem;
-    margin-bottom: 2rem;
-    text-align: center;
-  }
-  
-  .success-message {
-    background-color: #ecfdf5;
-    border-color: #6ee7b7;
-    color: #047857;
-  }
-  
-  .error-message p, .success-message p {
-    margin-bottom: 1rem;
-  }
-  
-  .action-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin-top: 1.5rem;
-  }
-  
-  .adoption-form-container {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 2rem;
-  }
-  
-  @media (min-width: 1024px) {
-    .adoption-form-container {
-      grid-template-columns: 1fr 2fr;
-    }
-  }
-  
-  .pet-preview {
-    background-color: #f9fafb;
-    border-radius: 0.5rem;
-    overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  }
-  
-  .pet-image {
-    width: 100%;
-    height: 250px;
-    overflow: hidden;
-  }
-  
-  .pet-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  
-  .pet-details {
-    padding: 1.5rem;
-  }
-  
-  .pet-details h2 {
-    margin-bottom: 1rem;
-    color: #333;
-  }
-  
-  .pet-details p {
-    margin-bottom: 0.5rem;
-  }
-  
-  .adoption-form {
-    background-color: #fff;
-    border-radius: 0.5rem;
-    padding: 2rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  }
-  
-  .adoption-form h3 {
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid #e5e7eb;
-    color: #333;
-  }
-  
-  .form-group {
-    margin-bottom: 1.5rem;
-  }
-  
-  .form-row {
-    display: flex;
-    gap: 1rem;
-  }
-  
-  .form-group.half {
-    width: 50%;
-  }
-  
-  label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-    color: #374151;
-  }
-  
-  input[type="text"],
-  input[type="email"],
-  input[type="tel"],
-  select,
-  textarea {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #d1d5db;
-    border-radius: 0.375rem;
-    font-size: 1rem;
-  }
-  
-  textarea {
-    resize: vertical;
-    min-height: 100px;
-  }
-  
-  .checkbox {
-    display: flex;
-    align-items: flex-start;
-  }
-  
-  .checkbox input {
-    margin-top: 0.25rem;
-    margin-right: 0.75rem;
-    min-width: 1rem;
-  }
-  
-  .terms-detail {
-    margin-top: 0.25rem;
-    font-size: 0.875rem;
-    color: #6b7280;
-  }
-  
-  .form-actions {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 2rem;
-    gap: 1rem;
-  }
-  
-  .btn {
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.375rem;
-    font-size: 1rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-    border: none;
-  }
-  
-  .btn-primary {
-    background-color: #4f46e5;
-    color: white;
-  }
-  
-  .btn-primary:hover {
-    background-color: #4338ca;
-  }
-  
-  .btn-secondary {
-    background-color: #f3f4f6;
-    color: #111827;
-  }
-  
-  .btn-secondary:hover {
-    background-color: #e5e7eb;
-  }
-  
-  .btn:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-  }
-  </style>
+}
+</style>

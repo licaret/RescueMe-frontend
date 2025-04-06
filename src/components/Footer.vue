@@ -14,9 +14,8 @@
         <div>
           <h3 class="text-xl  mb-4">Quick Links</h3>
           <ul class="space-y-2">
-            <li><router-link to="/about" class="text-gray-400 hover:text-black transition-colors">About us</router-link></li>
-            <li><router-link to="/about" class="text-gray-400 hover:text-black transition-colors">Contact us</router-link></li>
-            <li><router-link to="/animals" class="text-gray-400 hover:text-black transition-colors">FAQ</router-link></li>
+            <li><router-link to="/about-us" class="text-gray-400 hover:text-black transition-colors">About us</router-link></li>
+            <li><router-link to="/contact" class="text-gray-400 hover:text-black transition-colors">Contact us</router-link></li>
             <li><router-link to="/adopt" class="text-gray-400 hover:text-black transition-colors">Volunteer</router-link></li>
           </ul>
         </div>

@@ -1,6 +1,7 @@
 <template>
-    <IntroNavbar />
-    <div class="max-w-6xl mx-auto px-4 py-16">
+    <Navbar v-if="isLoggedIn" />
+    <IntroNavbar v-else />
+    <div class="max-w-6xl mx-auto px-4 py-16 pt-40">
       <div class="text-center mb-16">
         <div class="relative inline-block mb-8">
           <h2 class="text-xl text-gray-600 mb-2">WHO ARE WE?</h2>
@@ -224,13 +225,22 @@
 
   <script>
   import IntroNavbar from '@/components/IntroNavbar.vue';
+  import Navbar from '@/components/Navbar.vue';
+  import IntroFooter from '@/components/IntroFooter.vue';
   import Footer from '@/components/Footer.vue';
 
   export default {
     name: 'AboutUs',
     components: {
-      IntroNavbar,
-      Footer
+        IntroNavbar,
+        Navbar,
+        IntroFooter,
+        Footer
+    },
+    methods: {
+      isLoggedIn() {
+        return !!localStorage.getItem('Id'); // sau 'Token' / altceva în funcție de cum salvezi autentificarea
+      }
     }
   }
   </script>

@@ -1,7 +1,7 @@
 
 <template>
-  <div class="bg-white min-h-screen p-6 md:p-10">
-    <div class="max-w-6xl mx-auto">
+  <div class="bg-white max-w-full p-6 md:p-10">
+    <div class="max-w-full mx-auto">
       <!-- Toast notification -->
       <div 
         v-if="showSuccessToast" 

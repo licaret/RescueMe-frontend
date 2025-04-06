@@ -368,6 +368,26 @@ const uploadShelterDocument = async (Id, documentType, file) => {
   }
 }
 
+const getShelterByPetId = async (petId) => {
+  try {
+    const response = await fetch(`http://localhost:8080/users/shelter/by-pet/${petId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error fetching shelter: ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error in getShelterByPetId:', error);
+    throw error;
+  }
+};
+
 
 export { 
   registerAdopter, 
@@ -384,5 +404,6 @@ export {
   requestPasswordReset,
   resetPassword,
   changePassword,
-  uploadShelterDocument
+  uploadShelterDocument,
+  getShelterByPetId
  };

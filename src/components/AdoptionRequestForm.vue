@@ -16,11 +16,57 @@
         </button>
       </div>
       
+      <!-- Success Message -->
+      <div v-if="successMessage" class="flex-1 flex items-center justify-center p-6">
+        <div class="text-center">
+          <div class="h-16 w-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-800 mb-2">Success!</h3>
+          <p class="text-gray-600 mb-6">{{ successMessage }}</p>
+          <div class="flex justify-center gap-4">
+            <button 
+              @click="navigateToAdoptionRequests" 
+              class="px-4 py-2 bg-indigo-600 text-white rounded-md font-medium hover:bg-indigo-700 transition-colors"
+            >
+              View My Adoption Requests
+            </button>
+            <button 
+              @click="goToHomePage" 
+              class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md font-medium hover:bg-gray-300 transition-colors"
+            >
+              Back to Home
+            </button>
+          </div>
+        </div>
+      </div>
+      
       <!-- Loading State -->
-      <div v-if="!pet" class="flex-1 flex items-center justify-center p-6">
+      <div v-else-if="!pet" class="flex-1 flex items-center justify-center p-6">
         <div class="text-center">
           <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500 mx-auto mb-4"></div>
           <p class="text-gray-500">Loading pet information...</p>
+        </div>
+      </div>
+      
+      <!-- Error Message -->
+      <div v-else-if="errorMessage" class="flex-1 flex items-center justify-center p-6">
+        <div class="text-center">
+          <div class="h-16 w-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-800 mb-2">Error</h3>
+          <p class="text-gray-600 mb-6">{{ errorMessage }}</p>
+          <button 
+            @click="errorMessage = ''" 
+            class="px-4 py-2 bg-red-600 text-white rounded-md font-medium hover:bg-red-700 transition-colors"
+          >
+            Try Again
+          </button>
         </div>
       </div>
       
@@ -435,7 +481,7 @@
       </div>
       
       <!-- Form Footer -->
-      <div class="px-6 py-4 border-t border-gray-100 flex justify-between bg-gray-50">
+      <div v-if="!successMessage && !errorMessage && pet" class="px-6 py-4 border-t border-gray-100 flex justify-between bg-gray-50">
         <button 
           @click="goBack"
           class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -476,14 +522,15 @@ export default {
       required: true
     }
   },
+  
   setup(props) {
     const router = useRouter();
     const route = useRoute();
     const userProfile = ref(null);
     const isSubmitting = ref(false);
     const pet = ref(null);
-    
-    console.log("AdoptionRequestForm mounted with petId:", props.petId);
+    const errorMessage = ref('');
+    const successMessage = ref('');
     
     // Form data
     const form = ref({
@@ -539,11 +586,11 @@ export default {
              form.value.agreeToTerms;
     });
     
-    // Load pet data
+
+    
     const loadPet = async () => {
       console.log("Loading pet data for ID:", props.petId);
       
-      // First check our state service
       const storedPet = getCurrentAdoptionPet();
       
       if (storedPet && storedPet.id == props.petId) {
@@ -552,7 +599,6 @@ export default {
         return;
       }
       
-      // If not in state service, fetch from API
       console.log("Fetching pet from API");
       try {
         const petData = await getPetById(props.petId);
@@ -560,11 +606,12 @@ export default {
         pet.value = petData;
       } catch (error) {
         console.error("Error fetching pet data:", error);
-        alert("Failed to load pet information. Please try again.");
+        errorMessage.value = "Failed to load pet information. Please try again.";
       }
     };
     
-    // Load user profile and pet data on component mount
+
+
     onMounted(async () => {
       console.log("AdoptionRequestForm component mounted");
       
@@ -575,11 +622,9 @@ export default {
       }
       
       try {
-        // Load user data
         const userData = await getUserById(userId);
         userProfile.value = userData;
         
-        // Pre-fill form with known user data if available
         if (userData.phoneNumber) {
           form.value.phone = userData.phoneNumber;
         }
@@ -590,33 +635,46 @@ export default {
           form.value.county = userData.county;
         }
         
-        // Load pet data
         await loadPet();
       } catch (error) {
         console.error('Error in component setup:', error);
+        errorMessage.value = "Failed to load user information. Please try again.";
       }
     });
     
-    // Clean up when component is unmounted
+
+    
     onBeforeUnmount(() => {
-      // Clear adoption pet data when leaving the form
-      // This ensures we don't keep the data around unnecessarily
-      clearCurrentAdoptionPet();
+      if (!successMessage.value) {
+        clearCurrentAdoptionPet();
+      }
     });
     
-    // Handle backdrop click (close modal)
+
+
     const handleBackdropClick = (event) => {
       if (event.target === event.currentTarget) {
         goBack();
       }
     };
     
-    // Navigate back
+
     const goBack = () => {
       router.go(-1);
     };
     
-    // Format pet age for display
+
+    const goToHomePage = () => {
+      router.push('/');
+    };
+    
+    
+    const navigateToAdoptionRequests = () => {
+      router.push('/adoption-requests');
+    };
+    
+
+
     const formatAge = (age) => {
       if (!age && age !== 0) return 'Unknown';
       
@@ -628,75 +686,78 @@ export default {
       }
     };
     
-    // Submit adoption request
+    
+
     const submitForm = async () => {
-  if (!isFormValid.value || !userProfile.value || !pet.value) {
-    if (!pet.value) {
-      alert('Pet information is missing. Please try again.');
-    }
-    return;
-  }
-  
-  isSubmitting.value = true;
-  
-  try {
-    // Create a clean adoption data object without any circular references
-    // and only including the necessary fields for the API
-    const adoptionData = {
-      userId: userProfile.value.id,
-      petId: parseInt(pet.value.id),  // Ensure petId is a number
-      requestDetails: {
-        contactInfo: {
-          name: userProfile.value.username,
-          email: userProfile.value.email,
-          phone: form.value.phone,
-          city: form.value.city,
-          county: form.value.county
-        },
-        housing: {
-          type: form.value.housingType,
-          ownership: form.value.ownRent,
-          landlordPermission: form.value.landlordPermission,
-          hasYard: form.value.hasYard,
-          fencedYard: form.value.fencedYard
-        },
-        household: {
-          members: parseInt(form.value.householdMembers),
-          children: {
-            has: form.value.hasChildren,
-            ages: form.value.childrenAges
+      if (!isFormValid.value || !userProfile.value || !pet.value) {
+        if (!pet.value) {
+          errorMessage.value = 'Pet information is missing. Please try again.';
+        } else {
+          errorMessage.value = 'Please fill out all required fields.';
+        }
+        return;
+      }
+      
+      isSubmitting.value = true;
+      errorMessage.value = '';
+      
+      try {
+        const adoptionData = {
+          userId: userProfile.value.id,
+          petId: parseInt(pet.value.id), 
+          requestDetails: {
+            contactInfo: {
+              name: userProfile.value.username,
+              email: userProfile.value.email,
+              phone: form.value.phone,
+              city: form.value.city,
+              county: form.value.county
+            },
+            housing: {
+              type: form.value.housingType,
+              ownership: form.value.ownRent,
+              landlordPermission: form.value.landlordPermission,
+              hasYard: form.value.hasYard,
+              fencedYard: form.value.fencedYard
+            },
+            household: {
+              members: parseInt(form.value.householdMembers),
+              children: {
+                has: form.value.hasChildren,
+                ages: form.value.childrenAges
+              },
+              otherPets: {
+                has: form.value.hasOtherPets,
+                description: form.value.otherPetsDescription
+              }
+            },
+            experience: {
+              level: form.value.petExperience,
+              activityLevel: form.value.activityLevel,
+              timeAlone: form.value.timeAlone,
+              reason: form.value.adoptReason
+            },
+            additionalInfo: form.value.additionalInfo
           },
-          otherPets: {
-            has: form.value.hasOtherPets,
-            description: form.value.otherPetsDescription
-          }
-        },
-        experience: {
-          level: form.value.petExperience,
-          activityLevel: form.value.activityLevel,
-          timeAlone: form.value.timeAlone,
-          reason: form.value.adoptReason
-        },
-        additionalInfo: form.value.additionalInfo
-      },
-      status: 'pending',
-      requestDate: new Date().toISOString()
+          status: 'PENDING',
+          requestDate: new Date().toISOString()
+        };
+        
+        console.log('Submitting adoption request with data:', JSON.stringify(adoptionData));
+        
+        await submitAdoptionRequest(adoptionData);
+        
+        successMessage.value = `Your adoption request for ${pet.value.name} has been submitted successfully! The shelter will review your application and contact you soon.`;
+        
+        clearCurrentAdoptionPet();
+      } catch (error) {
+        console.error('Error submitting adoption request:', error);
+        errorMessage.value = error.message || 'Failed to submit adoption request. Please try again.';
+      } finally {
+        isSubmitting.value = false;
+      }
     };
     
-    console.log('Submitting adoption request with data:', JSON.stringify(adoptionData));
-    
-    await submitAdoptionRequest(adoptionData);
-    
-    // Show success message and redirect
-    alert('Your adoption request has been submitted successfully!');
-    router.push('/adoption-requests');
-  } catch (error) {
-    console.error('Error submitting adoption request:', error);
-    alert('There was an error submitting your request. Please try again.');
-  } finally {
-    isSubmitting.value = false;
-  }
-};
     
     return {
       pet,
@@ -704,8 +765,12 @@ export default {
       form,
       isFormValid,
       isSubmitting,
+      errorMessage,
+      successMessage,
       handleBackdropClick,
       goBack,
+      goToHomePage,
+      navigateToAdoptionRequests,
       formatAge,
       submitForm
     };

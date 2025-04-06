@@ -3,15 +3,19 @@ const API_URL = 'http://localhost:8080/api/v1';
 
 const handleResponse = async (response) => {
   if (!response.ok) {
-    let errorData;
+    let errorMessage;
     try {
-      errorData = await response.json();
+      const errorData = await response.clone().json();
+      errorMessage = errorData.message || `Error: ${response.status} ${response.statusText}`;
     } catch (e) {
-      errorData = { message: await response.text() };
+      try {
+        errorMessage = await response.clone().text();
+      } catch (e2) {
+        errorMessage = `Error: ${response.status} ${response.statusText}`;
+      }
     }
-    const error = new Error(errorData.message || `Error: ${response.status} ${response.statusText}`);
+    const error = new Error(errorMessage);
     error.status = response.status;
-    error.data = errorData;
     throw error;
   }
   
@@ -19,8 +23,12 @@ const handleResponse = async (response) => {
     return null;
   }
   
-  const text = await response.text();
-  return text ? JSON.parse(text) : null;
+  try {
+    return await response.json();
+  } catch (e) {
+    const text = await response.text();
+    return text ? JSON.parse(text) : null;
+  }
 };
 
 
@@ -137,11 +145,34 @@ async function cancelAdoptionRequest(requestId) {
 }
 
 
+const completeAdoption = async (requestId) => {
+  try {
+    const response = await fetch(`http://localhost:8080/api/v1/adoptions/requests/${requestId}/complete`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to complete adoption');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error completing adoption:', error);
+    throw error;
+  }
+};
+
+
 export { 
   submitAdoptionRequest,
   getUserAdoptionRequests,
   getShelterAdoptionRequests,
   getAdoptionRequestById,
   updateAdoptionRequestStatus,
-  cancelAdoptionRequest
+  cancelAdoptionRequest,
+  completeAdoption
 };

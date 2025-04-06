@@ -115,7 +115,7 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
                 </svg>
                 <span class="flex-1 ms-3 whitespace-nowrap">Adoption Requests</span>
-                <span class="inline-flex items-center justify-center w-3 h-3 p-3 ms-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300">2</span>
+                <span class="inline-flex items-center justify-center w-3 h-3 p-3 ms-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300">{{ pendingAdoptionCount }}</span>
               </router-link>
             </li>
             <li>
@@ -526,6 +526,7 @@
 import { ref, onMounted, onUnmounted, computed } from "vue";
 import { useRouter, useRoute, onBeforeRouteUpdate } from "vue-router";
 import {fetchShelterPetStats} from '@/services/pet_service.js';
+import { getShelterAdoptionRequests } from '@/services/adoption_service';
 import PetAdoptionPieChart from '@/components/PetAdoptionPieChart.vue';
 
 export default {
@@ -542,9 +543,11 @@ export default {
     const sidebarOpen = ref(window.innerWidth >= 768); 
     const showNotifications = ref(false);
     const unreadNotifications = ref(3);
+    const pendingAdoptionCount = ref(0);
     
     onMounted(() => {
       loadStats();
+      loadPendingAdoptionCount();
     });
 
     onBeforeRouteUpdate((to, from, next) => {
@@ -561,6 +564,16 @@ export default {
       available: 0,
       pending: 0
     });
+
+    const loadPendingAdoptionCount = async () => {
+      const shelterId = localStorage.getItem("Id");
+      try {
+        const allRequests = await getShelterAdoptionRequests(shelterId);
+        pendingAdoptionCount.value = allRequests.filter(r => r.status === 'PENDING').length;
+      } catch (err) {
+        console.error('Failed to load adoption requests:', err);
+      }
+    };
 
     const loadStats = async () => {
       const shelterId = localStorage.getItem("Id");
@@ -657,6 +670,9 @@ export default {
         console.error("Username not found in localStorage.");
       }
 
+      window.addEventListener('adoption-status-updated', loadPendingAdoptionCount);
+
+
       window.history.pushState(null, "", window.location.href);
       window.addEventListener("popstate", blockBackButton);
       
@@ -671,6 +687,8 @@ export default {
       window.removeEventListener("popstate", blockBackButton);
       document.removeEventListener('click', handleClickOutside);
       window.removeEventListener('resize', handleResize);
+      window.removeEventListener('adoption-status-updated', loadPendingAdoptionCount);
+
     });
 
 
@@ -686,7 +704,8 @@ export default {
       handleLogout,
       route,
       stats,
-      loadStats
+      loadStats,
+      pendingAdoptionCount,
     };
   }
 };
