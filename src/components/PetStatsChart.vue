@@ -1,5 +1,5 @@
 <template>
-  <div class="w-96 mx-auto mt-16 ml-10 bg-white p-6 rounded-lg shadow-lg">
+  <div class="w-96 mx-auto mt-16 ml-10 bg-white p-6 rounded-2xl shadow-2xl">
     <h3 class="text-lg font-semibold text-gray-700 mb-4 text-center">Pet Adoption Statistics</h3>
 
     <div v-if="totalPets > 0">

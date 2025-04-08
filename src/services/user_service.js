@@ -47,9 +47,9 @@ async function registerShelter(shelterData) {
 
     const data = await response.json();
 
-    if (data.Id) {
-      localStorage.setItem("Id", data.Id);
-    }
+    // if (data.Id) {
+    //   localStorage.setItem("Id", data.Id);
+    // }
 
     return data;
   } catch (error) {

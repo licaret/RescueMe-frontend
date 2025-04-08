@@ -42,7 +42,7 @@
         </button>
       </div>
 
-      <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
+      <div class="bg-white rounded-2xl shadow-md overflow-hidden mb-8">
         <div class="h-32 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
         
         <div class="p-6 relative">
@@ -140,7 +140,7 @@
       </div>
 
       <!-- Account Information Tab -->
-      <div v-if="activeTab === 'account'" class="bg-white rounded-lg shadow p-6 mb-8">
+      <div v-if="activeTab === 'account'" class="bg-white rounded-2xl shadow p-6 mb-8">
         <h2 class="text-xl font-bold mb-6">Account Information</h2>
         
         <div class="flex items-start mb-8">
@@ -281,7 +281,7 @@
       </div>
       
       <!-- Shelter Details Tab -->
-      <div v-if="activeTab === 'details'" class="bg-white rounded-lg shadow p-6 mb-8">
+      <div v-if="activeTab === 'details'" class="bg-white rounded-2xl shadow p-6 mb-8">
         <h2 class="text-xl font-bold mb-6">Shelter Details</h2>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -432,7 +432,7 @@
       </div>
 
       <!-- Required Documents Tab -->
-      <div v-if="activeTab === 'documents'" class="bg-white rounded-lg shadow p-6 mb-8">
+      <div v-if="activeTab === 'documents'" class="bg-white rounded-2xl shadow p-6 mb-8">
         <h2 class="text-xl font-bold mb-4">Required Documents</h2>
         <p class="text-gray-600 mb-6">Upload and manage the required documents for your shelter verification.</p>
         
@@ -744,7 +744,7 @@
         
         <!-- Document viewer modal -->
         <div v-if="showDocumentModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div class="bg-white rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] flex flex-col">
+          <div class="bg-white rounded-2xl shadow-lg w-full max-w-4xl max-h-[90vh] flex flex-col">
             <div class="p-4 border-b flex items-center justify-between">
               <h3 class="font-medium">{{ getDocumentTypeName(currentDocumentType) }}</h3>
               <button @click="showDocumentModal = false" class="text-gray-500 hover:text-gray-800">
@@ -781,7 +781,7 @@
       </div>
 
       <!-- Password Tab-->
-      <div v-if="activeTab === 'password'" class="bg-white rounded-lg shadow p-6 mb-8">
+      <div v-if="activeTab === 'password'" class="bg-white rounded-2xl shadow p-6 mb-8">
         <h2 class="text-xl font-bold mb-6">Password</h2>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -907,7 +907,7 @@
           
           <!-- Right Column: Password Requirements -->
           <div>
-            <div class="p-4 bg-gray-50 rounded-lg">
+            <div class="p-4 bg-gray-50 rounded-2xl">
               <h3 class="text-sm font-medium mb-2">Password requirements:</h3>
               <p class="text-sm text-gray-600 mb-2">Ensure that these requirements are met:</p>
               <ul class="text-sm">

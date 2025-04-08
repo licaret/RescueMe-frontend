@@ -349,7 +349,7 @@
               <button 
                 v-if="isAnyFilterApplied"
                 @click="resetFilters"
-                class="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5"
+                class="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded-2xl transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5"
               >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -534,17 +534,19 @@
       </div>
     </div>
 
-    <!-- No Results State -->
-    <div v-if="!loading && sheltersWithPets.length === 0" class="text-center py-20 max-w-xl mx-auto">
-      <div class="bg-white p-8 rounded-2xl shadow-lg border border-gray-100">
-        <div class="flex justify-center mb-6">
-          <img src="../assets/empty-state.png" alt="No Pets" class="w-48 h-48 object-contain" />
+    <!-- No Matching Pets (when filters are applied) -->
+    <div v-if="!loading && sheltersWithPets.length === 0 && isAnyFilterApplied" class="text-center py-20 max-w-xl mx-auto">
+      <div class="rounded-2xl">
+        <div class="mb-6">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 mx-auto text-red-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
         </div>
-        <h2 class="text-2xl font-bold text-gray-800 mb-3">No pets match your search</h2>
+        <h2 class="text-2xl font-bold text-red-600 mb-3">No pets match your search</h2>
         <p class="text-gray-600 mb-8">We couldn't find any pets matching your current filters. Try adjusting your filters to see more pets.</p>
         <button 
           @click="resetFilters" 
-          class="primary-button px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-all duration-300 flex items-center gap-2 mx-auto shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+          class="primary-button px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-2xl transition-all duration-300 flex items-center gap-2 mx-auto shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -553,6 +555,20 @@
         </button>
       </div>
     </div>
+
+    <!-- No Pets in System  -->
+    <div v-if="!loading && sheltersWithPets.length === 0 && !isAnyFilterApplied" class="text-center py-20 max-w-xl mx-auto">
+      <div class="rounded-2xl">
+        <div class="mb-6">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 mx-auto text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+        </div>
+        <h2 class="text-2xl font-bold text-red-600 mb-3">No pets available yet</h2>
+        <p class="text-gray-600">Shelters haven't added any pets to the platform yet. Please check back later!</p>
+      </div>
+    </div>
+
   </div>
 </template>
 

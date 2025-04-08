@@ -1,6 +1,6 @@
 <template>
   <div class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-8 z-50">
-    <div class="bg-white rounded-lg w-full max-w-3xl max-h-[80vh] overflow-y-auto">
+    <div class="bg-white rounded-2xl w-full max-w-3xl max-h-[80vh] overflow-y-auto">
 
       <!-- Form Header -->
       <div class="p-6 border-b">
@@ -23,7 +23,7 @@
               <input
                 v-model="petData.name"
                 type="text"
-                class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+                class="mt-1 block w-full rounded-2xl border border-gray-300 px-3 py-2"
                 required
               />
             </div>
@@ -31,7 +31,7 @@
               <label class="block text-sm font-medium text-gray-700">Species</label>
               <select
                 v-model="petData.species"
-                class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+                class="mt-1 block w-full rounded-2xl border border-gray-300 px-3 py-2"
                 required
               >
                 <option value="Dog">Dog</option>
@@ -43,7 +43,7 @@
               <input
                 v-model="petData.breed"
                 type="text"
-                class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+                class="mt-1 block w-full rounded-2xl border border-gray-300 px-3 py-2"
                 required
               />
             </div>
@@ -55,10 +55,10 @@
                   type="number"
                   min="0"
                   step="1"
-                  class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+                  class="mt-1 block w-full rounded-2xl border border-gray-300 px-3 py-2"
                   required
                 />
-                <select v-model="petData.ageUnit" class="mt-1 block w-28 rounded-md border border-gray-300 px-3 py-2">
+                <select v-model="petData.ageUnit" class="mt-1 block w-28 rounded-2xl border border-gray-300 px-3 py-2">
                   <option value="years">Years</option>
                   <option value="months">Months</option>
                 </select>
@@ -68,7 +68,7 @@
               <label class="block text-sm font-medium text-gray-700">Sex</label>
               <select
                 v-model="petData.sex"
-                class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+                class="mt-1 block w-full rounded-2xl border border-gray-300 px-3 py-2"
                 required
               >
                 <option value="Male">Male</option>
@@ -79,7 +79,7 @@
               <label class="block text-sm font-medium text-gray-700">Size</label>
               <select
                 v-model="petData.size"
-                class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+                class="mt-1 block w-full rounded-2xl border border-gray-300 px-3 py-2"
                 required
               >
                 <option value="Small">Small</option>
@@ -91,7 +91,7 @@
               <label class="block text-sm font-medium text-gray-700">Status</label>
               <select
                 v-model="petData.status"
-                class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+                class="mt-1 block w-full rounded-2xl border border-gray-300 px-3 py-2"
                 required
               >
                 <option value="AVAILABLE">Available</option>
@@ -107,9 +107,9 @@
                   type="number"
                   min="0"
                   step="1"
-                  class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+                  class="mt-1 block w-full rounded-2xl border border-gray-300 px-3 py-2"
                 />
-                <select v-model="petData.shelterTimeUnit" class="mt-1 block w-28 rounded-md border border-gray-300 px-3 py-2">
+                <select v-model="petData.shelterTimeUnit" class="mt-1 block w-28 rounded-2xl border border-gray-300 px-3 py-2">
                   <option value="years">Years</option>
                   <option value="months">Months</option>
                 </select>
@@ -126,7 +126,7 @@
               <label class="block text-sm font-medium text-gray-700">Health Status</label>
               <select
                 v-model="petData.healthStatus"
-                class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+                class="mt-1 block w-full rounded-2xl border border-gray-300 px-3 py-2"
                 required
               >
                 <option value="Healthy">Healthy</option>
@@ -165,7 +165,7 @@
         <!-- Photo Upload -->
         <div class="space-y-4">
           <h3 class="text-lg font-semibold">Photos</h3>
-          <div class="border-2 border-dashed border-gray-300 rounded-lg p-6">
+          <div class="border-2 border-dashed border-gray-300 rounded-2xl p-6">
             <div class="flex items-center justify-center">
               <label class="cursor-pointer">
                 <input
@@ -180,7 +180,6 @@
                     <span class="relative cursor-pointer rounded-md font-medium text-red-600 hover:text-red-500">
                       Upload photos
                     </span>
-                    <p class="pl-1">or drag and drop</p>
                   </div>
                 </div>
               </label>
@@ -205,7 +204,7 @@
           <textarea
             v-model="petData.story"
             rows="4"
-            class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+            class="mt-1 block w-full rounded-2xl border border-gray-300 px-3 py-2"
             placeholder="Share this pet's story..."
           ></textarea>
         </div>
@@ -230,13 +229,13 @@
           <button
             type="button"
             @click="$emit('close')"
-            class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+            class="px-4 py-2 border border-gray-300 rounded-3xl text-gray-700 hover:bg-gray-50"
           >
             Cancel
           </button>
           <button
             type="submit"
-            class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+            class="px-4 py-2 bg-red-600 text-white rounded-3xl hover:bg-red-700"
           >
             {{ petToEdit ? 'Update Pet' : 'Add Pet' }}
           </button>

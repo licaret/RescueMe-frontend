@@ -52,13 +52,14 @@ const router = createRouter({
     {
       path: '/shelter-profile-completion',
       name: 'ShelterProfileCompletionPage',
-      component: ShelterProfileCompletionPage, 
+      component: ShelterProfileCompletionPage,
+      meta: { requiresAuth: true }, 
     },
     {
       path: '/home',
       name: 'HomePage',
       component: HomePage, 
-      meta: { requiresAuth: true },
+      // meta: { requiresAuth: true },
     },
     {
       path: '/favorites',
@@ -77,7 +78,7 @@ const router = createRouter({
       name: 'ShelterProfilePage',
       component: ShelterProfilePage, 
       props: true,
-      // meta: { requiresAuth: true },
+      meta: { requiresAuth: true },
     },
     {
       path: '/shelter-dashboard/',
@@ -121,17 +122,18 @@ const router = createRouter({
       path: '/admin-dashboard',
       name: 'AdminDashboardPage',
       component: AdminDashboardPage, 
-      // meta: { requiresAuth: true },
+      meta: { requiresAuth: true },
     },
     {
       path: '/welcome',
       name: 'WelcomePage',
       component: WelcomePage, 
-      // meta: { requiresAuth: true },
+      meta: { requiresAuth: true },
     },
     {
       path: '/adopt/:petId',
       name: 'AdoptionForm',
+      meta: { requiresAuth: true }, 
       component: AdoptionRequestForm,
       props: route => {
         return {
@@ -162,6 +164,7 @@ const router = createRouter({
     {
       path: '/adoption-requests',
       name: 'AdoptionRequests',
+      meta: { requiresAuth: true }, 
       component: AdoptionRequestsView,
       // Guard to ensure user is logged in
       beforeEnter: (to, from, next) => {
@@ -177,6 +180,7 @@ const router = createRouter({
     {
       path: '/adoption-requests/:id',
       name: 'AdoptionRequestDetail',
+      meta: { requiresAuth: true }, 
       component: AdoptionRequestDetail,
       // Guard to ensure user is logged in
       beforeEnter: (to, from, next) => {

@@ -10,7 +10,7 @@
             <div class="flex items-center">
               <button 
                 @click="logout" 
-                class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-2xl text-sm font-medium"
               >
                 Logout
               </button>
@@ -23,7 +23,7 @@
       <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Dashboard Stats -->
         <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-          <div class="bg-white overflow-hidden shadow rounded-lg">
+          <div class="bg-white overflow-hidden shadow rounded-2xl">
             <div class="px-4 py-5 sm:p-6">
               <dl>
                 <dt class="text-sm font-medium text-gray-500 truncate">Pending Approvals</dt>
@@ -31,7 +31,7 @@
               </dl>
             </div>
           </div>
-          <div class="bg-white overflow-hidden shadow rounded-lg">
+          <div class="bg-white overflow-hidden shadow rounded-2xl">
             <div class="px-4 py-5 sm:p-6">
               <dl>
                 <dt class="text-sm font-medium text-gray-500 truncate">Total Shelters</dt>
@@ -39,7 +39,7 @@
               </dl>
             </div>
           </div>
-          <div class="bg-white overflow-hidden shadow rounded-lg">
+          <div class="bg-white overflow-hidden shadow rounded-2xl">
             <div class="px-4 py-5 sm:p-6">
               <dl>
                 <dt class="text-sm font-medium text-gray-500 truncate">Total Users</dt>
@@ -47,7 +47,7 @@
               </dl>
             </div>
           </div>
-          <div class="bg-white overflow-hidden shadow rounded-lg">
+          <div class="bg-white overflow-hidden shadow rounded-2xl">
             <div class="px-4 py-5 sm:p-6">
               <dl>
                 <dt class="text-sm font-medium text-gray-500 truncate">Total Animals</dt>
@@ -133,7 +133,7 @@
         
 <!-- Pending Shelters Tab -->
 <div v-if="activeTab === 'pending'">
-        <div class="bg-white shadow overflow-hidden sm:rounded-md">
+        <div class="bg-white shadow overflow-hidden sm:rounded-2xl">
           <div class="px-4 py-5 border-b border-gray-200 sm:px-6 flex justify-between items-center">
             <div>
               <h3 class="text-lg leading-6 font-medium text-gray-900">
@@ -301,7 +301,7 @@
         
         <!-- Approved Shelters Tab -->
         <div v-if="activeTab === 'approved'">
-          <div class="bg-white shadow overflow-hidden sm:rounded-md">
+          <div class="bg-white shadow overflow-hidden sm:rounded-2xl">
             <div class="px-4 py-5 border-b border-gray-200 sm:px-6 flex justify-between items-center">
               <div>
                 <h3 class="text-lg leading-6 font-medium text-gray-900">
@@ -316,7 +316,7 @@
                   v-model="searchQuery" 
                   type="text" 
                   placeholder="Search shelters..." 
-                  class="block w-64 pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                  class="block w-64 pl-10 pr-3 py-2 border border-gray-300 rounded-2xl leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-red-500 focus:border-red-500 sm:text-sm"
                 >
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -460,7 +460,7 @@
         
         <!-- User Management Tab -->
         <div v-if="activeTab === 'users'">
-          <div class="bg-white shadow overflow-hidden sm:rounded-md">
+          <div class="bg-white shadow overflow-hidden sm:rounded-2xl">
             <div class="px-4 py-5 border-b border-gray-200 sm:px-6">
               <h3 class="text-lg leading-6 font-medium text-gray-900">
                 User Management
@@ -476,7 +476,7 @@
                   v-model="userSearchQuery" 
                   type="text" 
                   placeholder="Search users..." 
-                  class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                  class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-2xl leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-red-500 focus:border-red-500 sm:text-sm"
                 >
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -655,7 +655,7 @@
       
       <!-- Reports Tab -->
       <div v-if="activeTab === 'reports'">
-        <div class="bg-white shadow overflow-hidden sm:rounded-md">
+        <div class="bg-white shadow overflow-hidden sm:rounded-2xl">
           <div class="px-4 py-5 border-b border-gray-200 sm:px-6">
             <h3 class="text-lg leading-6 font-medium text-gray-900">
               Reports and Analytics
@@ -690,7 +690,7 @@
             <div class="flex items-end">
               <button 
                 @click="generateReport" 
-                class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
+                class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-2xl text-white bg-red-600 hover:bg-red-700"
               >
                 Generate Report
               </button>

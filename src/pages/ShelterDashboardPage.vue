@@ -197,7 +197,7 @@
         <div v-if="route.path === '/shelter-dashboard/'">
           <!-- Dashboard Summary Cards -->
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-            <div class="bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow">
+            <div class="bg-white rounded-2xl shadow p-4 hover:shadow-md transition-shadow">
               <div class="flex items-center">
                 <div class="rounded-full p-3 bg-blue-100">
                   <svg class="w-6 h-6 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -210,7 +210,7 @@
                 </div>
               </div>
             </div>
-            <div class="bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow">
+            <div class="bg-white rounded-2xl shadow p-4 hover:shadow-md transition-shadow">
               <div class="flex items-center">
                 <div class="rounded-full p-3 bg-red-100">
                     <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -223,7 +223,7 @@
                 </div>
               </div>
             </div>
-            <div class="bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow">
+            <div class="bg-white rounded-2xl shadow p-4 hover:shadow-md transition-shadow">
               <div class="flex items-center">
                 <div class="rounded-full p-3 bg-green-100">
                   <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -236,7 +236,7 @@
                 </div>
               </div>
             </div>
-            <div class="bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow">
+            <div class="bg-white rounded-2xl shadow p-4 hover:shadow-md transition-shadow">
               <div class="flex items-center">
                 <div class="rounded-full p-3 bg-yellow-100">
                   <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -249,7 +249,7 @@
                 </div>
               </div>
             </div>
-            <div class="bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow">
+            <div class="bg-white rounded-2xl shadow p-4 hover:shadow-md transition-shadow">
               <div class="flex items-center">
                 <div class="rounded-full p-3 bg-gray-200">
                     <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -267,7 +267,7 @@
           <!-- Main Dashboard Sections -->
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Recent Activity Section -->
-            <div class="lg:col-span-2 bg-white rounded-lg shadow">
+            <div class="lg:col-span-2 bg-white rounded-2xl shadow">
               <div class="p-4 border-b">
                 <h2 class="text-lg font-semibold text-gray-800">Recent Activity</h2>
               </div>
@@ -345,7 +345,7 @@
           </div>
 
           <!-- Upcoming Events Section -->
-          <div class="bg-white rounded-lg shadow">
+          <div class="bg-white rounded-2xl shadow">
             <div class="p-4 border-b">
               <h2 class="text-lg font-semibold text-gray-800">Upcoming Events</h2>
             </div>

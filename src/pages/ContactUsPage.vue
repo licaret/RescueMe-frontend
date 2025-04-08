@@ -56,6 +56,7 @@
             </div>
           </form>
         </div>
+        
   
         <!-- Contact Details -->
         <div class="bg-white rounded-lg shadow-md p-6">
@@ -230,9 +231,10 @@
       toggleFaq(index) {
         this.faqs[index].isOpen = !this.faqs[index].isOpen
       },
-
+    },
+    computed: {
       isLoggedIn() {
-        return !!localStorage.getItem('Id'); // sau 'Token' / altceva în funcție de cum salvezi autentificarea
+        return !!localStorage.getItem('Id');
       }
     }
   }

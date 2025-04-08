@@ -20,66 +20,122 @@
       </div>
 
       <!-- Search and Filter Section -->
-      <div class="bg-white p-4 rounded-2xl border border-gray-200 shadow-xl mb-4">
+      <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-xl mb-6">
         <!-- Top Row: Search & Toggle Filters -->
-        <div class="flex flex-col md:flex-row gap-3 justify-between items-center mb-4">
+        <div class="flex flex-col md:flex-row gap-4 justify-between items-center mb-4">
           <!-- Search Bar -->
           <div class="flex-1 w-full">
             <div class="relative">
-              <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-4 top-3.5 h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
               <input
                 type="text"
                 v-model="filters.name"
-                placeholder="Search by name..."
-                class="pl-12 pr-4 py-3 w-full border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200 shadow-sm"
+                placeholder="Search pets by name..."
+                class="pl-4 pr-4 py-3 w-full border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200 shadow-sm"
               />
             </div>
           </div>
 
           <div class="flex items-center gap-3 w-full md:w-auto">
-            <!-- Sort Button/Dropdown -->
+            <!-- Sort Dropdown -->
             <div class="relative flex-1 md:flex-initial">
-              <select 
-                v-model="sortBy" 
-                class="appearance-none pl-4 pr-10 py-3 text-gray-700 bg-gray-50 border border-gray-200 rounded-xl hover:bg-gray-100 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 cursor-pointer shadow-sm w-full"
+              <button 
+                @click="toggleSortDropdown"
+                class="flex items-center justify-between w-full pl-4 pr-3 py-3 text-left text-gray-700 bg-gray-50 border border-gray-200 rounded-xl hover:bg-gray-100 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 shadow-sm"
               >
-                <option value="">Sort Pets</option>
-                <option value="name">By Name</option>
-                <option value="age">By Age</option>
-                <option value="timeSpentInShelter">By Time in Shelter</option>
-              </select>
-              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
-                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <span>{{ getSortLabel() }}</span>
+                <svg class="h-4 w-4 ml-2" :class="{'transform rotate-180': showSortDropdown}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
+              </button>
+              
+              <!-- Sort Dropdown Menu -->
+              <div 
+                v-show="showSortDropdown" 
+                class="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg py-1 max-h-60 overflow-auto"
+              >
+                <!-- Sort Options -->
+                <div
+                  v-for="option in sortOptions" 
+                  :key="option.value"
+                  @click="selectSortOption(option.value, option.order)"
+                  class="px-4 py-2 hover:bg-gray-50 cursor-pointer flex items-center justify-between"
+                  :class="{'bg-red-50': sortBy === option.value && sortOrder === option.order}"
+                >
+                  <span>{{ option.label }}</span>
+                  <svg v-if="sortBy === option.value && sortOrder === option.order" class="h-4 w-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
               </div>
             </div>
 
             <!-- Filters Toggle Button -->
             <button 
-              @click="showFilters = !showFilters"
+              @click="toggleFilters"
               class="flex items-center gap-2 px-4 py-3 text-gray-700 bg-gray-50 border border-gray-200 rounded-xl hover:bg-gray-100 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 shadow-sm flex-1 md:flex-initial justify-center"
+              :class="{'bg-red-50 border-red-200': showFilters}"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-              </svg>
-              <span class="font-medium">{{ showFilters ? "Hide Filters" : "Filters" }}</span>
-              <span v-if="isAnyFilterApplied" class="ml-1 flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full">
-                {{ Object.values(filters).filter(value => value !== '' && value !== false).length }}
+              <span class="font-medium" :class="{'text-red-600': showFilters}">{{ showFilters ? "Hide Filters" : "Filters" }}</span>
+              <span v-if="activeFilterCount > 0" class="flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full">
+                {{ activeFilterCount }}
               </span>
+            </button>
+            
+            <!-- Clear Filters Button -->
+            <button 
+              v-if="activeFilterCount > 0"
+              @click="resetFilters"
+              class="hidden md:flex items-center gap-1 px-3 py-3 text-red-600 bg-red-50 border border-red-200 rounded-xl hover:bg-red-100 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 shadow-sm flex-shrink-0"
+              title="Clear all filters"
+            >
+              Clear
             </button>
           </div>
         </div>
 
-        <!-- Filters Section -->
+        <!-- Applied Filters Pills (visible when filters are applied but filter panel is closed) -->
         <transition 
           enter-active-class="transition-all duration-300 ease-out" 
           enter-from-class="opacity-0 max-h-0" 
-          enter-to-class="opacity-100 max-h-[2000px]" 
+          enter-to-class="opacity-100 max-h-[200px]" 
           leave-active-class="transition-all duration-200 ease-in" 
-          leave-from-class="opacity-100 max-h-[2000px]" 
+          leave-from-class="opacity-100 max-h-[200px]" 
+          leave-to-class="opacity-0 max-h-0"
+        >
+          <div v-if="!showFilters && activeFilterCount > 0" class="mb-4 overflow-hidden">
+            <div class="flex flex-wrap gap-2 items-center">
+              <span class="text-sm text-gray-500">Applied filters:</span>
+              <div 
+                v-for="(value, key) in getActiveFilters()" 
+                :key="key" 
+                class="bg-red-50 border border-red-100 rounded-full px-3 py-1 text-sm text-red-700 flex items-center"
+              >
+                <span>{{ formatFilterName(key) }}: {{ formatFilterValue(value) }}</span>
+                <button 
+                  @click="clearSingleFilter(key)" 
+                  class="ml-1.5 p-0.5 hover:bg-red-200 rounded-full transition-colors"
+                  title="Remove filter"
+                >
+                  ×
+                </button>
+              </div>
+              <button 
+                @click="resetFilters" 
+                class="text-xs text-red-600 hover:text-red-800 underline ml-1"
+              >
+                Clear all
+              </button>
+            </div>
+          </div>
+        </transition>
+
+        <!-- Expanded Filters Section -->
+        <transition 
+          enter-active-class="transition-all duration-300 ease-out" 
+          enter-from-class="opacity-0 max-h-0" 
+          enter-to-class="opacity-100 max-h-[800px]" 
+          leave-active-class="transition-all duration-200 ease-in" 
+          leave-from-class="opacity-100 max-h-[800px]" 
           leave-to-class="opacity-0 max-h-0"
         >
           <div v-if="showFilters" class="overflow-hidden">
@@ -89,88 +145,153 @@
                 <!-- Filter Fields - Species -->
                 <div class="space-y-1">
                   <label class="text-xs font-medium text-gray-500 ml-1">Species</label>
-                  <select v-model="filters.species" class="custom-filter-input">
-                    <option value="">All Species</option>
-                    <option value="Dog">Dog</option>
-                    <option value="Cat">Cat</option>
-                  </select>
+                  <div class="relative">
+                    <select 
+                      v-model="filters.species" 
+                      class="custom-filter-input appearance-none"
+                    >
+                      <option value="">All Species</option>
+                      <option value="Dog">Dog</option>
+                      <option value="Cat">Cat</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </div>
                 </div>
 
-                <!-- Breed Dropdown with Tooltip on Hover -->
+                <!-- Breed Dropdown with Tooltip -->
                 <div class="space-y-1">
                   <label class="text-xs font-medium text-gray-500 ml-1">Breed</label>
                   <div class="relative group">
                     <select 
                       v-model="filters.breed" 
-                      class="custom-filter-input w-full"
-                      :class="{'cursor-not-allowed bg-gray-100 text-gray-400': !filters.species}"
+                      class="custom-filter-input w-full transition-all duration-300"
+                      :class="{
+                        'cursor-not-allowed bg-gray-100 text-gray-400': !filters.species,
+                        'border-red-200 focus:ring-red-500': filters.species && breedOptions.length > 0
+                      }"
                       :disabled="!filters.species"
                     >
-                      <option value="" disabled>All Breeds</option>
+                      <option value="">All Breeds</option>
                       <option v-for="breed in breedOptions" :key="breed" :value="breed">
                         {{ breed }}
                       </option>
                     </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
 
-                    <!-- Tooltip message on hover -->
+                    <!-- Tooltip message -->
                     <div 
                       v-if="!filters.species" 
-                      class="absolute left-0 -bottom-10 bg-gray-800 text-white px-4 py-2 rounded-lg text-sm z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-lg"
+                      class="absolute left-0 -bottom-12 bg-gray-800 text-white px-4 py-2.5 rounded-lg text-sm z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-lg w-52 pointer-events-none"
                     >
-                      Please select a species first
+                      <span>Please select a species first</span>
                       <div class="absolute -top-2 left-4 w-0 h-0 border-l-8 border-r-8 border-b-8 border-transparent border-b-gray-800"></div>
                     </div>
                   </div>
                 </div>
 
-                <!-- Sex -->
+                <!-- Gender/Sex -->
                 <div class="space-y-1">
                   <label class="text-xs font-medium text-gray-500 ml-1">Gender</label>
-                  <select v-model="filters.sex" class="custom-filter-input">
-                    <option value="">All Genders</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                  </select>
+                  <div class="relative">
+                    <select v-model="filters.sex" class="custom-filter-input appearance-none">
+                      <option value="">All Genders</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </div>
                 </div>
 
                 <!-- Size -->
                 <div class="space-y-1">
                   <label class="text-xs font-medium text-gray-500 ml-1">Size</label>
-                  <select v-model="filters.size" class="custom-filter-input">
-                    <option value="">All Sizes</option>
-                    <option value="Small">Small</option>
-                    <option value="Medium">Medium</option>
-                    <option value="Large">Large</option>
-                  </select>
+                  <div class="relative">
+                    <select v-model="filters.size" class="custom-filter-input appearance-none">
+                      <option value="">All Sizes</option>
+                      <option value="Small">Small</option>
+                      <option value="Medium">Medium</option>
+                      <option value="Large">Large</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </div>
                 </div>
 
                 <!-- Health Status -->
                 <div class="space-y-1">
                   <label class="text-xs font-medium text-gray-500 ml-1">Health Status</label>
-                  <select v-model="filters.healthStatus" class="custom-filter-input">
-                    <option value="">All Health Statuses</option>
-                    <option value="Healthy">Healthy</option>
-                    <option value="Minor Issues">Minor Issues</option>
-                    <option value="Needs Medical Attention">Needs Medical Attention</option>
-                    <option value="Recovered">Recovered</option>
-                    <option value="Under Treatment">Under Treatment</option>
-                    <option value="Critical Condition">Critical Condition</option>
-                    <option value="Needs Surgery">Needs Surgery</option>
-                    <option value="Disabled">Disabled</option>
-                    <option value="Senior Care">Senior Care</option>
-                    <option value="Special Needs">Special Needs</option>
-                  </select>
+                  <div class="relative">
+                    <select v-model="filters.healthStatus" class="custom-filter-input appearance-none">
+                      <option value="">All Health Statuses</option>
+                      <option value="Healthy">Healthy</option>
+                      <option value="Minor Issues">Minor Issues</option>
+                      <option value="Needs Medical Attention">Needs Medical Attention</option>
+                      <option value="Recovered">Recovered</option>
+                      <option value="Under Treatment">Under Treatment</option>
+                      <option value="Critical Condition">Critical Condition</option>
+                      <option value="Needs Surgery">Needs Surgery</option>
+                      <option value="Disabled">Disabled</option>
+                      <option value="Senior Care">Senior Care</option>
+                      <option value="Special Needs">Special Needs</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </div>
                 </div>
 
                 <!-- Availability Status -->
                 <div class="space-y-1">
                   <label class="text-xs font-medium text-gray-500 ml-1">Availability</label>
-                  <select v-model="filters.status" class="custom-filter-input">
-                    <option value="">All Availabilities</option>
-                    <option value="AVAILABLE">Available</option>
-                    <option value="PENDING">Pending</option>
-                    <option value="ADOPTED">Adopted</option>
-                  </select>
+                  <div class="relative">
+                    <select v-model="filters.status" class="custom-filter-input appearance-none">
+                      <option value="">All Availabilities</option>
+                      <option value="AVAILABLE">Available</option>
+                      <option value="PENDING">Pending</option>
+                      <option value="ADOPTED">Adopted</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Age Range (new filter) -->
+                <div class="space-y-1">
+                  <label class="text-xs font-medium text-gray-500 ml-1">Age (Years)</label>
+                  <div class="relative">
+                    <select v-model="filters.ageRange" class="custom-filter-input appearance-none">
+                      <option value="">Any Age</option>
+                      <option value="0-1">Less than 1 year</option>
+                      <option value="1-3">1-3 years</option>
+                      <option value="3-7">3-7 years</option>
+                      <option value="7+">7+ years</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </div>
                 </div>
 
                 <!-- Boolean Filters -->
@@ -215,13 +336,10 @@
                 <!-- Clear Filters Button -->
                 <div class="flex items-center mt-auto">
                   <button 
-                    v-if="isAnyFilterApplied"
+                    v-if="activeFilterCount > 0"
                     @click="resetFilters"
                     class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded-lg transition-all duration-200 shadow-sm"
                   >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
                     Clear All Filters
                   </button>
                 </div>
@@ -353,7 +471,7 @@
       </div>
       
       <!-- No Pets at All -->
-      <div v-if="pets.length === 0" class="w-full py-16 text-center">
+      <div v-if="pets.length === 0 && !isAnyFilterApplied" class="w-full py-16 text-center">
         <!-- Text content -->
         <h2 class="text-2xl font-bold text-gray-800 mb-3">Add your first pet</h2>
         <p class="text-gray-600 mb-6 max-w-md mx-auto">
@@ -400,6 +518,7 @@ export default {
     AddEditPetForm
   },
 
+
   setup() {
     const pets = ref([]);
     const searchQuery = ref("");
@@ -417,7 +536,6 @@ export default {
       species: "",
       breed: "",
       sex: "",
-      age: "",
       size: "",
       healthStatus: "",
       vaccinated: "",
@@ -425,6 +543,7 @@ export default {
       urgentAdoptionNeeded: "",
       timeSpentInShelter: "",
       status: "", // AVAILABLE, PENDING, ADOPTED
+      ageRange: "" // Added new filter for age ranges
     });
 
     const resetFilters = () => {
@@ -441,49 +560,91 @@ export default {
         urgentAdoptionNeeded: "",
         timeSpentInShelter: "",
         status: "",
+        ageRange: ""
       };
       currentPage.value = 1; // reset to first page when filters change
     };
 
     const sortBy = ref(""); 
     const sortOrder = ref("asc"); 
+    const showSortDropdown = ref(false);
     const showFilters = ref(false);
     const breedOptions = ref([]);
     const filteredBreeds = ref([]);
     const showDropdown = ref(false);
+    const sortOptions = [
+      { label: 'Name (A-Z)', value: 'name', order: 'asc' },
+      { label: 'Name (Z-A)', value: 'name', order: 'desc' },
+      { label: 'Newest First', value: 'createdAt', order: 'desc' },
+      { label: 'Oldest First', value: 'createdAt', order: 'asc' },
+      { label: 'Age (Youngest)', value: 'age', order: 'asc' },
+      { label: 'Age (Oldest)', value: 'age', order: 'desc' },
+      { label: 'Time in Shelter (Shortest)', value: 'timeSpentInShelter', order: 'asc' },
+      { label: 'Time in Shelter (Longest)', value: 'timeSpentInShelter', order: 'desc' }
+    ];
 
+    // Toggle sort dropdown visibility
+    const toggleSortDropdown = () => {
+      showSortDropdown.value = !showSortDropdown.value;
+    };
 
+    // Select a sort option
+    const selectSortOption = (value, order) => {
+      sortBy.value = value;
+      sortOrder.value = order;
+      showSortDropdown.value = false;
+    };
 
-    const isAnyFilterApplied = computed(() => {
-      return Object.values(filters.value).some(value => 
-        value !== "" && value !== false && value !== null && value !== undefined
+    // Get the label for the currently selected sort option
+    const getSortLabel = () => {
+      const selectedOption = sortOptions.find(
+        option => option.value === sortBy.value && option.order === sortOrder.value
       );
-    });
-    
+      return selectedOption ? selectedOption.label : 'Sort Pets';
+    };
 
-    function getActiveFilters() {
+    // Toggle filters panel visibility
+    const toggleFilters = () => {
+      showFilters.value = !showFilters.value;
+      // Close the sort dropdown when toggling filters
+      showSortDropdown.value = false;
+    };
+
+    // Clear a single filter
+    const clearSingleFilter = (key) => {
+      if (typeof filters.value[key] === 'boolean') {
+        filters.value[key] = false;
+      } else {
+        filters.value[key] = '';
+      }
+    };
+
+    // Get active filters as an object
+    const getActiveFilters = () => {
       const active = {};
-      for (const [key, value] of Object.entries(this.filters)) {
+      for (const [key, value] of Object.entries(filters.value)) {
         if (value !== "" && value !== false && value !== null && value !== undefined) {
           active[key] = value;
         }
       }
       return active;
-    }
+    };
 
-
-    function formatFilterName(key) {
+    // Format filter names for display
+    const formatFilterName = (key) => {
       // Convert camelCase to Title Case with spaces
       const formatted = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
       
       // Special cases
       switch (key) {
         case 'urgentAdoptionNeeded': return 'Urgent Adoption';
+        case 'ageRange': return 'Age Range';
         default: return formatted;
       }
-    }
+    };
 
-    function formatFilterValue(value) {
+    // Format filter values for display
+    const formatFilterValue = (value) => {
       if (typeof value === 'boolean') {
         return value ? 'Yes' : 'No';
       }
@@ -493,8 +654,81 @@ export default {
       if (value === 'PENDING') return 'Pending';
       if (value === 'ADOPTED') return 'Adopted';
       
+      // For age range values
+      if (value === '0-1') return 'Less than 1 year';
+      if (value === '1-3') return '1-3 years';
+      if (value === '3-7') return '3-7 years';
+      if (value === '7+') return '7+ years';
+      
       return value;
-    }
+    };
+
+    // Apply age range filter to a pet
+    const applyAgeRangeFilter = (pet) => {
+      if (!filters.value.ageRange) return true;
+      
+      const petAge = pet.age;
+      
+      switch(filters.value.ageRange) {
+        case '0-1':
+          return petAge < 1;
+        case '1-3':
+          return petAge >= 1 && petAge < 3;
+        case '3-7':
+          return petAge >= 3 && petAge < 7;
+        case '7+':
+          return petAge >= 7;
+        default:
+          return true;
+      }
+    };
+
+    const activeFilterCount = computed(() => {
+      return Object.values(filters.value).filter(value => 
+        value !== "" && value !== false && value !== null && value !== undefined
+      ).length;
+    });
+
+    // Computed value for checking if any filter is applied
+    const isAnyFilterApplied = computed(() => {
+      return activeFilterCount.value > 0;
+    });
+    
+
+    // function getActiveFilters() {
+    //   const active = {};
+    //   for (const [key, value] of Object.entries(this.filters)) {
+    //     if (value !== "" && value !== false && value !== null && value !== undefined) {
+    //       active[key] = value;
+    //     }
+    //   }
+    //   return active;
+    // }
+
+
+    // function formatFilterName(key) {
+    //   // Convert camelCase to Title Case with spaces
+    //   const formatted = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+      
+    //   // Special cases
+    //   switch (key) {
+    //     case 'urgentAdoptionNeeded': return 'Urgent Adoption';
+    //     default: return formatted;
+    //   }
+    // }
+
+    // function formatFilterValue(value) {
+    //   if (typeof value === 'boolean') {
+    //     return value ? 'Yes' : 'No';
+    //   }
+      
+    //   // For status values
+    //   if (value === 'AVAILABLE') return 'Available';
+    //   if (value === 'PENDING') return 'Pending';
+    //   if (value === 'ADOPTED') return 'Adopted';
+      
+    //   return value;
+    // }
 
 
     const loadPets = async () => {
@@ -566,7 +800,11 @@ export default {
 
       return pets.value
         .filter(pet => {
-          return Object.keys(filters.value).every(key => {
+          // Apply all standard filters
+          const standardFiltersPass = Object.keys(filters.value).every(key => {
+            // Skip ageRange as we'll handle it separately
+            if (key === 'ageRange') return true;
+            
             if (!filters.value[key]) return true; 
 
             if (key === "age") {
@@ -604,13 +842,30 @@ export default {
               return parseInt(filters.value[key]) === pet[key];
             }
 
+            // Name search should be case-insensitive and partial match
+            if (key === "name" && pet[key]) {
+              return pet[key].toLowerCase().includes(filters.value[key].toLowerCase());
+            }
+
             return pet[key]?.toString().toLowerCase().includes(filters.value[key].toString().toLowerCase());
           });
+          
+          // Now apply the age range filter separately
+          const ageRangeFilterPasses = applyAgeRangeFilter(pet);
+          
+          return standardFiltersPass && ageRangeFilterPasses;
         })
         .sort((a, b) => {
           if (!sortBy.value) return 0;
 
           let modifier = sortOrder.value === "asc" ? 1 : -1;
+
+          if (sortBy.value === "createdAt") {
+            // Convert date strings to Date objects for comparison
+            const dateA = new Date(a.createdAt);
+            const dateB = new Date(b.createdAt);
+            return (dateA - dateB) * modifier;
+          }
 
           if (typeof a[sortBy.value] === "string") {
             return a[sortBy.value].localeCompare(b[sortBy.value]) * modifier;
@@ -627,6 +882,7 @@ export default {
           return 0;
         });
     });
+
 
 
 
@@ -757,7 +1013,6 @@ export default {
     onMounted(loadPets);
     
     return { 
-      searchQuery, 
       pets, 
       filteredPets,
       showAddEditPetForm, 
@@ -772,17 +1027,23 @@ export default {
       resetFilters, 
       isAnyFilterApplied,
       breedOptions, 
-      filteredBreeds, 
-      showDropdown, 
-      showBreedMessage,
       currentPage,
       totalPages,
       paginatedPets,
       goToPage,
       displayedPages,
+      activeFilterCount,
       getActiveFilters,
       formatFilterName,
-      formatFilterValue
+      formatFilterValue,
+      clearSingleFilter,
+      showSortDropdown,
+      sortOptions,
+      toggleSortDropdown,
+      selectSortOption,
+      getSortLabel,
+      toggleFilters,
+      applyAgeRangeFilter
     };
     },
   };

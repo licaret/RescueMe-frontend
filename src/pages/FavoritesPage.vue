@@ -307,7 +307,7 @@
                   >
                   <label for="vaccinated" class="ml-2 text-gray-700 font-medium">Only Vaccinated</label>
                 </div>
-  
+
                 <!-- Neutered -->
                 <div class="flex items-center">
                   <input 
@@ -318,7 +318,7 @@
                   >
                   <label for="neutered" class="ml-2 text-gray-700 font-medium">Only Neutered</label>
                 </div>
-  
+
                 <!-- Urgent Adoption Needed -->
                 <div class="flex items-center">
                   <input 
@@ -330,13 +330,13 @@
                   <label for="urgentAdoptionNeeded" class="ml-2 text-red-600 font-medium">Urgent Adoption Needed</label>
                 </div>
               </div>
-  
+
               <!-- Clear Filters Button --> 
               <div class="flex items-center md:justify-end lg:col-span-2 pt-2">
                 <button 
                   v-if="isAnyFilterApplied"
                   @click="resetFilters"
-                  class="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5"
+                  class="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded-2xl transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5"
                 >
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -507,12 +507,35 @@
           </div>
         </div>
       </div>
-  
-      <!--  No Favorites State -->
-      <div v-if="!loading && sheltersWithFavorites.length === 0" class="text-center py-20 max-w-xl mx-auto">
-        <div class="bg-white p-8 rounded-2xl shadow-lg border border-gray-100">
+      
+
+      <!-- No Matching Favorites (when filters are applied) -->
+      <div v-if="!loading && sheltersWithFavorites.length === 0 && isAnyFilterApplied " class="text-center py-20 max-w-xl mx-auto">
+        <div class="rounded-2xl">
           <div class="flex justify-center mb-6">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 text-red-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 text-red-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h2 class="text-2xl font-bold text-gray-800 mb-3">No favorites match your filters</h2>
+          <p class="text-gray-600 mb-8">None of your favorite pets match the current search criteria. Try adjusting your filters to see your saved pets.</p>
+          <button 
+            @click="resetFilters" 
+            class="primary-button px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-2xl transition-all duration-300 flex items-center gap-2 mx-auto shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            Clear All Filters
+          </button>
+        </div>
+      </div>
+
+      <!--  No Favorites State -->
+      <div v-if="!loading && sheltersWithFavorites.length === 0 && !isAnyFilterApplied" class="text-center py-20 max-w-xl mx-auto">
+        <div class="rounded-2xl">
+          <div class="flex justify-center mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 text-red-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
             </svg>
           </div>
@@ -520,7 +543,7 @@
           <p class="text-gray-600 mb-8">You haven't saved any pets to your favorites yet. Browse available pets and click the heart icon to save them here.</p>
           <router-link 
             to="/available-pets" 
-            class="primary-button px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-all duration-300 flex items-center gap-2 mx-auto shadow-md hover:shadow-lg transform hover:-translate-y-0.5 inline-flex"
+            class="primary-button px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-2xl transition-all duration-300 flex items-center gap-2 mx-auto shadow-md hover:shadow-lg transform hover:-translate-y-0.5 inline-flex"
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />

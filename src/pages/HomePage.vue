@@ -1,5 +1,6 @@
 <template>
-  <Navbar></Navbar>
+  <Navbar v-if="isLoggedIn" />
+  <IntroNavbar v-else />
   <!-- Hero Section -->
   <section class="relative min-h-screen bg-gradient-to-b from-white via-white to-black">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row items-center justify-between py-12 sm:py-16 lg:py-0">
@@ -57,9 +58,12 @@
           Every animal deserves love, respect, and a permanent home.
         </p>
         <div class="flex justify-center">
-          <router-link to="/available-pets" class="px-8 py-3 bg-red-600 text-white font-semibold rounded-full hover:bg-red-700 transition-colors duration-300 shadow-lg">
+          <button 
+            @click="handleAdoptNow"
+            class="px-8 py-3 bg-red-600 text-white font-semibold rounded-full hover:bg-red-700 transition-colors duration-300 shadow-lg"
+          >
             Adopt Now
-          </router-link>
+          </button>
         </div>
       </div>
     </div>
@@ -80,9 +84,12 @@
       </div>
 
       <div class="mt-12 text-center">
-        <router-link to="/available-pets" class="inline-block px-8 py-3 bg-transparent border-2 border-red-600 text-red-600 font-semibold rounded-full hover:bg-red-600 hover:text-white transition-colors duration-300 shadow-md">
+        <button
+          @click="handleSeeAllAnimals"
+          class="inline-block px-8 py-3 bg-transparent border-2 border-red-600 text-red-600 font-semibold rounded-full hover:bg-red-600 hover:text-white transition-colors duration-300 shadow-md"
+        >
           See All Animals
-        </router-link>
+        </button>
       </div>
     </div>
   </section>
@@ -310,9 +317,12 @@
       </div>
       
       <div class="mt-12 text-center">
-        <router-link to="/events" class="inline-block px-8 py-3 bg-transparent border-2 border-red-600 text-red-600 font-semibold rounded-full hover:bg-red-600 hover:text-white transition-colors duration-300 shadow-md">
+        <button
+          @click="handleViewEvents"
+          class="inline-block px-8 py-3 bg-transparent border-2 border-red-600 text-red-600 font-semibold rounded-full hover:bg-red-600 hover:text-white transition-colors duration-300 shadow-md"
+        > 
           View all events
-        </router-link>
+        </button>
       </div>
     </div>
   </section>
@@ -327,9 +337,12 @@
           </svg>
           <p class="font-bold">Emergency: We urgently need foster homes for 5 puppies rescued yesterday!</p>
         </div>
-        <router-link to="/emergency-foster" class="px-4 py-2 bg-white text-red-600 font-semibold rounded-full hover:bg-gray-100 transition-colors duration-300">
+        <button
+          @click="handleEmergencyFoster"
+          class="px-4 py-2 bg-white text-red-600 font-semibold rounded-full hover:bg-gray-100 transition-colors duration-300"
+        >
           Learn More
-        </router-link>
+        </button>
       </div>
     </div>
   </section>
@@ -370,6 +383,7 @@
 
 <script>
 import Navbar from "@/components/Navbar.vue";
+import IntroNavbar from "@/components/IntroNavbar.vue";
 import Footer from "@/components/Footer.vue";
 import PetCard from "@/components/PetCard.vue";
 
@@ -379,7 +393,8 @@ export default {
   components: {
     Navbar,
     Footer,
-    PetCard
+    PetCard,
+    IntroNavbar
   },
 
   data() {
@@ -398,8 +413,29 @@ export default {
   beforeUnmount() {
     clearInterval(this.intervalId);
   },
+  computed: {
+    isLoggedIn() {
+      return !!localStorage.getItem('Id');
+    }
+  },
 
   methods: {
+    handleAdoptNow() {
+    this.$router.push(this.isLoggedIn ? '/available-pets' : '/login');
+    },
+    handleSeeAllAnimals() {
+      this.$router.push(this.isLoggedIn ? '/available-pets' : '/login');
+    },
+    handleViewEvents() {
+      this.$router.push(this.isLoggedIn ? '/events' : '/login');
+    },
+    handleEmergencyFoster() {
+      this.$router.push(this.isLoggedIn ? '/emergency-foster' : '/login');
+    },
+    subscribeNewsletter() {
+      alert('Thank you for subscribing!');
+      this.email = '';
+    },
     subscribeNewsletter() {
       alert('Thank you for subscribing!');
       this.email = '';

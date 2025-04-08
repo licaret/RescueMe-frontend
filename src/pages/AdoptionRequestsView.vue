@@ -11,7 +11,7 @@
       </p>
     </div>
 
-    <div class="rounded-2xl bg-blue-50 border border-blue-200 text-blue-700 text-sm p-4 mb-6 text-center">
+    <div class="rounded-2xl bg-pink-50 border border-pink-200 text-pink-600 text-sm p-4 mb-6 text-center">
       If you encounter any issues with your requests, please contact the shelter directly or email us at <span class="underline">rescueme.care@gmail.com</span>.
     </div>
 
@@ -80,7 +80,7 @@
       <p class="text-gray-600 mb-8 max-w-md mx-auto">You haven't submitted any adoption requests yet. Start your journey to find a furry friend!</p>
       <router-link 
         to="/available-pets" 
-        class="px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors inline-flex items-center space-x-2 shadow-md hover:shadow-lg"
+        class="px-6 py-3 bg-pink-200 text-red-600 font-medium rounded-3xl hover:bg-pink-300 transition-colors inline-flex items-center space-x-2 shadow-md hover:shadow-lg"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
