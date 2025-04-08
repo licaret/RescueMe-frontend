@@ -137,19 +137,11 @@
               <span>Contact Us</span>
             </a>
           </li>
-          <!-- <li>
-            <a @click="navigateTo('/help')" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-red-600 rounded cursor-pointer">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>Help & Support</span>
-            </a>
-          </li> -->
         </ul>
         
         <!-- Logout section -->
         <div class="mt-8 pt-4 border-t border-gray-100">
-          <a @click="logout" class="flex items-center px-4 py-2 text-red-600 hover:bg-red-50 hover:text-red-700 rounded cursor-pointer">
+          <a @click="showLogoutConfirmation" class="flex items-center px-4 py-2 text-red-600 hover:bg-red-50 hover:text-red-700 rounded cursor-pointer">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
             </svg>
@@ -158,6 +150,47 @@
         </div>
       </nav>
     </div>
+
+    <!-- Logout Confirmation Modal -->
+    <div v-if="logoutConfirmationVisible" class="fixed inset-0 flex items-center justify-center z-50">
+      <!-- Modal backdrop with blur effect -->
+      <div class="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm" @click="hideLogoutConfirmation"></div>
+      
+      <!-- Modal content -->
+      <div class="bg-white rounded-2xl shadow-2xl w-96 p-8 z-10 relative transform transition-all duration-300 ease-in-out scale-100">
+        <button @click="hideLogoutConfirmation" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        
+        <div class="text-center mb-6">
+          <div class="mx-auto h-16 w-16 flex items-center justify-center rounded-full bg-red-50 mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900">Are you sure you want to logout?</h3>
+          <p class="text-gray-500 mt-3">You will be redirected to the login page.</p>
+        </div>
+        
+        <div class="flex justify-center space-x-4 mt-8">
+          <button 
+            @click="hideLogoutConfirmation"
+            class="px-5 py-2.5 bg-gray-100 text-gray-700 rounded-3xl font-medium hover:bg-gray-200 transition-colors duration-200 border border-gray-200 shadow-sm"
+          >
+            Cancel
+          </button>
+          <button 
+            @click="confirmLogout"
+            class="px-5 py-2.5 bg-red-600 text-white rounded-3xl font-medium hover:bg-red-700 transition-colors duration-200 shadow-sm"
+          >
+            Logout
+          </button>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -179,6 +212,7 @@ export default {
     const userProfilePicture = ref(null);
     const username = ref('');
     const userRole = ref('');
+    const logoutConfirmationVisible = ref(false);
 
     onMounted(() => {
       username.value = localStorage.getItem('Username') || 'Guest';
@@ -192,7 +226,7 @@ export default {
 
     const fetchProfilePicture = async (userId) => {
       try {
-        const response = await fetch(`/users/${userId}/profilePicture`);
+        const response = await fetch(`http://localhost:8080/users/${userId}/profilePicture`);
         if (response.ok) {
           const blob = await response.blob();
           userProfilePicture.value = URL.createObjectURL(blob);
@@ -211,7 +245,15 @@ export default {
       emit('close');
     };
 
-    const logout = () => {
+    const showLogoutConfirmation = () => {
+      logoutConfirmationVisible.value = true;
+    };
+
+    const hideLogoutConfirmation = () => {
+      logoutConfirmationVisible.value = false;
+    };
+
+    const confirmLogout = () => {
       localStorage.removeItem('token');
       localStorage.removeItem('Role');
       localStorage.removeItem('Username');
@@ -219,15 +261,19 @@ export default {
       
       router.push('/login');
       emit('close');
+      hideLogoutConfirmation();
     };
 
     return {
       userProfilePicture,
       username,
       userRole,
+      logoutConfirmationVisible,
       navigateTo,
       close,
-      logout
+      showLogoutConfirmation,
+      hideLogoutConfirmation,
+      confirmLogout
     };
   }
 };

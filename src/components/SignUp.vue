@@ -576,6 +576,10 @@ export default {
       this.validatePassword(this.formData.password);
       this.validatePhoneNumber();
 
+      if (!this.formData.phoneNumber.startsWith("+40")) {
+        this.formData.phoneNumber = `+40${this.formData.phoneNumber.replace(/^0+/, '')}`;
+      }
+
       if (this.usernameError || this.wrongFormatedEmail || this.passwordError || this.phoneNumberError) {
         this.isLoading = false;
         return;

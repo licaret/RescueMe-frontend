@@ -20,7 +20,7 @@
       <div class="flex space-x-4 w-full sm:w-auto">
         <select 
           v-model="statusFilter" 
-          class="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300"
+          class="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300"
         >
           <option value="">All Statuses</option>
           <option value="PENDING">Pending</option>
@@ -31,7 +31,7 @@
 
         <select 
           v-model="sortBy" 
-          class="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300"
+          class="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-300"
         >
           <option value="newest">Newest First</option>
           <option value="oldest">Oldest First</option>

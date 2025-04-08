@@ -20,6 +20,7 @@ import FavoritesPage from '@/pages/FavoritesPage.vue';
 import AdoptionRequestDetail from '@/components/AdoptionRequestDetail.vue';
 import AdoptionRequestForm from '@/components/AdoptionRequestForm.vue';
 import AdoptionRequestsView from '@/pages/AdoptionRequestsView.vue';
+import MyProfilePage from '@/pages/MyProfilePage.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -78,6 +79,12 @@ const router = createRouter({
       name: 'ShelterProfilePage',
       component: ShelterProfilePage, 
       props: true,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/profile',
+      name: 'MyProfile',
+      component: MyProfilePage, 
       meta: { requiresAuth: true },
     },
     {
