@@ -474,7 +474,7 @@
           </div>
   
           <!-- No adoptions message -->
-          <div v-if="adoptionView === 'pending' && !pendingAdoptions.length" class="text-center py-8">
+          <!-- <div v-if="adoptionView === 'pending' && !pendingAdoptions.length" class="text-center py-8">
             <div class="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
               <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -485,9 +485,9 @@
             <button class="mt-4 bg-red-600 text-white px-4 py-2 rounded font-medium" @click="goToFindPets">
               Find pets to adopt
             </button>
-          </div>
+          </div> -->
   
-          <div v-if="adoptionView === 'completed' && !completedAdoptions.length" class="text-center py-8">
+          <!-- <div v-if="adoptionView === 'completed' && !completedAdoptions.length" class="text-center py-8">
             <div class="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
               <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
@@ -498,9 +498,9 @@
             <button class="mt-4 bg-red-600 text-white px-4 py-2 rounded font-medium" @click="goToFindPets">
               Find pets to adopt
             </button>
-          </div>
+          </div> -->
   
-          <div v-if="adoptionView === 'favorites' && !favoriteAdoptions.length" class="text-center py-8">
+          <!-- <div v-if="adoptionView === 'favorites' && !favoriteAdoptions.length" class="text-center py-8">
             <div class="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
               <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -511,106 +511,129 @@
             <button class="mt-4 bg-red-600 text-white px-4 py-2 rounded font-medium" @click="goToFindPets">
               Browse available pets
             </button>
-          </div>
+          </div> -->
   
-          <!-- Pending adoptions list -->
-          <div v-if="adoptionView === 'pending' && pendingAdoptions.length" class="space-y-4">
-            <div v-for="adoption in pendingAdoptions" :key="adoption.id" class="border rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-              <div class="flex flex-col md:flex-row">
-                <div class="w-full md:w-1/4">
-                  <img :src="adoption.petImageUrl" :alt="adoption.petName" class="w-full h-48 md:h-full object-cover">
-                </div>
-                <div class="p-4 md:p-6 flex-1">
-                  <div class="flex justify-between items-start mb-2">
-                    <div>
-                      <h3 class="text-lg font-bold text-gray-900">{{ adoption.petName }}</h3>
-                      <p class="text-gray-600 text-sm">{{ adoption.petBreed }} · {{ adoption.petAge }} years old</p>
-                    </div>
-                    <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">Pending</span>
-                  </div>
-                  <p class="text-gray-500 mb-3">Application submitted: {{ formatDate(adoption.applicationDate) }}</p>
-                  <div class="flex items-center mb-4">
-                    <img :src="adoption.shelterImage" alt="Shelter logo" class="w-8 h-8 rounded-full mr-2">
-                    <div>
-                      <p class="text-sm font-medium">{{ adoption.shelterName }}</p>
-                      <p class="text-xs text-gray-500">{{ adoption.shelterLocation }}</p>
-                    </div>
-                  </div>
-                  <div class="flex flex-wrap gap-2">
-                    <button class="text-red-600 border border-red-600 bg-white px-3 py-1 rounded-2xl text-sm hover:bg-red-50">
-                      View application
-                    </button>
-                    <button class="text-red-600 border border-red-600 bg-white px-3 py-1 rounded-2xl text-sm hover:bg-red-50">
-                      Cancel application
-                    </button>
-                  </div>
-                </div>
-              </div>
+        <!-- Pending adoptions list -->
+        <div v-if="adoptionView === 'pending'" class="space-y-4">
+        <div v-if="pendingAdoptions.length === 0" class="text-center py-8">
+            <div class="mx-auto w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mb-4">
+            <svg class="w-8 h-8 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
             </div>
-          </div>
-  
-          <!-- Completed adoptions list -->
-          <div v-if="adoptionView === 'completed' && completedAdoptions.length" class="space-y-4">
-            <div v-for="adoption in completedAdoptions" :key="adoption.id" class="border rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-              <div class="flex flex-col md:flex-row">
-                <div class="w-full md:w-1/4">
-                  <img :src="adoption.petImageUrl" :alt="adoption.petName" class="w-full h-48 md:h-full object-cover">
-                </div>
-                <div class="p-4 md:p-6 flex-1">
-                  <div class="flex justify-between items-start mb-2">
-                    <div>
-                      <h3 class="text-lg font-bold text-gray-900">{{ adoption.petName }}</h3>
-                      <p class="text-gray-600 text-sm">{{ adoption.petBreed }} · Adopted on {{ formatDate(adoption.adoptionDate) }}</p>
-                    </div>
-                    <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Adopted</span>
-                  </div>
-                  <p class="text-gray-700 mb-4">{{ adoption.petName }} has been part of your family for {{ daysSinceAdoption(adoption.adoptionDate) }} days!</p>
-                  <div class="flex items-center mb-4">
-                    <img :src="adoption.shelterImage" alt="Shelter logo" class="w-8 h-8 rounded-full mr-2">
-                    <div>
-                      <p class="text-sm font-medium">{{ adoption.shelterName }}</p>
-                      <p class="text-xs text-gray-500">{{ adoption.shelterLocation }}</p>
-                    </div>
-                  </div>
-                  <div class="flex flex-wrap gap-2">
-                    <button class="text-red-600 border border-red-600 bg-white px-3 py-1 rounded-2xl text-sm hover:bg-red-50">
-                      View adoption details
-                    </button>
-                  </div>
-                </div>
-              </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-1">No pending adoptions</h3>
+            <p class="text-gray-500">You don't have any adoption applications in progress.</p>
+            <button class="mt-4 bg-red-600 text-white px-4 py-2 rounded font-medium" @click="goToFindPets">
+            Find pets to adopt
+            </button>
+        </div>
+
+        <div v-for="adoption in pendingAdoptions" :key="adoption.id" class="border rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+            <div class="flex flex-col md:flex-row">
+            <div class="w-full md:w-1/4">
+                <img :src="adoption.pet.imageUrl || '/placeholder-pet.jpg'" :alt="adoption.pet.name" class="w-full h-48 md:h-full object-cover">
             </div>
-          </div>
-  
-          <!-- Favorites list -->
-          <div v-if="adoptionView === 'favorites' && favoriteAdoptions.length" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div v-for="pet in favoriteAdoptions" :key="pet.id" class="border rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-              <div class="relative">
-                <img :src="pet.imageUrl" :alt="pet.name" class="w-full h-48 object-cover">
-                <button class="absolute top-2 right-2 text-red-500 bg-white rounded-full p-1 shadow-md hover:bg-red-50">
-                  <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
-                  </svg>
+            <div class="p-4 md:p-6 flex-1">
+                <div class="flex justify-between items-start mb-2">
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900">{{ adoption.pet.name }}</h3>
+                    <p class="text-gray-600 text-sm">{{ adoption.pet.breed }} · {{ adoption.pet.age }} years old</p>
+                </div>
+                <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">Pending</span>
+                </div>
+                <p class="text-gray-500 mb-3">Application submitted: {{ formatDate(adoption.applicationDate) }}</p>
+                <div class="flex items-center mb-4">
+                <img :src="adoption.shelter.imageUrl || '/placeholder-shelter.jpg'" alt="Shelter logo" class="w-8 h-8 rounded-full mr-2">
+                <div>
+                    <p class="text-sm font-medium">{{ adoption.shelter.name }}</p>
+                    <p class="text-xs text-gray-500">{{ adoption.shelter.location }}</p>
+                </div>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                <button @click="viewAdoptionDetails(adoption.id)" class="text-red-600 border border-red-600 bg-white px-3 py-1 rounded-2xl text-sm hover:bg-red-50">
+                    View application
                 </button>
-              </div>
-              <div class="p-4">
-                <h3 class="font-bold text-gray-900">{{ pet.name }}</h3>
-                <p class="text-gray-600 text-sm">{{ pet.breed }} · {{ pet.age }} years old</p>
-                <div class="flex items-center mt-2 mb-3">
-                  <img :src="pet.shelterImage" alt="Shelter logo" class="w-6 h-6 rounded-full mr-2">
-                  <p class="text-xs text-gray-500">{{ pet.shelterName }}</p>
+                <button @click="handleCancelAdoption(adoption.id)" class="text-red-600 border border-red-600 bg-white px-3 py-1 rounded-2xl text-sm hover:bg-red-50">
+                    Cancel application
+                </button>
                 </div>
-                <div class="flex justify-between">
-                  <span class="text-sm font-medium text-gray-800">
-                    {{ pet.status === 'AVAILABLE' ? 'Available for adoption' : 'Not available' }}
-                  </span>
-                  <button v-if="pet.status === 'AVAILABLE'" class="text-red-600 text-sm font-medium hover:text-red-800">
-                    Apply now
-                  </button>
-                </div>
-              </div>
             </div>
-          </div>
+            </div>
+        </div>
+        </div>
+
+        <!-- Completed adoptions list -->
+        <div v-if="adoptionView === 'completed'" class="space-y-4">
+        <div v-if="completedAdoptions.length === 0" class="text-center py-8">
+            <div class="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+            <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+            </svg>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-1">No completed adoptions</h3>
+            <p class="text-gray-500">You haven't completed any pet adoptions yet.</p>
+            <button class="mt-4 bg-red-600 text-white px-4 py-2 rounded font-medium" @click="goToFindPets">
+            Find pets to adopt
+            </button>
+        </div>
+
+        <div v-for="adoption in completedAdoptions" :key="adoption.id" class="border rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+            <div class="flex flex-col md:flex-row">
+            <div class="w-full md:w-1/4">
+                <img :src="adoption.pet.imageUrl || '/placeholder-pet.jpg'" :alt="adoption.pet.name" class="w-full h-48 md:h-full object-cover">
+            </div>
+            <div class="p-4 md:p-6 flex-1">
+                <div class="flex justify-between items-start mb-2">
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900">{{ adoption.pet.name }}</h3>
+                    <p class="text-gray-600 text-sm">{{ adoption.pet.breed }} · Adopted on {{ formatDate(adoption.adoptionDate) }}</p>
+                </div>
+                <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Adopted</span>
+                </div>
+                <p class="text-gray-700 mb-4">{{ adoption.pet.name }} has been part of your family for {{ daysSinceAdoption(adoption.adoptionDate) }} days!</p>
+                <div class="flex items-center mb-4">
+                <img :src="adoption.shelter.imageUrl || '/placeholder-shelter.jpg'" alt="Shelter logo" class="w-8 h-8 rounded-full mr-2">
+                <div>
+                    <p class="text-sm font-medium">{{ adoption.shelter.name }}</p>
+                    <p class="text-xs text-gray-500">{{ adoption.shelter.location }}</p>
+                </div>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                <button @click="viewAdoptionDetails(adoption.id)" class="text-red-600 border border-red-600 bg-white px-3 py-1 rounded-2xl text-sm hover:bg-red-50">
+                    View adoption details
+                </button>
+                </div>
+            </div>
+            </div>
+        </div>
+        </div>
+  
+        <!-- Favorites list -->
+        <div v-if="adoptionView === 'favorites'" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div v-if="favoriteAdoptions.length === 0" class="text-center py-8 col-span-2">
+                <div class="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
+                <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                </svg>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 mb-1">No favorite pets</h3>
+                <p class="text-gray-500">You haven't added any pets to your favorites list yet.</p>
+                <button class="mt-4 bg-red-600 text-white px-4 py-2 rounded font-medium" @click="goToFindPets">
+                Browse available pets
+                </button>
+            </div>
+            
+            <div v-for="pet in favoriteAdoptions" :key="pet.id" class="relative">
+                <!-- Use your PetCard component -->
+                <PetCard 
+                :pet="pet" 
+                :showFavoriteButton="true"
+                :isFavorite="true"
+                @remove-favorite="handleRemoveFavorite(pet.id)"
+                />
+            </div>
+        </div>
+
         </div>
       </div>
     </div>
@@ -618,17 +641,20 @@
   
   
   <script>
-  import { ref, reactive, computed, onMounted } from 'vue';
+  import { ref, reactive, computed, onMounted, onUnmounted } from 'vue';
   import { getUserById, updateUser, changePassword } from '@/services/user_service';
   import { fetchProfilePicture, uploadProfilePicture, deleteProfilePicture } from '@/services/user_service';
   import blankPicture from '@/assets/blank_profile_picture.jpg';
   import Navbar from '@/components/Navbar.vue';
-
+  import { getFavorites, addToFavorites, removeFromFavorites, checkIfFavorite, getFavoritesCount} from '@/services/favorite_service';
+  import { getUserAdoptionRequests, cancelAdoptionRequest, getAdoptionRequestById } from '@/services/adoption_service';
+  import PetCard from '@/components/PetCard.vue'; 
   
   export default {
     name: 'AdopterProfile',
     components: {
         Navbar,
+        PetCard,
     },
     setup() {
       // Basic state
@@ -793,6 +819,129 @@
         adoptionStats.pending = 1;
         adoptionStats.favorites = 3;
       };
+
+      const loadFavorites = async () => {
+        try {
+            if (!adopter.id) return;
+            
+            // Get favorite pets
+            const favoritesData = await getFavorites(adopter.id);
+            favoriteAdoptions.value = favoritesData;
+            
+            // Set favorites count
+            adoptionStats.favorites = favoritesData.length;
+        } catch (error) {
+            console.error('Error loading favorites:', error);
+            displayErrorToast('Failed to load favorites data.');
+        }
+      };
+
+
+      const handleRemoveFavorite = async (petId) => {
+        try {
+            await removeFromFavorites(adopter.id, petId);
+            displaySuccessToast('Pet removed from favorites');
+            // Refresh favorites
+            loadFavorites();
+        } catch (error) {
+            console.error('Error removing from favorites:', error);
+            displayErrorToast('Failed to remove pet from favorites');
+        }
+      };
+
+      const loadAdoptions = async () => {
+        try {
+            if (!adopter.id) return;
+            
+            // Get all adoption requests for the user
+            const adoptionRequests = await getUserAdoptionRequests(adopter.id);
+            
+            // Filter and process adoption requests
+            pendingAdoptions.value = adoptionRequests
+            .filter(request => request.status === 'PENDING' || request.status === 'APPROVED')
+            .map(request => ({
+                id: request.id,
+                status: request.status,
+                applicationDate: request.createdAt,
+                pet: request.pet,
+                shelter: {
+                id: request.shelterId,
+                name: request.shelterName,
+                location: `${request.shelterCity}, ${request.shelterCounty}`,
+                imageUrl: request.shelterProfilePicture || '/placeholder-shelter.jpg'
+                }
+            }));
+            
+            completedAdoptions.value = adoptionRequests
+            .filter(request => request.status === 'COMPLETED')
+            .map(request => ({
+                id: request.id,
+                status: request.status,
+                applicationDate: request.createdAt,
+                adoptionDate: request.completedAt,
+                pet: request.pet,
+                shelter: {
+                id: request.shelterId,
+                name: request.shelterName,
+                location: `${request.shelterCity}, ${request.shelterCounty}`,
+                imageUrl: request.shelterProfilePicture || '/placeholder-shelter.jpg'
+                }
+            }));
+            
+            // Set adoption stats
+            adoptionStats.pending = pendingAdoptions.value.length;
+            adoptionStats.completed = completedAdoptions.value.length;
+            
+        } catch (error) {
+            console.error('Error loading adoptions:', error);
+            displayErrorToast('Failed to load adoption data.');
+        }
+      };
+
+      const handleCancelAdoption = async (adoptionId) => {
+        try {
+            await cancelAdoptionRequest(adoptionId);
+            displaySuccessToast('Adoption application canceled successfully');
+            // Refresh adoptions
+            loadAdoptions();
+        } catch (error) {
+            console.error('Error canceling adoption:', error);
+            displayErrorToast('Failed to cancel adoption application');
+        }
+      };
+
+      const viewAdoptionDetails = async (adoptionId) => {
+        try {
+            // You could navigate to a details page
+            router.push(`/adoptions/requests/${adoptionId}`);
+            
+            // Or fetch and show details in a modal
+            /*
+            const details = await getAdoptionRequestById(adoptionId);
+            // Show details in modal
+            */
+        } catch (error) {
+            console.error('Error fetching adoption details:', error);
+            displayErrorToast('Failed to load adoption details');
+        }
+        };
+
+
+      onMounted(async () => {
+        await loadAdopterData();
+        await loadFavorites(); 
+        await loadAdoptions();
+        
+        // Listen for favorites updates from other components
+        window.addEventListener('favorites-updated', loadFavorites);
+        window.addEventListener('adoption-updated', loadAdoptions);
+      });
+
+        // 6. Don't forget to clean up event listeners
+        onUnmounted(() => {
+        window.removeEventListener('favorites-updated', loadFavorites);
+        window.removeEventListener('adoption-updated', loadAdoptions);
+      });
       
       const formatDate = (date) => {
         if (!date) return '';
@@ -1087,7 +1236,7 @@
       
       const goToFindPets = () => {
         // Navigate to find pets page
-        window.location.href = '/pets';
+        window.location.href = '/available-pets';
       };
       
       onMounted(async () => {
@@ -1199,6 +1348,12 @@
       pendingAdoptions,
       completedAdoptions,
       favoriteAdoptions,
+
+      loadFavorites,
+      handleRemoveFavorite,
+      loadAdoptions, 
+      handleCancelAdoption, 
+      viewAdoptionDetails,
       
       // Computed
       accountHasChanges,

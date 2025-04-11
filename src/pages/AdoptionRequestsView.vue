@@ -232,6 +232,8 @@
             Message Shelter
           </button>
         </div>
+
+        
       </div>
     </div>
 
@@ -257,7 +259,52 @@
         </button>
       </nav>
     </div>
+
+    
   </div>
+  <!-- Cancel Request Confirmation Popup -->
+  <div v-if="showCancelPopup" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-hidden" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0;">
+      <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden transform transition-all">
+        <!-- Header -->
+        <div class="bg-red-50 px-6 py-4 border-b border-red-100">
+          <div class="flex items-center justify-center">
+            <div class="bg-red-100 p-2 rounded-full">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+          </div>
+          <h3 class="mt-3 text-center text-xl font-medium text-red-800">Cancel Adoption Request</h3>
+        </div>
+        
+        <!-- Body -->
+        <div class="px-6 py-4">
+          <p class="text-gray-700 mb-4 text-center">
+            Are you sure you want to cancel this adoption request? This action cannot be undone.
+          </p>
+          
+          <p class="text-sm text-gray-600 bg-gray-50 p-3 rounded-2xl border border-gray-200 mb-4">
+            If you're having second thoughts about adopting, consider discussing your concerns with the shelter first. They may be able to address your questions or concerns.
+          </p>
+        </div>
+        
+        <!-- Footer -->
+        <div class="bg-gray-50 px-6 py-4 flex justify-center space-x-4">
+          <button
+            @click="closeCancelPopup"
+            class="py-2 px-4 bg-white text-gray-600 rounded-3xl border border-gray-300 hover:bg-gray-100 transition duration-200 font-medium"
+          >
+            No, Keep Request
+          </button>
+          <button
+            @click="confirmCancelRequest"
+            class="py-2 px-4 bg-red-600 text-white rounded-3xl hover:bg-red-700 transition duration-200 font-medium"
+          >
+            Yes, Cancel Request
+          </button>
+        </div>
+      </div>
+    </div>
 </template>
 
 <script>
@@ -284,7 +331,33 @@ export default {
     const currentPage = ref(1);
     const itemsPerPage = ref(10);
 
+    const showCancelPopup = ref(false);
+    const requestToCancel = ref(null);
 
+    const cancelRequest = (requestId) => {
+      requestToCancel.value = requestId;
+      showCancelPopup.value = true;
+    };
+
+    const confirmCancelRequest = async () => {
+      try {
+        await cancelAdoptionRequest(requestToCancel.value);
+        const requestIndex = requests.value.findIndex(req => req.id === requestToCancel.value);
+        if (requestIndex !== -1) {
+          requests.value[requestIndex].status = 'CANCELED';
+        }
+        showCancelPopup.value = false;
+        requestToCancel.value = null;
+      } catch (err) {
+        console.error('Error canceling adoption request:', err);
+        window.alert('Failed to cancel the request. Please try again later.');
+      }
+    };
+
+    const closeCancelPopup = () => {
+      showCancelPopup.value = false;
+      requestToCancel.value = null;
+    };
     
     const fetchRequests = async () => {
       loading.value = true;
@@ -327,27 +400,6 @@ export default {
       }
     };
     
-
-
-
-    const cancelRequest = async (requestId) => {
-      const confirmCancel = window.confirm('Are you sure you want to cancel this adoption request? This action cannot be undone.');
-      
-      if (!confirmCancel) return;
-      
-      try {
-        await cancelAdoptionRequest(requestId);
-        const requestIndex = requests.value.findIndex(req => req.id === requestId);
-        if (requestIndex !== -1) {
-          requests.value[requestIndex].status = 'CANCELED';
-        }
-      } catch (err) {
-        console.error('Error canceling adoption request:', err);
-        window.alert('Failed to cancel the request. Please try again later.');
-      }
-    };
-    
-
 
     const filteredRequests = computed(() => {
       let filtered = requests.value;
@@ -465,7 +517,12 @@ export default {
       cancelRequest,
       formatStatus,
       formatDate,
-      getPetPhotoUrl
+      getPetPhotoUrl, 
+
+      confirmCancelRequest,
+      closeCancelPopup, 
+      showCancelPopup ,
+      requestToCancel 
     };
   }
 };

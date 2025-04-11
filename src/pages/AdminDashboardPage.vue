@@ -9,7 +9,7 @@
             </div>
             <div class="flex items-center">
               <button 
-                @click="logout" 
+                @click="confirmLogout" 
                 class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-2xl text-sm font-medium"
               >
                 Logout
@@ -146,13 +146,13 @@
             <div>
               <button 
                 @click="sortPendingShelters()" 
-                class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-2xl text-gray-700 bg-white hover:bg-gray-50"
               >
                 Sort Newest First
               </button>
               <button 
                 @click="sortPendingShelters(true)" 
-                class="ml-2 inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                class="ml-2 inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-2xl text-gray-700 bg-white hover:bg-gray-50"
               >
                 Sort Oldest First
               </button>
@@ -193,19 +193,19 @@
                 <div class="flex space-x-2">
                   <button 
                     @click="viewShelterDetails(shelter.id)" 
-                    class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                    class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-2xl text-gray-700 bg-white hover:bg-gray-50"
                   >
                     View Details
                   </button>
                   <button 
                     @click="approveShelter(shelter.id)" 
-                    class="inline-flex items-center px-3 py-1.5 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
+                    class="inline-flex items-center px-3 py-1.5 border border-transparent shadow-sm text-sm font-medium rounded-2xl text-white bg-green-600 hover:bg-green-700"
                   >
                     Approve
                   </button>
                   <button 
                     @click="rejectShelter(shelter.id)" 
-                    class="inline-flex items-center px-3 py-1.5 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
+                    class="inline-flex items-center px-3 py-1.5 border border-transparent shadow-sm text-sm font-medium rounded-2xl text-white bg-red-600 hover:bg-red-700"
                   >
                     Reject
                   </button>
@@ -860,7 +860,7 @@
         
         <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
         
-        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full">
+        <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full">
           <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
             <div class="sm:flex sm:items-start">
               <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
@@ -959,27 +959,27 @@
             <button 
               v-if="selectedShelter && selectedShelter.status === 'PENDING_APPROVAL'"
               @click="approveShelter(selectedShelter.id, true)" 
-              class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm"
+              class="w-full inline-flex justify-center rounded-3xl border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm"
             >
               Approve
             </button>
             <button 
               v-if="selectedShelter && selectedShelter.status === 'PENDING_APPROVAL'"
               @click="rejectShelter(selectedShelter.id, true)" 
-              class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
+              class="w-full inline-flex justify-center rounded-3xl border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
             >
               Reject
             </button>
             <button 
               v-if="selectedShelter && selectedShelter.status === 'APPROVED'"
               @click="suspendShelter(selectedShelter.id, true)" 
-              class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-yellow-600 text-base font-medium text-white hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 sm:ml-3 sm:w-auto sm:text-sm"
+              class="w-full inline-flex justify-center rounded-3xl border border-transparent shadow-sm px-4 py-2 bg-yellow-600 text-base font-medium text-white hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 sm:ml-3 sm:w-auto sm:text-sm"
             >
               Suspend
             </button>
             <button 
               @click="showShelterModal = false" 
-              class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+              class="mt-3 w-full inline-flex justify-center rounded-3xl border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
             >
               Close
             </button>
@@ -1247,6 +1247,47 @@
         </div>
       </div>
     </div>
+
+    <!-- Logout Confirmation Modal -->
+    <div v-if="showLogoutConfirmation" class="fixed inset-0 flex items-center justify-center z-50">
+      <!-- Modal backdrop with blur effect -->
+      <div class="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm" @click="showLogoutConfirmation = false"></div>
+      
+      <!-- Modal content -->
+      <div class="bg-white rounded-2xl shadow-2xl w-96 p-8 z-10 relative transform transition-all duration-300 ease-in-out scale-100">
+        <button @click="showLogoutConfirmation = false" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        
+        <div class="text-center mb-6">
+          <div class="mx-auto h-16 w-16 flex items-center justify-center rounded-full bg-red-50 mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900">Are you sure you want to logout?</h3>
+          <p class="text-gray-500 mt-3">You will be redirected to the login page.</p>
+        </div>
+        
+        <div class="flex justify-center space-x-4 mt-8">
+          <button 
+            @click="showLogoutConfirmation = false"
+            class="px-5 py-2.5 bg-gray-100 text-gray-700 rounded-3xl font-medium hover:bg-gray-200 transition-colors duration-200 border border-gray-200 shadow-sm"
+          >
+            Cancel
+          </button>
+          <button 
+            @click="performLogout"
+            class="px-5 py-2.5 bg-red-600 text-white rounded-3xl font-medium hover:bg-red-700 transition-colors duration-200 shadow-sm"
+          >
+            Logout
+          </button>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -1274,6 +1315,7 @@ export default {
     const successMessage = ref('');
     const defaultShelterImage = ref(blankProfilePicture);
     const defaultUserImage = ref(blankProfilePicture);
+    const showLogoutConfirmation = ref(false);
     
     // Dashboard Statistics
     const stats = ref({
@@ -1334,6 +1376,21 @@ export default {
       avgSessionDuration: 0,
       sessionDurationChange: 0
     });
+
+    const confirmLogout = () => {
+      showLogoutConfirmation.value = true;
+    };
+    
+    // Perform the actual logout when confirmed
+    const performLogout = () => {
+      // Close the confirmation modal
+      showLogoutConfirmation.value = false;
+      
+      // In a real implementation, call API to logout
+      // Then redirect to login page
+      localStorage.clear();
+      router.push("/");
+    };
 
     
     const sortPendingShelters = (ascending = false) => {
@@ -2304,7 +2361,9 @@ export default {
       getDocumentUrl,
       viewShelterDocument,
       logout,
-
+      showLogoutConfirmation,
+      confirmLogout,
+      performLogout,
       pendingCurrentPage,
       pendingItemsPerPage,
       paginatedPendingShelters,
