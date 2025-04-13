@@ -9,6 +9,7 @@ import ResetPasswordPage from '@/pages/ResetPasswordPage.vue';
 import ContactUsPage from '@/pages/ContactUsPage.vue';
 import AboutUsPage from '@/pages/AboutUsPage.vue';
 import ManagePets from '@/components/ManagePets.vue';
+import ManageEvents from '@/components/ManageEvents.vue';
 import ShelterAdoptionRequests from '@/components/ShelterAdoptionRequests.vue';
 import EditShelterProfileVue from '@/pages/EditShelterProfile.vue';
 import AvailablePetsPage from '@/pages/AvailablePetsPage.vue';
@@ -21,6 +22,7 @@ import AdoptionRequestDetail from '@/components/AdoptionRequestDetail.vue';
 import AdoptionRequestForm from '@/components/AdoptionRequestForm.vue';
 import AdoptionRequestsView from '@/pages/AdoptionRequestsView.vue';
 import MyProfilePage from '@/pages/MyProfilePage.vue';
+import EventsPage from '@/pages/EventsPage.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -75,6 +77,12 @@ const router = createRouter({
       // meta: { requiresAuth: true },
     },
     {
+      path: '/events',
+      name: 'EventsPage',
+      component: EventsPage, 
+      // meta: { requiresAuth: true },
+    },
+    {
       path: '/shelter/:id',
       name: 'ShelterProfilePage',
       component: ShelterProfilePage, 
@@ -105,6 +113,11 @@ const router = createRouter({
           props: route => ({ 
             shelterId: parseInt(localStorage.getItem('Id')) 
           })
+        },
+        {
+          path: 'manage-events',
+          name: 'ManageEvents',
+          component: ManageEvents
         },
         {
           path: 'edit-profile',
