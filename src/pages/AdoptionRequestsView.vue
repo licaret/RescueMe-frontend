@@ -103,7 +103,8 @@
             'bg-yellow-100 text-yellow-800': request.status === 'PENDING',
             'bg-green-100 text-green-800': request.status === 'APPROVED',
             'bg-red-100 text-red-800': request.status === 'REJECTED',
-            'bg-gray-100 text-gray-800': request.status === 'CANCELED'
+            'bg-gray-100 text-gray-800': request.status === 'CANCELED',
+            'bg-blue-100 text-blue-800': request.status === 'COMPLETED'
           }"
         >
           {{ formatStatus(request.status) }}
@@ -445,7 +446,8 @@ export default {
         'PENDING': 'Pending Review',
         'APPROVED': 'Approved',
         'REJECTED': 'Declined',
-        'CANCELED': 'Canceled'
+        'CANCELED': 'Canceled',
+        'COMPLETED': 'Completed'
       };
       
       return statusMap[status] || status;

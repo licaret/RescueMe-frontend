@@ -89,14 +89,26 @@
         <!-- Adoption Statistics -->
         <div class="mb-8 grid grid-cols-1 md:grid-cols-3 gap-4">
           <div class="bg-white rounded-2xl shadow p-6 flex items-center">
-            <div class="rounded-full bg-green-100 p-3 mr-4">
-              <svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="rounded-full bg-blue-100 p-3 mr-4">
+              <svg class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
             <div>
               <p class="text-sm text-gray-600">Completed Adoptions</p>
               <p class="text-2xl font-bold text-gray-800">{{ adoptionStats.completed }}</p>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-2xl shadow p-6 flex items-center">
+            <div class="rounded-full bg-green-100 p-3 mr-4">
+              <svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div>
+              <p class="text-sm text-gray-600">Approved Adoptions</p>
+              <p class="text-2xl font-bold text-gray-800">{{ adoptionStats.approved }}</p>
             </div>
           </div>
           
@@ -107,22 +119,11 @@
               </svg>
             </div>
             <div>
-              <p class="text-sm text-gray-600">Pending Adoptions</p>
+              <p class="text-sm text-gray-600">Pending Approval Adoptions</p>
               <p class="text-2xl font-bold text-gray-800">{{ adoptionStats.pending }}</p>
             </div>
           </div>
           
-          <div class="bg-white rounded-2xl shadow p-6 flex items-center">
-            <div class="rounded-full bg-blue-100 p-3 mr-4">
-              <svg class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-              </svg>
-            </div>
-            <div>
-              <p class="text-sm text-gray-600">Favorite Pets</p>
-              <p class="text-2xl font-bold text-gray-800">{{ adoptionStats.favorites }}</p>
-            </div>
-          </div>
         </div>
   
         <!-- Tab navigation -->
@@ -444,15 +445,6 @@
           <div class="mb-6 border-b">
             <div class="flex flex-wrap -mb-px">
               <button 
-                @click="adoptionView = 'pending'"
-                class="mr-2 inline-block p-2 transition-all duration-200 ease-in-out"
-                :class="adoptionView === 'pending' 
-                  ? 'text-red-600 border-b-2 border-red-600'
-                  : 'text-gray-500 hover:text-gray-700 border-b-2 border-transparent hover:border-gray-300'"
-              >
-                Pending ({{ adoptionStats.pending }})
-              </button>
-              <button 
                 @click="adoptionView = 'completed'"
                 class="mr-2 inline-block p-2 transition-all duration-200 ease-in-out"
                 :class="adoptionView === 'completed' 
@@ -462,57 +454,71 @@
                 Completed ({{ adoptionStats.completed }})
               </button>
               <button 
-                @click="adoptionView = 'favorites'"
-                class="inline-block p-2 transition-all duration-200 ease-in-out"
-                :class="adoptionView === 'favorites' 
+                @click="adoptionView = 'approved'"
+                class="mr-2 inline-block p-2 transition-all duration-200 ease-in-out"
+                :class="adoptionView === 'approved' 
                   ? 'text-red-600 border-b-2 border-red-600'
                   : 'text-gray-500 hover:text-gray-700 border-b-2 border-transparent hover:border-gray-300'"
               >
-                Favorites ({{ adoptionStats.favorites }})
+                Approved ({{ adoptionStats.approved }})
               </button>
+              <button 
+                @click="adoptionView = 'pending'"
+                class="mr-2 inline-block p-2 transition-all duration-200 ease-in-out"
+                :class="adoptionView === 'pending' 
+                  ? 'text-red-600 border-b-2 border-red-600'
+                  : 'text-gray-500 hover:text-gray-700 border-b-2 border-transparent hover:border-gray-300'"
+              >
+                Pending Approval ({{ adoptionStats.pending }})
+              </button>
+              
             </div>
           </div>
   
-          <!-- No adoptions message -->
-          <!-- <div v-if="adoptionView === 'pending' && !pendingAdoptions.length" class="text-center py-8">
-            <div class="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
-              <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
-            </div>
-            <h3 class="text-lg font-medium text-gray-900 mb-1">No pending adoptions</h3>
-            <p class="text-gray-500">You don't have any adoption applications in progress.</p>
-            <button class="mt-4 bg-red-600 text-white px-4 py-2 rounded font-medium" @click="goToFindPets">
+          
+  
+        <!-- Approved adoptions list -->
+        <div v-if="adoptionView === 'approved'" class="space-y-4">
+          <div v-if="approvedAdoptions.length === 0" class="text-center py-8">
+            <!-- mesaj fallback -->
+            <h3 class="text-lg font-medium text-gray-900 mb-1">No approved adoptions</h3>
+            <p class="text-gray-500">You don't have any approved adoptions yet.</p>
+            <button class="mt-4 bg-red-600 text-white px-4 py-2 rounded-3xl font-medium" @click="goToFindPets">
               Find pets to adopt
             </button>
-          </div> -->
-  
-          <!-- <div v-if="adoptionView === 'completed' && !completedAdoptions.length" class="text-center py-8">
-            <div class="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
-              <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-              </svg>
+          </div>
+
+          <div v-for="adoption in approvedAdoptions" :key="adoption.id" class="border rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+            <div class="flex flex-col md:flex-row">
+              <div class="w-full md:w-1/4">
+                <img :src="adoption.pet.imageUrl || '/placeholder-pet.jpg'" :alt="adoption.pet.name" class="w-full h-48 md:h-full object-cover">
+              </div>
+              <div class="p-4 md:p-6 flex-1">
+                <div class="flex justify-between items-start mb-2">
+                  <div>
+                    <h3 class="text-lg font-bold text-gray-900">{{ adoption.pet.name }}</h3>
+                    <p class="text-gray-600 text-sm">{{ adoption.pet.breed }} · {{ adoption.pet.age }} years old</p>
+                  </div>
+                  <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Approved</span>
+                </div>
+                <p class="text-gray-500 mb-3">Application approved: {{ formatDate(adoption.applicationDate) }}</p>
+                <!-- <div class="flex items-center mb-4">
+                  <img :src="adoption.shelter.imageUrl || '/placeholder-shelter.jpg'" alt="Shelter logo" class="w-8 h-8 rounded-full mr-2">
+                  <div>
+                    <p class="text-sm font-medium">{{ adoption.shelter.name }}</p>
+                    <p class="text-xs text-gray-500">{{ adoption.shelter.location }}</p>
+                  </div>
+                </div> -->
+                <div class="flex flex-wrap gap-2">
+                  <button @click="viewAdoptionDetails(adoption.id)" class="text-red-600 border border-red-600 bg-white px-3 py-1 rounded-2xl text-sm hover:bg-red-50">
+                    View application
+                  </button>
+                </div>
+              </div>
             </div>
-            <h3 class="text-lg font-medium text-gray-900 mb-1">No completed adoptions</h3>
-            <p class="text-gray-500">You haven't completed any pet adoptions yet.</p>
-            <button class="mt-4 bg-red-600 text-white px-4 py-2 rounded font-medium" @click="goToFindPets">
-              Find pets to adopt
-            </button>
-          </div> -->
-  
-          <!-- <div v-if="adoptionView === 'favorites' && !favoriteAdoptions.length" class="text-center py-8">
-            <div class="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
-              <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-              </svg>
-            </div>
-            <h3 class="text-lg font-medium text-gray-900 mb-1">No favorite pets</h3>
-            <p class="text-gray-500">You haven't added any pets to your favorites list yet.</p>
-            <button class="mt-4 bg-red-600 text-white px-4 py-2 rounded font-medium" @click="goToFindPets">
-              Browse available pets
-            </button>
-          </div> -->
-  
+          </div>
+        </div>
+
         <!-- Pending adoptions list -->
         <div v-if="adoptionView === 'pending'" class="space-y-4">
         <div v-if="pendingAdoptions.length === 0" class="text-center py-8">
@@ -523,8 +529,8 @@
             </div>
             <h3 class="text-lg font-medium text-gray-900 mb-1">No pending adoptions</h3>
             <p class="text-gray-500">You don't have any adoption applications in progress.</p>
-            <button class="mt-4 bg-red-600 text-white px-4 py-2 rounded font-medium" @click="goToFindPets">
-            Find pets to adopt
+            <button class="mt-4 bg-red-600 text-white px-4 py-2 rounded-3xl font-medium" @click="goToFindPets">
+              Find pets to adopt
             </button>
         </div>
 
@@ -539,16 +545,16 @@
                     <h3 class="text-lg font-bold text-gray-900">{{ adoption.pet.name }}</h3>
                     <p class="text-gray-600 text-sm">{{ adoption.pet.breed }} · {{ adoption.pet.age }} years old</p>
                 </div>
-                <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">Pending</span>
+                <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">Pending Approval</span>
                 </div>
                 <p class="text-gray-500 mb-3">Application submitted: {{ formatDate(adoption.applicationDate) }}</p>
-                <div class="flex items-center mb-4">
+                <!-- <div class="flex items-center mb-4">
                 <img :src="adoption.shelter.imageUrl || '/placeholder-shelter.jpg'" alt="Shelter logo" class="w-8 h-8 rounded-full mr-2">
                 <div>
                     <p class="text-sm font-medium">{{ adoption.shelter.name }}</p>
                     <p class="text-xs text-gray-500">{{ adoption.shelter.location }}</p>
                 </div>
-                </div>
+                </div> -->
                 <div class="flex flex-wrap gap-2">
                 <button @click="viewAdoptionDetails(adoption.id)" class="text-red-600 border border-red-600 bg-white px-3 py-1 rounded-2xl text-sm hover:bg-red-50">
                     View application
@@ -572,7 +578,7 @@
             </div>
             <h3 class="text-lg font-medium text-gray-900 mb-1">No completed adoptions</h3>
             <p class="text-gray-500">You haven't completed any pet adoptions yet.</p>
-            <button class="mt-4 bg-red-600 text-white px-4 py-2 rounded font-medium" @click="goToFindPets">
+            <button class="mt-4 bg-red-600 text-white px-4 py-2 rounded-3xl font-medium" @click="goToFindPets">
             Find pets to adopt
             </button>
         </div>
@@ -588,15 +594,15 @@
                     <h3 class="text-lg font-bold text-gray-900">{{ adoption.pet.name }}</h3>
                     <p class="text-gray-600 text-sm">{{ adoption.pet.breed }} · Adopted on {{ formatDate(adoption.adoptionDate) }}</p>
                 </div>
-                <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Adopted</span>
+                <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">Completed</span>
                 </div>
                 <p class="text-gray-700 mb-4">{{ adoption.pet.name }} has been part of your family for {{ daysSinceAdoption(adoption.adoptionDate) }} days!</p>
                 <div class="flex items-center mb-4">
-                <img :src="adoption.shelter.imageUrl || '/placeholder-shelter.jpg'" alt="Shelter logo" class="w-8 h-8 rounded-full mr-2">
+                <!-- <img :src="adoption.shelter.imageUrl || '/placeholder-shelter.jpg'" alt="Shelter logo" class="w-8 h-8 rounded-full mr-2">
                 <div>
                     <p class="text-sm font-medium">{{ adoption.shelter.name }}</p>
                     <p class="text-xs text-gray-500">{{ adoption.shelter.location }}</p>
-                </div>
+                </div> -->
                 </div>
                 <div class="flex flex-wrap gap-2">
                 <button @click="viewAdoptionDetails(adoption.id)" class="text-red-600 border border-red-600 bg-white px-3 py-1 rounded-2xl text-sm hover:bg-red-50">
@@ -607,32 +613,6 @@
             </div>
         </div>
         </div>
-  
-        <!-- Favorites list -->
-        <div v-if="adoptionView === 'favorites'" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div v-if="favoriteAdoptions.length === 0" class="text-center py-8 col-span-2">
-                <div class="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
-                <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
-                </div>
-                <h3 class="text-lg font-medium text-gray-900 mb-1">No favorite pets</h3>
-                <p class="text-gray-500">You haven't added any pets to your favorites list yet.</p>
-                <button class="mt-4 bg-red-600 text-white px-4 py-2 rounded font-medium" @click="goToFindPets">
-                Browse available pets
-                </button>
-            </div>
-            
-            <div v-for="pet in favoriteAdoptions" :key="pet.id" class="relative">
-                <!-- Use your PetCard component -->
-                <PetCard 
-                :pet="pet" 
-                :showFavoriteButton="true"
-                :isFavorite="true"
-                @remove-favorite="handleRemoveFavorite(pet.id)"
-                />
-            </div>
-        </div>
 
         </div>
       </div>
@@ -642,6 +622,7 @@
   
   <script>
   import { ref, reactive, computed, onMounted, onUnmounted } from 'vue';
+  import { useRouter } from 'vue-router';
   import { getUserById, updateUser, changePassword } from '@/services/user_service';
   import { fetchProfilePicture, uploadProfilePicture, deleteProfilePicture } from '@/services/user_service';
   import blankPicture from '@/assets/blank_profile_picture.jpg';
@@ -657,6 +638,8 @@
         PetCard,
     },
     setup() {
+      const router = useRouter();
+
       // Basic state
       const activeTab = ref('account');
       const adoptionView = ref('pending');
@@ -715,7 +698,7 @@
       const adoptionStats = reactive({
         completed: 0,
         pending: 0,
-        favorites: 0
+        approved: 0
       });
       
       // Profile picture states
@@ -725,7 +708,8 @@
       // Mock adoption data
       const pendingAdoptions = ref([]);
       const completedAdoptions = ref([]);
-      const favoriteAdoptions = ref([]);
+      const approvedAdoptions = ref([]);
+
   
       // Computed properties
       const accountHasChanges = computed(() => {
@@ -806,7 +790,7 @@
           loadAdoptionStats();
           
           // Load mock adoption data
-          loadMockAdoptions();
+          // loadMockAdoptions();
         } catch (error) {
           console.error('Error loading adopter data:', error);
           displayErrorToast('Failed to load profile data.');
@@ -817,86 +801,155 @@
         // In a real app, this would come from an API call
         adoptionStats.completed = 2;
         adoptionStats.pending = 1;
-        adoptionStats.favorites = 3;
-      };
-
-      const loadFavorites = async () => {
-        try {
-            if (!adopter.id) return;
-            
-            // Get favorite pets
-            const favoritesData = await getFavorites(adopter.id);
-            favoriteAdoptions.value = favoritesData;
-            
-            // Set favorites count
-            adoptionStats.favorites = favoritesData.length;
-        } catch (error) {
-            console.error('Error loading favorites:', error);
-            displayErrorToast('Failed to load favorites data.');
-        }
+        adoptionStats.approved = 3;
       };
 
 
-      const handleRemoveFavorite = async (petId) => {
-        try {
-            await removeFromFavorites(adopter.id, petId);
-            displaySuccessToast('Pet removed from favorites');
-            // Refresh favorites
-            loadFavorites();
-        } catch (error) {
-            console.error('Error removing from favorites:', error);
-            displayErrorToast('Failed to remove pet from favorites');
-        }
-      };
+      
 
       const loadAdoptions = async () => {
         try {
-            if (!adopter.id) return;
-            
-            // Get all adoption requests for the user
-            const adoptionRequests = await getUserAdoptionRequests(adopter.id);
-            
-            // Filter and process adoption requests
-            pendingAdoptions.value = adoptionRequests
-            .filter(request => request.status === 'PENDING' || request.status === 'APPROVED')
-            .map(request => ({
+          if (!adopter.id) return;
+
+          const adoptionRequests = await getUserAdoptionRequests(adopter.id);
+          console.log('First adoption request:', adoptionRequests[0]);
+
+          // Process pending adoptions
+          pendingAdoptions.value = adoptionRequests
+            .filter(request => request.status === 'PENDING')
+            .map(request => {
+              let petImageUrl = '/placeholder-pet.jpg';
+              
+              // We need to fetch the photo data separately since it's not included directly
+              if (request.pet && request.pet.photoIds && request.pet.photoIds.length > 0) {
+                // Use the photoId to fetch the base64 image URL
+                fetch(`http://localhost:8080/pet-photos/${request.pet.photoIds[0]}`)
+                  .then(response => response.json())
+                  .then(data => {
+                    // Update the pet's image URL with the base64 data from the response
+                    if (data && data.url) {
+                      // Find the adoption in our array and update its image
+                      const adoption = pendingAdoptions.value.find(a => a.id === request.id);
+                      if (adoption) {
+                        adoption.pet.imageUrl = data.url;
+                      }
+                    }
+                  })
+                  .catch(error => console.error(`Error fetching pet photo: ${error}`));
+              }
+              
+              return {
                 id: request.id,
                 status: request.status,
-                applicationDate: request.createdAt,
-                pet: request.pet,
+                applicationDate: request.createdAt || request.requestDate,
+                pet: {
+                  ...request.pet,
+                  imageUrl: petImageUrl, // This will be updated after the fetch completes
+                  name: request.pet.name || request.petName,
+                  breed: request.pet.breed,
+                  age: request.pet.age
+                },
                 shelter: {
-                id: request.shelterId,
-                name: request.shelterName,
-                location: `${request.shelterCity}, ${request.shelterCounty}`,
-                imageUrl: request.shelterProfilePicture || '/placeholder-shelter.jpg'
+                  id: request.shelterId,
+                  name: request.shelterName || "Shelter",
+                  location: `${request.shelterCity || ''}, ${request.shelterCounty || ''}`,
+                  imageUrl: request.shelterProfilePicture || '/placeholder-shelter.jpg'
                 }
-            }));
-            
-            completedAdoptions.value = adoptionRequests
+              };
+            });
+
+          // Same pattern for approved adoptions
+          approvedAdoptions.value = adoptionRequests
+            .filter(request => request.status === 'APPROVED')
+            .map(request => {
+              let petImageUrl = '/placeholder-pet.jpg';
+              
+              if (request.pet && request.pet.photoIds && request.pet.photoIds.length > 0) {
+                fetch(`http://localhost:8080/pet-photos/${request.pet.photoIds[0]}`)
+                  .then(response => response.json())
+                  .then(data => {
+                    if (data && data.url) {
+                      const adoption = approvedAdoptions.value.find(a => a.id === request.id);
+                      if (adoption) {
+                        adoption.pet.imageUrl = data.url;
+                      }
+                    }
+                  })
+                  .catch(error => console.error(`Error fetching pet photo: ${error}`));
+              }
+              
+              return {
+                id: request.id,
+                status: request.status,
+                applicationDate: request.createdAt || request.requestDate,
+                pet: {
+                  ...request.pet,
+                  imageUrl: petImageUrl,
+                  name: request.pet.name || request.petName,
+                  breed: request.pet.breed,
+                  age: request.pet.age
+                },
+                shelter: {
+                  id: request.shelterId,
+                  name: request.shelterName || "Shelter",
+                  location: `${request.shelterCity || ''}, ${request.shelterCounty || ''}`,
+                  imageUrl: request.shelterProfilePicture || '/placeholder-shelter.jpg'
+                }
+              };
+            });
+
+          // Same pattern for completed adoptions
+          completedAdoptions.value = adoptionRequests
             .filter(request => request.status === 'COMPLETED')
-            .map(request => ({
+            .map(request => {
+              let petImageUrl = '/placeholder-pet.jpg';
+              
+              if (request.pet && request.pet.photoIds && request.pet.photoIds.length > 0) {
+                fetch(`http://localhost:8080/pet-photos/${request.pet.photoIds[0]}`)
+                  .then(response => response.json())
+                  .then(data => {
+                    if (data && data.url) {
+                      const adoption = completedAdoptions.value.find(a => a.id === request.id);
+                      if (adoption) {
+                        adoption.pet.imageUrl = data.url;
+                      }
+                    }
+                  })
+                  .catch(error => console.error(`Error fetching pet photo: ${error}`));
+              }
+              
+              return {
                 id: request.id,
                 status: request.status,
-                applicationDate: request.createdAt,
+                applicationDate: request.createdAt || request.requestDate,
                 adoptionDate: request.completedAt,
-                pet: request.pet,
+                pet: {
+                  ...request.pet,
+                  imageUrl: petImageUrl,
+                  name: request.pet.name || request.petName,
+                  breed: request.pet.breed,
+                  age: request.pet.age
+                },
                 shelter: {
-                id: request.shelterId,
-                name: request.shelterName,
-                location: `${request.shelterCity}, ${request.shelterCounty}`,
-                imageUrl: request.shelterProfilePicture || '/placeholder-shelter.jpg'
+                  id: request.shelterId,
+                  name: request.shelterName || "Shelter",
+                  location: `${request.shelterCity || ''}, ${request.shelterCounty || ''}`,
+                  imageUrl: request.shelterProfilePicture || '/placeholder-shelter.jpg'
                 }
-            }));
-            
-            // Set adoption stats
-            adoptionStats.pending = pendingAdoptions.value.length;
-            adoptionStats.completed = completedAdoptions.value.length;
-            
+              };
+            });
+
+          // Set stats
+          adoptionStats.pending = pendingAdoptions.value.length;
+          adoptionStats.approved = approvedAdoptions.value.length;
+          adoptionStats.completed = completedAdoptions.value.length;
+
         } catch (error) {
-            console.error('Error loading adoptions:', error);
-            displayErrorToast('Failed to load adoption data.');
+          console.error('Error loading adoptions:', error);
+          displayErrorToast('Failed to load adoption data.');
         }
       };
+
 
       const handleCancelAdoption = async (adoptionId) => {
         try {
@@ -913,7 +966,7 @@
       const viewAdoptionDetails = async (adoptionId) => {
         try {
             // You could navigate to a details page
-            router.push(`/adoptions/requests/${adoptionId}`);
+            router.push(`/adoption-requests/${adoptionId}`);
             
             // Or fetch and show details in a modal
             /*
@@ -929,17 +982,14 @@
 
       onMounted(async () => {
         await loadAdopterData();
-        await loadFavorites(); 
         await loadAdoptions();
         
         // Listen for favorites updates from other components
-        window.addEventListener('favorites-updated', loadFavorites);
         window.addEventListener('adoption-updated', loadAdoptions);
       });
 
         // 6. Don't forget to clean up event listeners
         onUnmounted(() => {
-        window.removeEventListener('favorites-updated', loadFavorites);
         window.removeEventListener('adoption-updated', loadAdoptions);
       });
       
@@ -1286,39 +1336,6 @@
           }
         ];
         
-        // Favorite pets
-        favoriteAdoptions.value = [
-          {
-            id: 4,
-            name: 'Charlie',
-            breed: 'Beagle',
-            age: 1,
-            imageUrl: 'https://images.unsplash.com/photo-1583512603805-3cc6b41f3edb?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80',
-            status: 'AVAILABLE',
-            shelterName: 'Paws & Claws Rescue',
-            shelterImage: 'https://images.unsplash.com/photo-1601758125946-6ec2ef64daf8?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80'
-          },
-          {
-            id: 5,
-            name: 'Milo',
-            breed: 'Siamese',
-            age: 2,
-            imageUrl: 'https://images.unsplash.com/photo-1518791841217-8f162f1e1131?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80',
-            status: 'AVAILABLE',
-            shelterName: 'Cat Haven',
-            shelterImage: 'https://images.unsplash.com/photo-1583511655826-05700442982d?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80'
-          },
-          {
-            id: 6,
-            name: 'Rocky',
-            breed: 'German Shepherd',
-            age: 3,
-            imageUrl: 'https://images.unsplash.com/photo-1589941013453-ec89f33b5e95?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80',
-            status: 'PENDING',
-            shelterName: 'Second Chance Rescue',
-            shelterImage: 'https://images.unsplash.com/photo-1550645612-83f5d594b671?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80'
-          }
-        ];
       };
     
     onMounted(async () => {
@@ -1347,10 +1364,8 @@
       adoptionStats,
       pendingAdoptions,
       completedAdoptions,
-      favoriteAdoptions,
+      approvedAdoptions,
 
-      loadFavorites,
-      handleRemoveFavorite,
       loadAdoptions, 
       handleCancelAdoption, 
       viewAdoptionDetails,

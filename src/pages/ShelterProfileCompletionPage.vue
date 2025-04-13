@@ -912,7 +912,8 @@ export default {
         'DRAFT': 'Draft',
         'PENDING_APPROVAL': 'Pending Approval',
         'APPROVED': 'Approved',
-        'REJECTED': 'Rejected'
+        'REJECTED': 'Rejected',
+        'COMPLETED': 'Completed'
       };
       
       return statusMap[this.shelterData.status] || 'Pending Completion';

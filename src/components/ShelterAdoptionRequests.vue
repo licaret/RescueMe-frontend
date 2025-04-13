@@ -33,6 +33,7 @@
                 <option value="PENDING" class="text-gray-800">Pending</option>
                 <option value="APPROVED" class="text-gray-800">Approved</option>
                 <option value="REJECTED" class="text-gray-800">Rejected</option>
+                <option value="COMPLETED" class="text-gray-800">Completed</option>
               </select>
             </div>
             
@@ -103,6 +104,7 @@
               <span 
                 class="px-3 py-1 rounded-full text-xs font-semibold"
                 :class="{
+                  'bg-blue-100 text-blue-800': petGroup.requests.some(r => r.status === 'COMPLETED'),
                   'bg-green-100 text-green-800': petGroup.requests.some(r => r.status === 'APPROVED'),
                   'bg-yellow-100 text-yellow-800': !petGroup.requests.some(r => r.status === 'APPROVED') && petGroup.requests.some(r => r.status === 'PENDING'),
                   'bg-red-100 text-red-800': petGroup.requests.every(r => r.status === 'REJECTED')
@@ -150,7 +152,8 @@
                     :class="{
                       'bg-yellow-100 text-yellow-800': request.status === 'PENDING',
                       'bg-green-100 text-green-800': request.status === 'APPROVED',
-                      'bg-red-100 text-red-800': request.status === 'REJECTED'
+                      'bg-red-100 text-red-800': request.status === 'REJECTED',
+                      'bg-blue-100 text-blue-800': request.status === 'COMPLETED'
                     }"
                   >
                     {{ request.status }}
@@ -653,22 +656,29 @@ export default {
 
     const completeAdoptionProcess = async () => {
       if (!selectedRequest.value) return;
-      
+
       try {
         isLoading.value = true;
-        
+
+        // Trimite către backend
         await completeAdoption(selectedRequest.value.id);
-        
-        window.dispatchEvent(new Event('adoption-completed'));
-        
+
+        // Update local statusuri
         const index = requests.value.findIndex(r => r.id === selectedRequest.value.id);
         if (index !== -1) {
+          // ✅ Marchează cererea ca FINALIZATĂ
+          requests.value[index].status = 'COMPLETED';
           requests.value[index].pet.status = 'ADOPTED';
-          
+
           if (selectedRequest.value) {
+            selectedRequest.value.status = 'COMPLETED'; // ✅ aici e cheia
             selectedRequest.value.pet.status = 'ADOPTED';
           }
         }
+
+        // Emit event (dacă ai componente care ascultă)
+        window.dispatchEvent(new Event('adoption-completed'));
+
       } catch (error) {
         console.error('Error completing adoption process:', error);
         alert('Failed to complete the adoption process. Please try again.');
@@ -676,6 +686,7 @@ export default {
         isLoading.value = false;
       }
     };
+
 
     const fetchRequests = async () => {
       try {

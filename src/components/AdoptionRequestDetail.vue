@@ -65,7 +65,8 @@
                     'bg-yellow-100 text-yellow-800': request.status === 'pending',
                     'bg-green-100 text-green-800': request.status === 'approved',
                     'bg-red-100 text-red-800': request.status === 'rejected',
-                    'bg-gray-100 text-gray-800': request.status === 'canceled'
+                    'bg-gray-100 text-gray-800': request.status === 'canceled',
+                    'bg-blue-100 text-blue-800': request.status === 'completed'
                   }"
                 >
                   {{ formatStatus(request.status) }}
@@ -796,6 +797,8 @@ export default {
           return 'Declined';
         case 'canceled':
           return 'Canceled';
+        case 'completed':
+          return 'Completed';
         default:
           return status.charAt(0).toUpperCase() + status.slice(1);
       }
