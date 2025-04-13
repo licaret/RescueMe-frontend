@@ -527,25 +527,20 @@ export default {
 
     // Apply attendance status filter to an event
     const applyAttendanceStatusFilter = (event) => {
-      if (!filters.value.attendanceStatus || !userId.value) return true;
-      
-      // Find the user's attendance record for this event
-      const userAttendance = event.attendees ? 
-        event.attendees.find(a => a.userId.toString() === userId.value.toString()) : null;
-      
-      switch(filters.value.attendanceStatus) {
+      const status = event.userAttendanceStatus;
+
+      switch (filters.value.attendanceStatus) {
         case 'attending':
-          return userAttendance && userAttendance.status === 'ATTENDING';
+          return status === 'GOING';
         case 'maybe':
-          return userAttendance && userAttendance.status === 'MAYBE';
-        case 'notAttending':
-          return userAttendance && userAttendance.status === 'NOT_ATTENDING';
+          return status === 'INTERESTED';
         case 'noResponse':
-          return !userAttendance;
+          return status === null || status === undefined;
         default:
           return true;
       }
     };
+
 
     const resetFilters = () => {
       filters.value = {
@@ -609,6 +604,7 @@ export default {
       }
 
       return events.value
+        .filter(event => event.isActive)
         .filter(event => {
           // Apply all filters
           if (filters.value.title && !event.title.toLowerCase().includes(filters.value.title.toLowerCase())) {

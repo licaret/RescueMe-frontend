@@ -377,6 +377,24 @@ export async function removeEventAttendance(eventId, userId) {
   }
 }
 
+export const partialUpdateEvent = async (eventId, updateData, shelterId) => {
+  const response = await fetch(`${baseUrl}/events/${eventId}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      'shelterId': shelterId
+    },
+    body: JSON.stringify(updateData)
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to partially update event");
+  }
+
+  return await response.json();
+};
+
+
 // Export all functions
 export default {
   fetchAllEvents,
