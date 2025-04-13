@@ -240,80 +240,13 @@
       <h2 class="text-3xl sm:text-4xl font-bold text-center text-gray-900 mb-12">Upcoming Events</h2>
       
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Event 1 -->
-        <div class="bg-white rounded-3xl overflow-hidden shadow-md border border-gray-100">
-          <div class="p-4 bg-red-600 text-white">
-            <p class="text-2xl font-bold">15</p>
-            <p class="text-sm">March 2025</p>
-          </div>
-          <div class="p-6">
-            <h3 class="text-xl font-bold text-gray-900 mb-2">Adoption Day</h3>
-            <p class="text-gray-700 mb-4">Meet our animals and find your perfect companion. Special adoption fees and giveaways.</p>
-            <div class="flex items-center text-gray-600 mb-2">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>10:00 AM - 4:00 PM</span>
-            </div>
-            <div class="flex items-center text-gray-600">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              <span>Main Shelter Location</span>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Event 2 -->
-        <div class="bg-white rounded-3xl overflow-hidden shadow-md border border-gray-100">
-          <div class="p-4 bg-red-600 text-white">
-            <p class="text-2xl font-bold">22</p>
-            <p class="text-sm">March 2025</p>
-          </div>
-          <div class="p-6">
-            <h3 class="text-xl font-bold text-gray-900 mb-2">Volunteer Training</h3>
-            <p class="text-gray-700 mb-4">Learn how to become a volunteer and help our shelter animals. No experience necessary.</p>
-            <div class="flex items-center text-gray-600 mb-2">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>2:00 PM - 5:00 PM</span>
-            </div>
-            <div class="flex items-center text-gray-600">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              <span>Community Center</span>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Event 3 -->
-        <div class="bg-white rounded-3xl overflow-hidden shadow-md border border-gray-100">
-          <div class="p-4 bg-red-600 text-white">
-            <p class="text-2xl font-bold">29</p>
-            <p class="text-sm">March 2025</p>
-          </div>
-          <div class="p-6">
-            <h3 class="text-xl font-bold text-gray-900 mb-2">Fundraising Gala</h3>
-            <p class="text-gray-700 mb-4">Join us for an elegant evening of fun and fundraising to support our shelter's mission.</p>
-            <div class="flex items-center text-gray-600 mb-2">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>7:00 PM - 10:00 PM</span>
-            </div>
-            <div class="flex items-center text-gray-600">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              <span>Grand Hotel Ballroom</span>
-            </div>
-          </div>
-        </div>
+        <EventCard
+          v-for="event in displayedEvents"
+          :key="event.id"
+          :event="event"
+          @status-updated="updateEventStatus"
+          @event-updated="onEventUpdated"
+        />
       </div>
       
       <div class="mt-12 text-center">
@@ -386,6 +319,8 @@ import Navbar from "@/components/Navbar.vue";
 import IntroNavbar from "@/components/IntroNavbar.vue";
 import Footer from "@/components/Footer.vue";
 import PetCard from "@/components/PetCard.vue";
+import EventCard from "@/components/EventCard.vue";
+import { fetchAllEvents } from '@/services/event_service';
 
 export default {
   name: 'HomePage',
@@ -394,7 +329,8 @@ export default {
     Navbar,
     Footer,
     PetCard,
-    IntroNavbar
+    IntroNavbar,
+    EventCard
   },
 
   data() {
@@ -402,12 +338,16 @@ export default {
       email: '',
       availablePets: [],
       displayedPets: [],
-      intervalId: null
+      intervalId: null,
+      activeEvents: [],
+      displayedEvents: [],
+      eventIntervalId: null,
     }
   },
 
   mounted() {
     this.fetchAvailablePets();
+    this.fetchActiveEvents();
   },
 
   beforeUnmount() {
@@ -461,6 +401,50 @@ export default {
       }
       const shuffled = [...this.availablePets].sort(() => 0.5 - Math.random());
       this.displayedPets = shuffled.slice(0, 3);
+    },
+    async fetchActiveEvents() {
+      try {
+        const events = await fetchAllEvents();
+        // Filter for active events only if needed
+        this.activeEvents = events.filter(event => event.isActive);
+        this.updateDisplayedEvents();
+        // ...
+      } catch (error) {
+        console.error("Failed to fetch active events:", error);
+      }
+    },
+    updateDisplayedEvents() {
+      if (this.activeEvents.length <= 3) {
+        this.displayedEvents = this.activeEvents;
+      } else {
+        const shuffled = [...this.activeEvents].sort(() => 0.5 - Math.random());
+        this.displayedEvents = shuffled.slice(0, 3);
+      }
+    },
+    updateEventStatus({ id, newStatus }) {
+      const target = this.displayedEvents.find(e => e.id === id);
+      if (target) {
+        target.participationStatus = newStatus;
+      }
+
+      const activeTarget = this.activeEvents.find(e => e.id === id);
+      if (activeTarget) {
+        activeTarget.participationStatus = newStatus;
+      }
+    },
+    onEventUpdated(updatedEvent) {
+      // Update in displayedEvents array
+      const displayIndex = this.displayedEvents.findIndex(e => e.id === updatedEvent.id);
+      if (displayIndex !== -1) {
+        // In Vue 3, just assign directly
+        this.displayedEvents[displayIndex] = updatedEvent;
+      }
+
+      // Also update in the main activeEvents array
+      const activeIndex = this.activeEvents.findIndex(e => e.id === updatedEvent.id);
+      if (activeIndex !== -1) {
+        this.activeEvents[activeIndex] = updatedEvent;
+      }
     }
   }
 }

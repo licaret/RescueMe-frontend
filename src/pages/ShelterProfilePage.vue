@@ -11,31 +11,9 @@
     <div v-else-if="error" class="bg-red-50 border-l-4 border-red-500 text-red-700 p-6 rounded-2xl mb-8 shadow-md">
       <p class="font-medium text-lg">{{ error }}</p>
       <p class="mt-2">Please try again or go back to browse available shelters.</p>
-      <button @click="goBack" class="mt-4 inline-flex items-center px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-all shadow-sm hover:shadow-md">
-        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-        </svg>
-        Back to Available Pets
-      </button>
     </div>
 
     <div v-else class="space-y-8">
-      <!-- Back button -->
-      <div class="flex items-center mb-6">
-        <button @click="goBack" class="flex items-center text-gray-600 hover:text-red-600 transition-colors font-medium">
-          <svg 
-            class="w-5 h-5 mr-2" 
-            xmlns="http://www.w3.org/2000/svg" 
-            fill="none" 
-            viewBox="0 0 24 24" 
-            stroke="currentColor"
-          >
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-          </svg>
-          Back to Available Pets
-        </button>
-      </div>
-
       <!-- Shelter Header Section -->
       <div class="bg-white shadow-lg rounded-3xl overflow-hidden border border-gray-200 hover:shadow-xl transition-all duration-300">
         <div class="flex flex-col md:flex-row">
@@ -353,88 +331,114 @@
           </button>
         </div>
       </div>
+
+      <!-- Event Showcase Section with Pagination -->
+      <div class="bg-white shadow-lg rounded-xl p-6 border border-gray-200 hover:shadow-xl transition-all duration-300 mt-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-6 border-b border-gray-200 pb-2 flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          Upcoming Events
+        </h2>
+
+        <div v-if="displayedEvents.length > 0" class="relative">
+          <!-- Pagination container with events and arrows -->
+          <div class="flex items-center">
+            <!-- Left navigation button -->
+            <button 
+              @click="prevEventPage" 
+              class="flex-shrink-0 mr-4 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-red-50 hover:to-red-100 text-gray-700 hover:text-red-600 rounded-full p-4 shadow-md transition-all transform hover:-translate-y-1"
+              :disabled="eventCurrentPage === 0"
+              :class="{ 'opacity-50 cursor-not-allowed': eventCurrentPage === 0 }"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+
+            <!-- Events container -->
+            <div class="flex-grow overflow-hidden">
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <EventCard
+                  v-for="event in displayedEvents"
+                  :key="event.id"
+                  :event="event"
+                  @status-updated="updateEventStatus"
+                  @event-updated="onEventUpdated"
+                />
+              </div>
+            </div>
+
+            <!-- Right navigation button -->
+            <button 
+              @click="nextEventPage" 
+              class="flex-shrink-0 ml-4 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-red-50 hover:to-red-100 text-gray-700 hover:text-red-600 rounded-full p-4 shadow-md transition-all transform hover:-translate-y-1"
+              :disabled="eventCurrentPage >= eventMaxPage"
+              :class="{ 'opacity-50 cursor-not-allowed': eventCurrentPage >= eventMaxPage }"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Page indicators -->
+          <div class="flex justify-center mt-8 space-x-3">
+            <div 
+              v-for="index in eventMaxPage + 1" 
+              :key="index"
+              @click="eventCurrentPage = index - 1"
+              class="w-3 h-3 rounded-full cursor-pointer transition-all"
+              :class="eventCurrentPage === index - 1 ? 'bg-red-600 scale-125' : 'bg-gray-300 hover:bg-gray-400 hover:scale-110'"
+            ></div>
+          </div>
+        </div>
+        
+        <!-- No events message -->
+        <div v-else class="bg-gradient-to-r from-gray-50 to-gray-100 text-center py-16 rounded-3xl shadow-inner">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+          <h3 class="text-xl font-medium text-gray-700 mb-2">No Upcoming Events</h3>
+          <p class="text-gray-500 max-w-md mx-auto">This shelter currently doesn't have any events listed. Please check back soon or contact them directly.</p>
+        </div>
+      </div>
     </div>
   </div>
 </template>
-
-
 
 <script>
 import { ref, computed, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import Navbar from "@/components/Navbar.vue";
 import PetCard from "@/components/PetCard.vue";
+import EventCard from "@/components/EventCard.vue";
 
 export default {
-
   name: 'ShelterProfile',
-
   components: {
     Navbar,
-    PetCard
+    PetCard, 
+    EventCard
   },
-  
   setup() {
     const router = useRouter();
     const route = useRoute();
-    
+
     const shelterId = route.params.id;
     const shelter = ref({});
     const loading = ref(true);
     const error = ref('');
     const imageError = ref(false);
+
+    // Pets pagination
     const currentPage = ref(0);
-    const petsPerPage = 3; 
-    
+    const petsPerPage = 3;
 
     const availablePetsCount = computed(() => {
       if (!shelter.value.pets) return 0;
       return shelter.value.pets.filter(pet => pet.status === 'AVAILABLE').length;
     });
-    
-
-    const formatLocation = computed(() => {
-      if (!shelter.value) return 'Location unavailable';
-      
-      const city = shelter.value.city || '';
-      const county = shelter.value.county || '';
-      
-      if (city && county) {
-        return `${city}, ${county}`;
-      } else if (city) {
-        return city;
-      } else if (county) {
-        return county;
-      } else {
-        return 'Location unavailable';
-      }
-    });
-    
-
-    const formatFullAddress = computed(() => {
-      if (!shelter.value) return 'Address unavailable';
-      
-      const fullAddress = shelter.value.fullAddress;
-      const city = shelter.value.city;
-      const county = shelter.value.county;
-      
-      if (fullAddress) {
-        if (city && !fullAddress.includes(city)) {
-          return `${fullAddress}, ${city}${county ? `, ${county}` : ''}`;
-        } else if (county && !fullAddress.includes(county)) {
-          return `${fullAddress}${county ? `, ${county}` : ''}`;
-        }
-        return fullAddress;
-      } else {
-        const components = [];
-        if (city) components.push(city);
-        if (county) components.push(county);
-        
-        return components.length > 0 ? components.join(', ') : 'Address unavailable';
-      }
-    });
-
-    
 
     const paginatedPets = computed(() => {
       if (!shelter.value.pets) return [];
@@ -442,12 +446,10 @@ export default {
       return shelter.value.pets.slice(start, start + petsPerPage);
     });
 
-
     const maxPage = computed(() => {
       if (!shelter.value.pets) return 0;
       return Math.ceil(shelter.value.pets.length / petsPerPage) - 1;
     });
-
 
     const nextPage = () => {
       if (currentPage.value < maxPage.value) {
@@ -461,29 +463,118 @@ export default {
       }
     };
 
+    // Events pagination
+    const eventCurrentPage = ref(0);
+    const eventsPerPage = 3;
+
+    const eventMaxPage = computed(() => {
+      if (!shelter.value.events || shelter.value.events.length === 0) return 0;
+      return Math.ceil(shelter.value.events.length / eventsPerPage) - 1;
+    });
+
+    const displayedEvents = computed(() => {
+      if (!shelter.value.events || shelter.value.events.length === 0) return [];
+      const start = eventCurrentPage.value * eventsPerPage;
+      return shelter.value.events.slice(start, start + eventsPerPage);
+    });
+
+    const nextEventPage = () => {
+      if (eventCurrentPage.value < eventMaxPage.value) {
+        eventCurrentPage.value++;
+      }
+    };
+
+    const prevEventPage = () => {
+      if (eventCurrentPage.value > 0) {
+        eventCurrentPage.value--;
+      }
+    };
+
+    const formatLocation = computed(() => {
+      if (!shelter.value) return 'Location unavailable';
+      const city = shelter.value.city || '';
+      const county = shelter.value.county || '';
+      if (city && county) return `${city}, ${county}`;
+      if (city) return city;
+      if (county) return county;
+      return 'Location unavailable';
+    });
+
+    const formatFullAddress = computed(() => {
+      if (!shelter.value) return 'Address unavailable';
+      const fullAddress = shelter.value.fullAddress;
+      const city = shelter.value.city;
+      const county = shelter.value.county;
+      if (fullAddress) {
+        if (city && !fullAddress.includes(city)) {
+          return `${fullAddress}, ${city}${county ? `, ${county}` : ''}`;
+        } else if (county && !fullAddress.includes(county)) {
+          return `${fullAddress}${county ? `, ${county}` : ''}`;
+        }
+        return fullAddress;
+      } else {
+        const components = [];
+        if (city) components.push(city);
+        if (county) components.push(county);
+        return components.length > 0 ? components.join(', ') : 'Address unavailable';
+      }
+    });
+
+    const adoptPet = (petId) => {
+      alert(`Starting adoption process for pet ID: ${petId}`);
+    };
+
+    // Event handlers for attendance status updates
+    const updateEventStatus = ({ id, newStatus }) => {
+      console.log(`Updating event ${id} status to ${newStatus}`);
+      
+      // Find and update the event in shelter's events array
+      if (shelter.value.events) {
+        const eventIndex = shelter.value.events.findIndex(event => event.id === id);
+        if (eventIndex !== -1) {
+          // Create a new event object with the updated status to maintain reactivity
+          const updatedEvent = { 
+            ...shelter.value.events[eventIndex],
+            userAttendanceStatus: newStatus  // This matches the property we set during fetch
+          };
+          
+          // Replace the old event with the updated one
+          shelter.value.events.splice(eventIndex, 1, updatedEvent);
+        }
+      }
+    };
+
+    const onEventUpdated = (updatedEvent) => {
+      console.log('Event updated:', updatedEvent);
+      
+      // Find and update the event in shelter's events array
+      if (shelter.value.events) {
+        const eventIndex = shelter.value.events.findIndex(event => event.id === updatedEvent.id);
+        if (eventIndex !== -1) {
+          // Replace the old event with the updated one
+          shelter.value.events.splice(eventIndex, 1, updatedEvent);
+        }
+      }
+    };
+
     const loadShelterData = async () => {
       try {
         loading.value = true;
         error.value = '';
         imageError.value = false;
-        
+
+        // Fetch shelter basic data
         const response = await fetch(`http://localhost:8080/users/shelter/${shelterId}`);
-        
-        if (!response.ok) {
-          throw new Error(`Failed to fetch shelter: ${response.status} ${response.statusText}`);
-        }
-        
+        if (!response.ok) throw new Error(`Failed to fetch shelter: ${response.status} ${response.statusText}`);
         shelter.value = await response.json();
-        
+
+        // Fetch pets
         const petsResponse = await fetch(`http://localhost:8080/pets/${shelterId}`);
-        
         if (petsResponse.ok) {
           const petsData = await petsResponse.json();
-          shelter.value.pets = petsData;
-          
-          shelter.value.pets = shelter.value.pets.map(pet => {
+          shelter.value.pets = petsData.map(pet => {
             if (pet.photos && pet.photos.length > 0) {
-              pet.photos.forEach((photo, index) => {
+              pet.photos.forEach(photo => {
                 if (!photo.url && photo.id) {
                   photo.url = `data:image/jpeg;base64,${photo}`;
                 }
@@ -495,7 +586,54 @@ export default {
           console.error("Failed to fetch pets for this shelter");
           shelter.value.pets = [];
         }
-        
+
+        // Fetch events with user participation status
+        const eventsResponse = await fetch(`http://localhost:8080/api/v1/events/shelter/${shelterId}`);
+        if (eventsResponse.ok) {
+          const eventsData = await eventsResponse.json();
+          
+          // Filter for upcoming and active events
+          const now = new Date();
+          const upcomingEvents = eventsData.filter(event => 
+            event.isActive && new Date(event.endDateTime) > now
+          );
+          
+          // Get current user ID for checking participation
+          const userId = localStorage.getItem('Id');
+          
+          // If user is logged in, fetch participation status for all events at once
+          if (userId) {
+            try {
+              const userEventsResponse = await fetch(
+                `http://localhost:8080/api/v1/events/user/${userId}`
+              );
+              
+              if (userEventsResponse.ok) {
+                const userEvents = await userEventsResponse.json();
+                console.log('User events:', userEvents);
+                
+                // Apply the participation status to each event
+                upcomingEvents.forEach(event => {
+                  const userEvent = userEvents.find(ue => ue.eventId === event.id);
+                  if (userEvent) {
+                    // Make sure we're using the right property name that the EventCard component expects
+                    event.userAttendanceStatus = userEvent.status; 
+                    console.log(`Event ${event.id} has status: ${event.userAttendanceStatus}`);
+                  }
+                });
+              }
+            } catch (err) {
+              console.error("Failed to fetch user's participation status:", err);
+            }
+          }
+          
+          shelter.value.events = upcomingEvents;
+          
+        } else {
+          console.error("Failed to fetch events for this shelter");
+          shelter.value.events = [];
+        }
+
       } catch (err) {
         console.error("Error loading shelter data:", err);
         error.value = "Could not load shelter information. Please try again later.";
@@ -504,34 +642,9 @@ export default {
       }
     };
 
-
-
-    const formatAge = (age) => {
-      if (age === undefined || age === null) return 'Unknown';
-      
-      const ageInMonths = Math.round(age * 12);
-      if (ageInMonths >= 12) {
-        return `${Math.floor(age)} ${Math.floor(age) === 1 ? 'year' : 'years'}`;
-      } else {
-        return `${ageInMonths} ${ageInMonths === 1 ? 'month' : 'months'}`;
-      }
-    };
-
-
-    const adoptPet = (petId) => {
-      alert(`Starting adoption process for pet ID: ${petId}`);
-    };
-
-
-    const goBack = () => {
-      router.push('/available-pets');
-    };
-
-
     onMounted(() => {
       loadShelterData();
     });
-
 
     return {
       shelter,
@@ -541,20 +654,24 @@ export default {
       availablePetsCount,
       formatLocation,
       formatFullAddress,
-      formatAge,
       adoptPet,
-      goBack,
       currentPage,
       paginatedPets,
       maxPage,
       nextPage,
-      prevPage
+      prevPage,
+      // Events
+      eventCurrentPage,
+      eventMaxPage,
+      displayedEvents,
+      nextEventPage,
+      prevEventPage,
+      updateEventStatus,
+      onEventUpdated
     };
   }
-}
+};
 </script>
-
-
 
 <style scoped>
 .shadow-lg {
