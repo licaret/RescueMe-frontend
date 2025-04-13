@@ -184,7 +184,7 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <!-- Image Gallery -->
             <div class="relative">
-              <div class="h-80 overflow-hidden bg-gray-100 rounded-lg">
+              <div class="h-80 overflow-hidden bg-gray-100 rounded-2xl">
                 <img
                   v-if="pet.photos && pet.photos.length > 0"
                   :src="pet.photos[currentIndex]?.url"
@@ -216,7 +216,7 @@
                     v-for="(photo, index) in pet.photos" 
                     :key="index"
                     @click.stop="goToImage(index)"
-                    class="h-8 w-8 rounded-md overflow-hidden cursor-pointer transition-all duration-300"
+                    class="h-8 w-8 rounded-2xl overflow-hidden cursor-pointer transition-all duration-300"
                     :class="index === currentIndex ? 'ring-2 ring-indigo-500' : ''"
                   >
                     <img :src="photo.url" alt="Thumbnail" class="w-full h-full object-cover" />
@@ -264,7 +264,7 @@
               <!-- Primary Attributes -->
               <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 <!-- Age -->
-                <div class="bg-gray-50 p-3 rounded-lg">
+                <div class="bg-gray-50 p-3 rounded-2xl">
                   <div class="text-amber-500 mb-1">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -275,7 +275,7 @@
                 </div>
                 
                 <!-- Sex -->
-                <div class="bg-gray-50 p-3 rounded-lg">
+                <div class="bg-gray-50 p-3 rounded-2xl">
                   <div class="text-purple-500 mb-1">
                     <svg v-if="pet.sex === 'Male'" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <circle cx="10.5" cy="10.5" r="7.5" />
@@ -294,7 +294,7 @@
                 </div>
                 
                 <!-- Size -->
-                <div class="bg-gray-50 p-3 rounded-lg">
+                <div class="bg-gray-50 p-3 rounded-2xl">
                   <div class="text-blue-500 mb-1">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
@@ -306,7 +306,7 @@
               </div>
               
               <!-- Health Status -->
-              <div class="flex items-center p-4 rounded-lg" 
+              <div class="flex items-center p-4 rounded-2xl" 
                    :class="pet.healthStatus === 'Healthy' ? 'bg-green-50' : pet.healthStatus === 'Minor Issues' ? 'bg-yellow-50' : 'bg-red-50'">
                 <div :class="pet.healthStatus === 'Healthy' ? 'text-green-500' : pet.healthStatus === 'Minor Issues' ? 'text-yellow-500' : 'text-red-500'" class="mr-3">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -350,7 +350,7 @@
               </div>
               
               <!-- Shelter Time -->
-              <div class="flex items-center p-4 bg-blue-50 rounded-lg">
+              <div class="flex items-center p-4 bg-blue-50 rounded-2xl">
                 <div class="text-blue-500 mr-3">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -363,7 +363,7 @@
               </div>
               
               <!-- Story -->
-              <div class="bg-gray-50 p-4 rounded-lg">
+              <div class="bg-gray-50 p-4 rounded-2xl">
                 <div class="flex items-center mb-2 text-indigo-600">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
@@ -385,7 +385,7 @@
             <div>
               <button
                 @click.stop="showDeleteModal"
-                class="flex items-center gap-1.5 bg-red-50 text-red-600 px-4 py-2 rounded-md text-sm font-medium hover:bg-red-100 transition-colors"
+                class="flex items-center gap-1.5 bg-red-50 text-red-600 px-4 py-2 rounded-2xl text-sm font-medium hover:bg-red-100 transition-colors"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -396,7 +396,7 @@
             <div class="flex gap-3">
               <button 
                 @click.stop="openEditForm"
-                class="flex items-center gap-1.5 bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 transition-colors"
+                class="flex items-center gap-1.5 bg-indigo-600 text-white px-4 py-2 rounded-2xl text-sm font-medium hover:bg-indigo-700 transition-colors"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -413,7 +413,7 @@
               <!-- Save -->
               <button 
                 @click.stop="toggleFavorite"
-                class="flex items-center gap-1.5 bg-gray-100 px-4 py-2 rounded-md text-sm font-medium"
+                class="flex items-center gap-1.5 bg-gray-100 px-4 py-2 rounded-2xl text-sm font-medium"
                 :class="isFavorite ? 'text-red-600 hover:bg-red-50' : 'text-gray-600 hover:bg-gray-200'"
               >
                 <svg 
@@ -434,7 +434,7 @@
               <button
                 v-if="pet.status === 'AVAILABLE'"
                 @click.stop="adoptPet"
-                class="flex items-center gap-1.5 bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition-colors"
+                class="flex items-center gap-1.5 bg-red-600 text-white px-4 py-2 rounded-2xl text-sm font-medium hover:bg-red-700 transition-colors"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -444,7 +444,7 @@
               <button
                 v-else
                 disabled
-                class="bg-gray-100 text-gray-400 cursor-not-allowed flex items-center justify-center gap-1.5 px-4 py-2 rounded-md text-sm"
+                class="bg-gray-100 text-gray-400 cursor-not-allowed flex items-center justify-center gap-1.5 px-4 py-2 rounded-2xl text-sm"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -462,7 +462,7 @@
   <!-- Confirmation Modal -->
   <Teleport to="body" v-if="showModal">
     <div class="fixed inset-0 z-[10000] bg-black/30 backdrop-blur-sm flex items-center justify-center p-4">
-      <div class="bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:max-w-lg w-full">
+      <div class="bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:max-w-lg w-full">
         <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
           <div class="sm:flex sm:items-start">
             <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
@@ -482,13 +482,13 @@
           <button 
             type="button" 
             @click.stop="deletePet"
-            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+            class="w-full inline-flex justify-center rounded-2xl border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
             Yes, delete it
           </button>
           <button 
             type="button" 
             @click.stop="showModal = false"
-            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+            class="mt-3 w-full inline-flex justify-center rounded-2xl border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
             Cancel
           </button>
         </div>

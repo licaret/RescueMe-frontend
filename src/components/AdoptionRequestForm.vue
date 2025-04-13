@@ -29,13 +29,13 @@
           <div class="flex justify-center gap-4">
             <button 
               @click="navigateToAdoptionRequests" 
-              class="px-4 py-2 bg-indigo-600 text-white rounded-md font-medium hover:bg-indigo-700 transition-colors"
+              class="px-4 py-2 bg-pink-600 text-white rounded-2xl font-medium hover:bg-pink-700 transition-colors"
             >
               View My Adoption Requests
             </button>
             <button 
               @click="goToHomePage" 
-              class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md font-medium hover:bg-gray-300 transition-colors"
+              class="px-4 py-2 bg-gray-200 text-gray-800 rounded-2xl font-medium hover:bg-gray-300 transition-colors"
             >
               Back to Home
             </button>
@@ -46,7 +46,7 @@
       <!-- Loading State -->
       <div v-else-if="!pet" class="flex-1 flex items-center justify-center p-6">
         <div class="text-center">
-          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500 mx-auto mb-4"></div>
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto mb-4"></div>
           <p class="text-gray-500">Loading pet information...</p>
         </div>
       </div>
@@ -63,7 +63,7 @@
           <p class="text-gray-600 mb-6">{{ errorMessage }}</p>
           <button 
             @click="errorMessage = ''" 
-            class="px-4 py-2 bg-red-600 text-white rounded-md font-medium hover:bg-red-700 transition-colors"
+            class="px-4 py-2 bg-red-600 text-white rounded-2xl font-medium hover:bg-red-700 transition-colors"
           >
             Try Again
           </button>
@@ -74,15 +74,15 @@
       <div v-else class="overflow-y-auto flex-1 p-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
           <!-- Pet Overview -->
-          <div class="bg-gray-50 rounded-xl p-4">
+          <div class="bg-gray-50 rounded-2xl p-4">
             <h3 class="font-medium text-gray-800 mb-4 flex items-center">
-              <span class="bg-indigo-100 text-indigo-700 w-6 h-6 rounded-full inline-flex items-center justify-center mr-2">1</span>
+              <span class="bg-pink-100 text-pink-700 w-6 h-6 rounded-full inline-flex items-center justify-center mr-2">1</span>
               Pet Overview
             </h3>
             
             <div class="flex items-start gap-4">
               <!-- Pet Image -->
-              <div class="w-24 h-24 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+              <div class="w-24 h-24 rounded-2xl overflow-hidden bg-gray-100 flex-shrink-0">
                 <img
                   v-if="pet && pet.photos && pet.photos.length > 0"
                   :src="pet.photos[0]?.url"
@@ -137,13 +137,13 @@
           <!-- Adopter Information -->
           <div>
             <h3 class="font-medium text-gray-800 mb-4 flex items-center">
-              <span class="bg-indigo-100 text-indigo-700 w-6 h-6 rounded-full inline-flex items-center justify-center mr-2">2</span>
+              <span class="bg-pink-100 text-pink-700 w-6 h-6 rounded-full inline-flex items-center justify-center mr-2">2</span>
               Your Information
             </h3>
             
-            <div v-if="userProfile" class="mb-4 p-4 bg-gray-50 rounded-lg">
+            <div v-if="userProfile" class="mb-4 p-4 bg-gray-50 rounded-2xl">
               <div class="flex items-center gap-3 mb-2">
-                <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600">
+                <div class="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center text-pink-600">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
@@ -158,7 +158,7 @@
               </div>
             </div>
             
-            <div v-else class="mb-4 p-4 bg-yellow-50 border border-yellow-100 rounded-lg">
+            <div v-else class="mb-4 p-4 bg-yellow-50 border border-yellow-100 rounded-2xl">
               <div class="flex items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -175,7 +175,7 @@
                   type="tel"
                   id="phone"
                   v-model="form.phone"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-2xl shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
                   placeholder="Your phone number"
                   required
                 />
@@ -188,7 +188,7 @@
                     type="text"
                     id="city"
                     v-model="form.city"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-2xl shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
                     placeholder="Your city"
                     required
                   />
@@ -200,7 +200,7 @@
                     type="text"
                     id="county"
                     v-model="form.county"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-2xl shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
                     placeholder="Your county"
                     required
                   />
@@ -213,11 +213,11 @@
         <!-- Questionnaire Section -->
         <div class="mt-8">
           <h3 class="font-medium text-gray-800 mb-4 flex items-center">
-            <span class="bg-indigo-100 text-indigo-700 w-6 h-6 rounded-full inline-flex items-center justify-center mr-2">3</span>
+            <span class="bg-pink-100 text-pink-700 w-6 h-6 rounded-full inline-flex items-center justify-center mr-2">3</span>
             Adoption Questionnaire
           </h3>
           
-          <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+          <div class="bg-white border border-gray-200 rounded-2xl overflow-hidden">
             <div class="divide-y divide-gray-200">
               <!-- Housing -->
               <div class="p-4">
@@ -228,7 +228,7 @@
                     <select
                       id="housingType"
                       v-model="form.housingType"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-2xl shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
                       required
                     >
                       <option value="">Select an option</option>
@@ -245,7 +245,7 @@
                     <select
                       id="ownRent"
                       v-model="form.ownRent"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-2xl shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
                       required
                     >
                       <option value="">Select an option</option>
@@ -260,15 +260,15 @@
                     <label for="landlordPermission" class="block text-sm font-medium text-gray-700 mb-1">Do you have your landlord's permission to have pets?</label>
                     <div class="flex items-center gap-4">
                       <label class="inline-flex items-center">
-                        <input type="radio" v-model="form.landlordPermission" value="yes" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" />
+                        <input type="radio" v-model="form.landlordPermission" value="yes" class="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded-2xl" />
                         <span class="ml-2 text-sm text-gray-700">Yes</span>
                       </label>
                       <label class="inline-flex items-center">
-                        <input type="radio" v-model="form.landlordPermission" value="no" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" />
+                        <input type="radio" v-model="form.landlordPermission" value="no" class="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded-2xl" />
                         <span class="ml-2 text-sm text-gray-700">No</span>
                       </label>
                       <label class="inline-flex items-center">
-                        <input type="radio" v-model="form.landlordPermission" value="notSure" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" />
+                        <input type="radio" v-model="form.landlordPermission" value="notSure" class="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded-2xl" />
                         <span class="ml-2 text-sm text-gray-700">Not sure</span>
                       </label>
                     </div>
@@ -278,11 +278,11 @@
                     <label for="yard" class="block text-sm font-medium text-gray-700 mb-1">Do you have a yard?</label>
                     <div class="flex items-center gap-4">
                       <label class="inline-flex items-center">
-                        <input type="radio" v-model="form.hasYard" value="yes" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" />
+                        <input type="radio" v-model="form.hasYard" value="yes" class="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded-2xl" />
                         <span class="ml-2 text-sm text-gray-700">Yes</span>
                       </label>
                       <label class="inline-flex items-center">
-                        <input type="radio" v-model="form.hasYard" value="no" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" />
+                        <input type="radio" v-model="form.hasYard" value="no" class="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded-2xl" />
                         <span class="ml-2 text-sm text-gray-700">No</span>
                       </label>
                     </div>
@@ -292,15 +292,15 @@
                     <label for="fencedYard" class="block text-sm font-medium text-gray-700 mb-1">Is your yard fully fenced?</label>
                     <div class="flex items-center gap-4">
                       <label class="inline-flex items-center">
-                        <input type="radio" v-model="form.fencedYard" value="yes" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" />
+                        <input type="radio" v-model="form.fencedYard" value="yes" class="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded-2xl" />
                         <span class="ml-2 text-sm text-gray-700">Yes</span>
                       </label>
                       <label class="inline-flex items-center">
-                        <input type="radio" v-model="form.fencedYard" value="partial" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" />
+                        <input type="radio" v-model="form.fencedYard" value="partial" class="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded-2xl" />
                         <span class="ml-2 text-sm text-gray-700">Partially</span>
                       </label>
                       <label class="inline-flex items-center">
-                        <input type="radio" v-model="form.fencedYard" value="no" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" />
+                        <input type="radio" v-model="form.fencedYard" value="no" class="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded-2xl" />
                         <span class="ml-2 text-sm text-gray-700">No</span>
                       </label>
                     </div>
@@ -319,7 +319,7 @@
                       id="householdMembers"
                       v-model="form.householdMembers"
                       min="1"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-2xl shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
                       required
                     />
                   </div>
@@ -328,11 +328,11 @@
                     <label for="children" class="block text-sm font-medium text-gray-700 mb-1">Do you have children under 18 in your home?</label>
                     <div class="flex items-center gap-4">
                       <label class="inline-flex items-center">
-                        <input type="radio" v-model="form.hasChildren" value="yes" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" />
+                        <input type="radio" v-model="form.hasChildren" value="yes" class="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded-2xl" />
                         <span class="ml-2 text-sm text-gray-700">Yes</span>
                       </label>
                       <label class="inline-flex items-center">
-                        <input type="radio" v-model="form.hasChildren" value="no" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" />
+                        <input type="radio" v-model="form.hasChildren" value="no" class="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded-2xl" />
                         <span class="ml-2 text-sm text-gray-700">No</span>
                       </label>
                     </div>
@@ -344,7 +344,7 @@
                       type="text"
                       id="childrenAges"
                       v-model="form.childrenAges"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-2xl shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
                       placeholder="e.g. 3, 7, 12"
                     />
                   </div>
@@ -353,11 +353,11 @@
                     <label for="otherPets" class="block text-sm font-medium text-gray-700 mb-1">Do you have other pets?</label>
                     <div class="flex items-center gap-4">
                       <label class="inline-flex items-center">
-                        <input type="radio" v-model="form.hasOtherPets" value="yes" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" />
+                        <input type="radio" v-model="form.hasOtherPets" value="yes" class="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded-2xl" />
                         <span class="ml-2 text-sm text-gray-700">Yes</span>
                       </label>
                       <label class="inline-flex items-center">
-                        <input type="radio" v-model="form.hasOtherPets" value="no" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" />
+                        <input type="radio" v-model="form.hasOtherPets" value="no" class="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded-2xl" />
                         <span class="ml-2 text-sm text-gray-700">No</span>
                       </label>
                     </div>
@@ -369,7 +369,7 @@
                       id="otherPetsDescription"
                       v-model="form.otherPetsDescription"
                       rows="3"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-2xl shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
                       placeholder="Tell us about your current pets"
                     ></textarea>
                   </div>
@@ -385,7 +385,7 @@
                     <select
                       id="petExperience"
                       v-model="form.petExperience"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-2xl shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
                       required
                     >
                       <option value="">Select an option</option>
@@ -401,7 +401,7 @@
                     <select
                       id="activity"
                       v-model="form.activityLevel"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-2xl shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
                       required
                     >
                       <option value="">Select an option</option>
@@ -417,7 +417,7 @@
                     <select
                       id="timeAlone"
                       v-model="form.timeAlone"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-2xl shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
                       required
                     >
                       <option value="">Select an option</option>
@@ -434,7 +434,7 @@
                       id="adoptReason"
                       v-model="form.adoptReason"
                       rows="3"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-2xl shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
                       placeholder="Tell us why you want to adopt this pet"
                       required
                     ></textarea>
@@ -451,7 +451,7 @@
                     id="additionalInfo"
                     v-model="form.additionalInfo"
                     rows="3"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-2xl shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
                     placeholder="Share any other relevant information"
                   ></textarea>
                 </div>
@@ -467,7 +467,7 @@
                   id="terms"
                   v-model="form.agreeToTerms"
                   type="checkbox"
-                  class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                  class="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded-2xl"
                   required
                 />
               </div>
@@ -484,14 +484,14 @@
       <div v-if="!successMessage && !errorMessage && pet" class="px-6 py-4 border-t border-gray-100 flex justify-between bg-gray-50">
         <button 
           @click="goBack"
-          class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          class="px-4 py-2 border border-gray-300 rounded-2xl shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500"
         >
           Cancel
         </button>
         <button 
           @click="submitForm"
           :disabled="isSubmitting || !isFormValid || !userProfile || !pet"
-          class="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+          class="px-6 py-2 border border-transparent rounded-2xl shadow-sm text-sm font-medium text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
         >
           <span v-if="isSubmitting" class="mr-2">
             <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

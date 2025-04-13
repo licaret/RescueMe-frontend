@@ -169,7 +169,7 @@
             <div class="flex flex-row space-x-5 mt-6">
               <button 
                 @click="$refs.fileInput.click()"
-                class="bg-red-600 text-white px-4 py-1.5 rounded text-sm flex items-center"
+                class="bg-red-600 text-white px-4 py-1.5 rounded-2xl text-sm flex items-center"
                 :disabled="isUploadingProfilePicture"
               >
                 <span v-if="isUploadingProfilePicture" class="flex items-center">
@@ -188,7 +188,7 @@
               </button>
               <button 
                 @click="removeProfilePicture"
-                class="text-gray-600 text-sm border border-gray-300 px-4 py-1.5 rounded hover:text-gray-800"
+                class="text-gray-600 text-sm border border-gray-300 px-4 py-1.5 rounded-2xl hover:text-gray-800"
                 :disabled="!adopter.profilePictureUrl || isDeletingProfilePicture"
               >
                 <span v-if="isDeletingProfilePicture">Removing...</span>

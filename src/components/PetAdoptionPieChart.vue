@@ -1,59 +1,94 @@
 <template>
-  <div class="bg-white rounded-2xl shadow transition-all duration-300 hover:shadow-lg">
-    <div class="p-4 border-b flex justify-between items-center">
-      <h2 class="text-lg font-semibold text-gray-800">Pet Adoption Statistics</h2>
-      <div class="text-sm text-gray-500">
-        Total: {{ totalPets }}
+  <div class="bg-white rounded-lg shadow-sm">
+    <div class="p-5 flex justify-between items-center border-b">
+      <h2 class="text-gray-800 text-lg font-medium">Adoption Dashboard</h2>
+      <div class="bg-blue-50 text-blue-800 text-sm py-1 px-3 rounded-full font-medium">
+        {{ totalPets }} pets
       </div>
     </div>
-    <div class="p-4">
-      <!-- No Data State -->
-      <div v-if="totalPets === 0" class="flex flex-col items-center justify-center py-8">
-        <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-          </svg>
-        </div>
-        <p class="text-gray-600 mb-2">No pets have been added yet</p>
-        <p class="text-sm text-gray-500 text-center max-w-xs">Once pets are added to the platform, you'll see adoption statistics here.</p>
-        <button 
-          v-if="showAddButton" 
-          @click="$emit('add-pet')" 
-          class="mt-4 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-        >
-          Add Your First Pet
-        </button>
+    
+    <!-- Empty state -->
+    <div v-if="totalPets === 0" class="flex flex-col items-center justify-center p-10">
+      <div class="text-gray-400 mb-3">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+        </svg>
       </div>
-      
-      <!-- Chart View (when data exists) -->
-      <div v-else>
-        <div class="mb-6 max-w-full h-64 mx-auto">
-          <canvas ref="chartCanvas"></canvas>
+      <p class="text-gray-600 mb-4">No pets have been added yet</p>
+      <button 
+        v-if="showAddButton" 
+        @click="$emit('add-pet')" 
+        class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md transition-colors"
+      >
+        Add Pet
+      </button>
+    </div>
+    
+    <!-- Stats with chart -->
+    <div v-else class="p-5">
+      <div class="flex mb-8">
+        <div class="w-1/2 relative">
+          <canvas ref="chartCanvas" height="180"></canvas>
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <div class="text-2xl font-semibold text-gray-800">{{ totalPets }}</div>
+            <div class="text-xs text-gray-500">TOTAL</div>
+          </div>
         </div>
-        <div class="grid grid-cols-3 gap-4">
-          <div class="bg-gray-200 p-3 rounded-2xl text-center transform transition-transform hover:scale-105">
-            <div class="font-bold text-xl text-gray-600">{{ stats.adopted }}</div>
-            <p class="text-sm text-gray-700">Adopted</p>
-          </div>
-          <div class="bg-yellow-100 p-3 rounded-2xl text-center transform transition-transform hover:scale-105">
-            <div class="font-bold text-xl text-yellow-600">{{ stats.pending }}</div>
-            <p class="text-sm text-gray-700">Pending</p>
-          </div>
-          <div class="bg-green-100 p-3 rounded-2xl text-center transform transition-transform hover:scale-105">
-            <div class="font-bold text-xl text-green-600">{{ stats.available }}</div>
-            <p class="text-sm text-gray-700">Available</p>
+        <div class="w-1/2 pl-6 flex flex-col justify-center">
+          <div class="grid gap-4">
+            <!-- Available -->
+            <div class="flex items-center">
+              <div class="w-3 h-3 rounded-full bg-blue-500 mr-3"></div>
+              <div class="flex-1">
+                <div class="flex justify-between items-baseline">
+                  <div class="text-sm text-gray-600">Available</div>
+                  <div class="text-xl font-medium text-gray-800">{{ stats.available }}</div>
+                </div>
+                <div class="mt-1 bg-gray-200 h-1.5 rounded-full w-full overflow-hidden">
+                  <div class="h-full bg-blue-500 rounded-full" :style="{width: `${getPercentage('available')}%`}"></div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Pending -->
+            <div class="flex items-center">
+              <div class="w-3 h-3 rounded-full bg-amber-500 mr-3"></div>
+              <div class="flex-1">
+                <div class="flex justify-between items-baseline">
+                  <div class="text-sm text-gray-600">Pending</div>
+                  <div class="text-xl font-medium text-gray-800">{{ stats.pending }}</div>
+                </div>
+                <div class="mt-1 bg-gray-200 h-1.5 rounded-full w-full overflow-hidden">
+                  <div class="h-full bg-amber-500 rounded-full" :style="{width: `${getPercentage('pending')}%`}"></div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Adopted -->
+            <div class="flex items-center">
+              <div class="w-3 h-3 rounded-full bg-green-500 mr-3"></div>
+              <div class="flex-1">
+                <div class="flex justify-between items-baseline">
+                  <div class="text-sm text-gray-600">Adopted</div>
+                  <div class="text-xl font-medium text-gray-800">{{ stats.adopted }}</div>
+                </div>
+                <div class="mt-1 bg-gray-200 h-1.5 rounded-full w-full overflow-hidden">
+                  <div class="h-full bg-green-500 rounded-full" :style="{width: `${getPercentage('adopted')}%`}"></div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 </template>
-  
+
 <script>
 import { ref, onMounted, onUnmounted, watch, computed } from 'vue';
-  
+
 export default {
-  name: 'PetAdoptionPieChart',
+  name: 'AdoptionDashboard',
   props: {
     stats: {
       type: Object,
@@ -61,6 +96,14 @@ export default {
         adopted: 0,
         pending: 0,
         available: 0
+      })
+    },
+    monthlyStats: {
+      type: Object,
+      default: () => ({
+        new: 12,
+        adoptions: 8,
+        avgDays: 14
       })
     },
     showAddButton: {
@@ -76,6 +119,11 @@ export default {
     const totalPets = computed(() => {
       return props.stats.adopted + props.stats.pending + props.stats.available;
     });
+    
+    const getPercentage = (type) => {
+      if (totalPets.value === 0) return 0;
+      return Math.round((props.stats[type] / totalPets.value) * 100);
+    };
 
     const createChart = () => {
       if (!chartCanvas.value || totalPets.value === 0) return;
@@ -87,91 +135,63 @@ export default {
         
         if (chart) chart.destroy();
         
-        // Enhanced color scheme
         const colors = {
-          adopted: {
-            background: '#d1d5db',
-            border: '#9ca3af',
-            hover: '#9ca3af'
+          available: {
+            background: 'rgba(59, 130, 246, 0.9)', // blue-500
+            border: '#fff'
           },
           pending: {
-            background: '#fef3c7',
-            border: '#fcd34d',
-            hover: '#fcd34d'
+            background: 'rgba(245, 158, 11, 0.9)', // amber-500
+            border: '#fff'
           },
-          available: {
-            background: '#d1fae5',
-            border: '#6ee7b7',
-            hover: '#6ee7b7'
+          adopted: {
+            background: 'rgba(16, 185, 129, 0.9)', // green-500
+            border: '#fff'
           }
         };
         
         chart = new Chart(ctx, {
           type: 'doughnut',
           data: {
-            labels: ['Adopted', 'Pending', 'Available'],
+            labels: ['Available', 'Pending', 'Adopted'],
             datasets: [{
-              data: [props.stats.adopted, props.stats.pending, props.stats.available],
-              backgroundColor: [colors.adopted.background, colors.pending.background, colors.available.background],
-              borderColor: [colors.adopted.border, colors.pending.border, colors.available.border],
-              hoverBackgroundColor: [colors.adopted.hover, colors.pending.hover, colors.available.hover],
+              data: [props.stats.available, props.stats.pending, props.stats.adopted],
+              backgroundColor: [
+                colors.available.background, 
+                colors.pending.background, 
+                colors.adopted.background
+              ],
+              borderColor: colors.available.border,
               borderWidth: 2
             }]
           },
           options: {
             responsive: true,
             maintainAspectRatio: false,
+            cutout: '75%',
             plugins: {
               legend: {
-                position: 'bottom',
-                labels: {
-                  usePointStyle: true,
-                  padding: 20,
-                  font: {
-                    size: 12
-                  }
-                }
+                display: false
               },
               tooltip: {
+                enabled: true,
+                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                titleColor: '#111827',
+                bodyColor: '#374151',
+                borderColor: '#e5e7eb',
+                borderWidth: 1,
+                cornerRadius: 4,
+                displayColors: true,
+                boxPadding: 4,
                 callbacks: {
                   label: function(context) {
                     const label = context.label || '';
                     const value = context.raw || 0;
-                    const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
-                    const percentage = Math.round((value / total) * 100);
-                    return `${label}: ${value} (${percentage}%)`;
+                    return `${label}: ${value} (${getPercentage(label.toLowerCase())}%)`;
                   }
-                }
-              },
-              // Add a title in the center of the doughnut
-              title: {
-                display: true,
-                text: totalPets.value.toString(),
-                position: 'center',
-                font: {
-                  size: 20,
-                  weight: 'bold'
-                },
-                padding: {
-                  top: 10,
-                  bottom: 0
-                }
-              },
-              subtitle: {
-                display: true,
-                text: 'TOTAL',
-                position: 'center',
-                font: {
-                  size: 12,
-                  weight: 'normal'
-                },
-                padding: {
-                  top: 0,
-                  bottom: 10
                 }
               }
             },
-            cutout: '65%',
             animation: {
               animateScale: true,
               animateRotate: true
@@ -197,21 +217,9 @@ export default {
 
     return {
       chartCanvas,
-      totalPets
+      totalPets,
+      getPercentage
     };
   }
 };
 </script>
-
-<style scoped>
-/* Animation for scale effect on hover */
-.transform {
-  transition-property: transform;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 300ms;
-}
-
-.hover\:scale-105:hover {
-  transform: scale(1.05);
-}
-</style>

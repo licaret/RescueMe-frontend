@@ -394,6 +394,34 @@ export const partialUpdateEvent = async (eventId, updateData, shelterId) => {
   return await response.json();
 };
 
+/**
+ * Fetch upcoming events for a specific shelter
+ * @param {number} shelterId
+ * @returns {Promise<Array>}
+ */
+export async function fetchUpcomingEventsForShelter(shelterId) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/upcoming/shelter/${shelterId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Failed to fetch upcoming events for shelter: ${errorText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching upcoming shelter events:', error);
+    throw error;
+  }
+}
+
+
 
 // Export all functions
 export default {

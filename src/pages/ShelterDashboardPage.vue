@@ -267,17 +267,22 @@
           <!-- Main Dashboard Sections -->
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Recent Activity Section -->
-            <div class="lg:col-span-2 bg-white rounded-2xl shadow">
-              <div class="p-4 border-b">
+            <div class="lg:col-span-2 bg-white rounded-2xl shadow h-full flex flex-col">
+              <div class="p-4 border-b flex items-center justify-between">
                 <h2 class="text-lg font-semibold text-gray-800">Recent Activity</h2>
+                <router-link to="/shelter-dashboard/reports" class="text-sm font-medium text-blue-600 hover:text-blue-800">
+                  View all activity
+                </router-link>
               </div>
               <div class="p-4">
                 <ul class="divide-y">
                   <li class="py-3">
                     <div class="flex items-start">
                       <div class="bg-blue-100 p-2 rounded-full">
-                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
+                          </path>
                         </svg>
                       </div>
                       <div class="ml-3">
@@ -292,8 +297,10 @@
                   <li class="py-3">
                     <div class="flex items-start">
                       <div class="bg-green-100 p-2 rounded-full">
-                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                          </path>
                         </svg>
                       </div>
                       <div class="ml-3">
@@ -305,137 +312,89 @@
                       </div>
                     </div>
                   </li>
-                  <li class="py-3">
-                    <div class="flex items-start">
-                      <div class="bg-green-100 p-2 rounded-full">
-                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
+                </ul>
+              </div>
+            </div>
+
+
+            <!-- Upcoming Events Section -->
+            <div class="bg-white rounded-2xl shadow  h-full flex flex-col">
+              <div class="p-4 border-b flex items-center justify-between">
+                <h2 class="text-lg font-semibold text-gray-800">Upcoming Events</h2>
+                <router-link to="/shelter-dashboard/manage-events" class="text-sm font-medium text-blue-600 hover:text-blue-800">
+                  View all
+                </router-link>
+              </div>
+              <div class="p-4">
+                <ul class="divide-y" v-if="upcomingEvents.length > 0">
+                  <li
+                    v-for="event in upcomingEvents.slice(0, 2)"
+                    :key="event.id"
+                    class="py-3"
+                  >
+                    <div class="flex items-center">
+                      <div class="bg-indigo-100 p-2 rounded text-center w-12">
+                        <div class="text-xs text-indigo-600 font-medium">
+                          {{ new Date(event.startDateTime).toLocaleString('en-US', { month: 'short' }).toUpperCase() }}
+                        </div>
+                        <div class="text-indigo-800 font-bold">
+                          {{ new Date(event.startDateTime).getDate() }}
+                        </div>
                       </div>
                       <div class="ml-3">
-                        <p class="text-sm font-medium">Donation received from <span class="font-semibold">Sarah Johnson</span></p>
-                        <p class="text-xs text-gray-500">Yesterday, 3:45 PM</p>
-                      </div>
-                      <div class="ml-auto">
-                        <span class="text-sm font-medium text-green-600">$120.00</span>
+                        <p class="text-sm font-semibold text-gray-800">
+                          {{ event.title }}
+                        </p>
+                        <p class="text-xs text-gray-500">
+                          {{ new Date(event.startDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }} - 
+                          {{ new Date(event.endDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }}
+                        </p>
                       </div>
                     </div>
                   </li>
-                  <li class="py-3">
-                    <div class="flex items-start">
-                      <div class="bg-purple-100 p-2 rounded-full">
-                        <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 15.546c-.523 0-1.046.151-1.5.454a2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.701 2.701 0 00-1.5-.454M9 6v2m3-2v2m3-2v2M9 3h.01M12 3h.01M15 3h.01M21 21v-7a2 2 0 00-2-2H5a2 2 0 00-2 2v7h18zm-3-9v-2a2 2 0 00-2-2H8a2 2 0 00-2 2v2h12z"></path>
-                      </svg>
-                    </div>
-                    <div class="ml-3">
-                      <p class="text-sm font-medium"><span class="font-semibold">Bella</span> has been adopted by Michael Collins</p>
-                      <p class="text-xs text-gray-500">Yesterday, 5:20 PM</p>
-                    </div>
-                    <div class="ml-auto">
-                      <span class="text-xs font-medium text-white bg-purple-500 px-2 py-1 rounded-full">Adoption</span>
-                    </div>
-                  </div>
-                </li>
-              </ul>
-              <div class="mt-3 text-center">
-                <a href="#" class="text-sm font-medium text-blue-600 hover:text-blue-800">View all activity</a>
+                </ul>
+                <p v-else class="text-sm text-gray-500 text-center py-6">
+                  No upcoming events scheduled.
+                </p>
               </div>
             </div>
+
           </div>
 
-          <!-- Upcoming Events Section -->
-          <div class="bg-white rounded-2xl shadow">
-            <div class="p-4 border-b">
-              <h2 class="text-lg font-semibold text-gray-800">Upcoming Events</h2>
-            </div>
-            <div class="p-4">
-              <ul class="divide-y">
-                <li class="py-3">
-                  <div class="flex items-center">
-                    <div class="bg-indigo-100 p-2 rounded text-center w-12">
-                      <div class="text-xs text-indigo-600 font-medium">APR</div>
-                      <div class="text-indigo-800 font-bold">15</div>
-                    </div>
-                    <div class="ml-3">
-                      <p class="text-sm font-medium">Adoption Day</p>
-                      <p class="text-xs text-gray-500">10:00 AM - 4:00 PM</p>
-                    </div>
-                  </div>
-                </li>
-                <li class="py-3">
-                  <div class="flex items-center">
-                    <div class="bg-indigo-100 p-2 rounded text-center w-12">
-                      <div class="text-xs text-indigo-600 font-medium">APR</div>
-                      <div class="text-indigo-800 font-bold">22</div>
-                    </div>
-                    <div class="ml-3">
-                      <p class="text-sm font-medium">Fundraiser</p>
-                      <p class="text-xs text-gray-500">6:30 PM - 9:00 PM</p>
-                    </div>
-                  </div>
-                </li>
-                <li class="py-3">
-                  <div class="flex items-center">
-                    <div class="bg-indigo-100 p-2 rounded text-center w-12">
-                      <div class="text-xs text-indigo-600 font-medium">MAY</div>
-                      <div class="text-indigo-800 font-bold">05</div>
-                    </div>
-                    <div class="ml-3">
-                      <p class="text-sm font-medium">Volunteer Training</p>
-                      <p class="text-xs text-gray-500">2:00 PM - 5:00 PM</p>
-                    </div>
-                  </div>
-                </li>
-              </ul>
-              <div class="mt-3 text-center">
-                <a href="#" class="text-sm font-medium text-blue-600 hover:text-blue-800">View all events</a>
-              </div>
-            </div>
+          <div>
+              <PetAdoptionPieChart :stats="stats" />
           </div>
-        </div>
-
-        <div>
-            <PetAdoptionPieChart :stats="stats" />
-        </div>
 
         <!-- Additional Sections -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
           <!-- Urgent Adoptions Needed -->
-          <div class="bg-white rounded-lg shadow">
-            <div class="p-4 border-b">
-              <h2 class="text-lg font-semibold text-gray-800">Urgent Adoptions Needed</h2>
+          <div class="bg-white rounded-2xl shadow flex flex-col">
+            <div class="p-4 border-b flex items-center justify-between">
+              <h2 class="text-lg font-semibold text-red-600 flex items-center gap-2">
+                <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Urgent Adoptions Needed
+              </h2>
+              <router-link to="/shelter-dashboard/manage-pets" class="text-sm font-medium text-blue-600 hover:text-blue-800">
+                View all
+              </router-link>
             </div>
             <div class="p-4">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="border rounded-lg overflow-hidden flex">
-                  <div class="w-24 h-24 bg-gray-200 flex-shrink-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  <div class="p-3">
-                    <h3 class="text-sm font-semibold">Buddy</h3>
-                    <p class="text-xs text-gray-500">German Shepherd, 6 years</p>
-                    <span class="inline-block mt-1 text-xs bg-red-100 text-red-800 px-2 py-0.5 rounded-full">12 days left</span>
-                  </div>
-                </div>
-                <div class="border rounded-lg overflow-hidden flex">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                  <div class="p-3">
-                    <h3 class="text-sm font-semibold">Mittens</h3>
-                    <p class="text-xs text-gray-500">Tabby Cat, 4 years</p>
-                    <span class="inline-block mt-1 text-xs bg-red-100 text-red-800 px-2 py-0.5 rounded-full">7 days left</span>
-                  </div>
-                </div>
+              <div v-if="urgentPets.length > 0" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <PetCard
+                  v-for="pet in urgentPets.slice(0, 2)"
+                  :key="pet.id"
+                  :pet="pet"
+                />
               </div>
-              <div class="mt-3 text-center">
-                <router-link to="/shelter-dashboard/manage-pets" class="text-sm font-medium text-blue-600 hover:text-blue-800">View all urgent cases</router-link>
-              </div>
+              <p v-else class="text-sm text-gray-500 text-center py-4">
+                No urgent pets at the moment.
+              </p>
             </div>
           </div>
+
+
 
           <!-- Recent Donations -->
           <div class="bg-white rounded-lg shadow">
@@ -492,12 +451,12 @@
               </svg>
               <span class="text-sm font-medium">Add New Pet</span>
             </router-link>
-            <a href="#" class="flex flex-col items-center justify-center p-4 border rounded-lg hover:bg-gray-50 transition">
+            <router-link to="/shelter-dashboard/manage-events" class="flex flex-col items-center justify-center p-4 border rounded-lg hover:bg-gray-50 transition">
               <svg class="w-8 h-8 text-purple-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
               </svg>
               <span class="text-sm font-medium">Create Event</span>
-            </a>
+            </router-link>
             <a href="#" class="flex flex-col items-center justify-center p-4 border rounded-lg hover:bg-gray-50 transition">
               <svg class="w-8 h-8 text-green-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -565,15 +524,18 @@
 <script>
 import { ref, onMounted, onUnmounted, computed } from "vue";
 import { useRouter, useRoute, onBeforeRouteUpdate } from "vue-router";
-import {fetchShelterPetStats} from '@/services/pet_service.js';
+import {fetchShelterPetStats, fetchShelterPets} from '@/services/pet_service.js';
 import { getShelterAdoptionRequests } from '@/services/adoption_service';
 import PetAdoptionPieChart from '@/components/PetAdoptionPieChart.vue';
+import { fetchUpcomingEventsForShelter } from '@/services/event_service';
+import PetCard from '@/components/PetCard.vue';
 
 export default {
   name: 'ShelterDashboardLayout',
 
   components: {
-    PetAdoptionPieChart
+    PetAdoptionPieChart,
+    PetCard
   },
 
   setup() {
@@ -585,10 +547,34 @@ export default {
     const unreadNotifications = ref(3);
     const pendingAdoptionCount = ref(0);
     const logoutModalVisible = ref(false);
+    const upcomingEvents = ref([]);
+    const urgentPets = ref([]);
+
+    const loadUrgentPets = async () => {
+      const shelterId = localStorage.getItem("Id");
+      try {
+        const pets = await fetchShelterPets(shelterId);
+        urgentPets.value = pets.filter(pet => pet.urgentAdoptionNeeded === true);
+      } catch (err) {
+        console.error("Failed to fetch urgent pets:", err);
+        urgentPets.value = [];
+      }
+    };
     
+    const loadUpcomingEvents = async () => {
+      const shelterId = localStorage.getItem("Id");
+      try {
+        upcomingEvents.value = await fetchUpcomingEventsForShelter(shelterId);
+      } catch (error) {
+        upcomingEvents.value = []; // fallback
+      }
+    };
+
     onMounted(() => {
       loadStats();
       loadPendingAdoptionCount();
+      loadUpcomingEvents(); 
+      loadUrgentPets();
     });
 
     onBeforeRouteUpdate((to, from, next) => {
@@ -732,6 +718,12 @@ export default {
       document.addEventListener('click', handleClickOutside);
       
       window.addEventListener('resize', handleResize);
+
+      window.addEventListener('pet-updated', loadUrgentPets);
+
+      window.addEventListener('event-updated', loadUpcomingEvents);
+
+
       handleResize();
     });
 
@@ -741,6 +733,8 @@ export default {
       document.removeEventListener('click', handleClickOutside);
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('adoption-status-updated', loadPendingAdoptionCount);
+      window.removeEventListener('pet-updated', loadUrgentPets);
+      window.removeEventListener('event-updated', loadUpcomingEvents);
 
     });
 
@@ -762,7 +756,12 @@ export default {
       logoutModalVisible,
       showLogoutConfirmation,
       hideLogoutConfirmation,
-      confirmLogout
+      confirmLogout,
+      loadUpcomingEvents,
+      upcomingEvents,
+      loadUrgentPets,
+      urgentPets
+
     };
   }
 };
