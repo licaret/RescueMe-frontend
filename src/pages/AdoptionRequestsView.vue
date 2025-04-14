@@ -205,7 +205,7 @@
         <!-- Action Buttons - Separated from the shelter details -->
         <div class="px-6 pb-6 grid grid-cols-3 gap-4">
           <router-link 
-            :to="`/adoption-requests/${request.id}`" 
+            :to="`/my-adoption-requests/${request.id}`" 
             class="text-center bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium rounded-2xl py-2.5 transition duration-200 border border-gray-300"
           >
             View Details

@@ -30,7 +30,7 @@
                     {{ unreadNotifications }}
                   </div>
                 </button>
-                <!-- Dropdown menu -->
+                <!-- Notifications dropdown -->
                 <div v-if="showNotifications" class="absolute top-full right-0 mt-2 w-80 bg-white rounded-lg shadow-lg overflow-hidden z-50">
                   <div class="p-3 border-b border-gray-200">
                     <h5 class="text-sm font-semibold text-gray-700">Notifications</h5>
@@ -39,11 +39,16 @@
                     <div v-if="notifications.length === 0" class="p-4 text-center text-gray-500">
                       No notifications yet
                     </div>
-                    <a v-for="(notification, index) in notifications" :key="index" href="#" class="flex px-4 py-3 border-b hover:bg-gray-50">
+                    <div 
+                      v-for="(notification, index) in notifications" 
+                      :key="index" 
+                      @click="handleNotificationClick(notification)"
+                      class="flex px-4 py-3 border-b hover:bg-gray-50 cursor-pointer"
+                    >
                       <div class="flex-shrink-0">
-                        <div :class="notification.icon.bg" class="w-10 h-10 rounded-full flex items-center justify-center">
-                          <svg class="w-5 h-5 text-white" :fill="notification.icon.fill" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path :d="notification.icon.path" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                        <div :class="getNotificationIconBg(notification)" class="w-10 h-10 rounded-full flex items-center justify-center">
+                          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path :d="getNotificationIconPath(notification)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
                           </svg>
                         </div>
                       </div>
@@ -52,10 +57,10 @@
                           {{ notification.message }}
                         </div>
                         <div class="text-xs text-blue-600">
-                          {{ notification.time }}
+                          {{ notification.time || formatRelativeTime(notification.createdAt) }}
                         </div>
                       </div>
-                    </a>
+                    </div>
                   </div>
                   <a href="#" class="block py-2 text-sm font-medium text-center text-gray-900 bg-gray-50 hover:bg-gray-100">
                     View all notifications
@@ -275,46 +280,47 @@
                 </router-link>
               </div>
               <div class="p-4">
-                <ul class="divide-y">
-                  <li class="py-3">
+                <ul class="divide-y" v-if="recentNotifications.length > 0">
+                  <li 
+                    v-for="(notification, index) in recentNotifications" 
+                    :key="index" 
+                    class="py-3"
+                  >
                     <div class="flex items-start">
-                      <div class="bg-blue-100 p-2 rounded-full">
-                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
-                          </path>
+                      <div :class="`${getNotificationIconBg(notification)} p-2 rounded-full`">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path :d="getNotificationIconPath(notification)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
                         </svg>
                       </div>
                       <div class="ml-3">
-                        <p class="text-sm font-medium">New adoption request for <span class="font-semibold">Max</span></p>
-                        <p class="text-xs text-gray-500">15 minutes ago</p>
+                        <p class="text-sm font-medium">
+                          {{ notification.message }}
+                        </p>
+                        <p class="text-xs text-gray-500">
+                          {{ notification.time }}
+                        </p>
                       </div>
                       <div class="ml-auto">
-                        <span class="text-xs font-medium text-white bg-blue-500 px-2 py-1 rounded-full">Pending</span>
-                      </div>
-                    </div>
-                  </li>
-                  <li class="py-3">
-                    <div class="flex items-start">
-                      <div class="bg-green-100 p-2 rounded-full">
-                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
-                          </path>
-                        </svg>
-                      </div>
-                      <div class="ml-3">
-                        <p class="text-sm font-medium">Updated profile for <span class="font-semibold">Luna</span></p>
-                        <p class="text-xs text-gray-500">2 hours ago</p>
-                      </div>
-                      <div class="ml-auto">
-                        <span class="text-xs font-medium text-white bg-green-500 px-2 py-1 rounded-full">Completed</span>
+                        <span 
+                          class="text-xs font-medium text-white px-2 py-1 rounded-full"
+                          :class="{
+                            'bg-blue-500': notification.type === 'ADOPTION_REQUEST',
+                            'bg-green-500': notification.type === 'APPROVAL' || notification.type === 'DONATION',
+                            'bg-purple-500': notification.type === 'EVENT',
+                            'bg-red-500': notification.type === 'PET_FAVORITE',
+                            'bg-gray-500': !notification.type
+                          }"
+                        >
+                          {{ formatNotificationLabel(notification.type) }}
+                        </span>
                       </div>
                     </div>
                   </li>
                 </ul>
+                <p v-else class="text-sm text-gray-500 text-center">No recent activity</p>
               </div>
             </div>
+
 
 
             <!-- Upcoming Events Section -->
@@ -532,6 +538,9 @@ import { getShelterAdoptionRequests } from '@/services/adoption_service';
 import PetAdoptionPieChart from '@/components/PetAdoptionPieChart.vue';
 import { fetchUpcomingEventsForShelter } from '@/services/event_service';
 import PetCard from '@/components/PetCard.vue';
+import { connectToNotifications, disconnectFromNotifications } from '@/services/notification_socket';
+import { fetchShelterNotifications, markNotificationAsRead } from '@/services/notification_service';
+
 
 export default {
   name: 'ShelterDashboardLayout',
@@ -546,12 +555,21 @@ export default {
     const route = useRoute();
     const shelterUsername = ref("Shelter");
     const sidebarOpen = ref(window.innerWidth >= 768); 
-    const showNotifications = ref(false);
-    const unreadNotifications = ref(3);
+    
     const pendingAdoptionCount = ref(0);
     const logoutModalVisible = ref(false);
     const upcomingEvents = ref([]);
     const urgentPets = ref([]);
+
+    const showNotifications = ref(false);
+    const notifications = ref([]);
+    const unreadNotifications = computed(() => notifications.value.filter(n => !n.read).length);
+    const recentNotifications = computed(() => {
+      return notifications.value
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .slice(0, 3);
+    });
+
 
     const loadUrgentPets = async () => {
       const shelterId = localStorage.getItem("Id");
@@ -578,11 +596,32 @@ export default {
 
 
     onMounted(() => {
+      const username = localStorage.getItem("Username");
+      if (username) shelterUsername.value = username;
+
+      const shelterId = localStorage.getItem("Id");
+      if (shelterId) {
+        console.log("Connecting to notifications for shelter:", shelterId);
+        connectToNotifications(shelterId, (newNotification) => {
+          console.log("Received new notification:", newNotification);
+          notifications.value.unshift({
+            ...newNotification,
+            icon: getNotificationIcon(newNotification.type),
+            time: formatRelativeTime(newNotification.createdAt),
+            read: false
+          });
+        });
+        
+        // Încarcă notificările existente
+        loadNotifications();
+      }
+
       loadStats();
       loadPendingAdoptionCount();
-      loadUpcomingEvents(); 
+      loadUpcomingEvents();
       loadUrgentPets();
     });
+
 
     onBeforeRouteUpdate((to, from, next) => {
       if (to.path === "/shelter-dashboard/") {
@@ -621,35 +660,187 @@ export default {
       }
     };
     
-    const notifications = ref([
-      {
-        message: "New adoption request for Max",
-        time: "A few moments ago",
-        icon: {
-          bg: "bg-blue-600",
-          fill: "none",
-          path: "M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-        }
-      },
-      {
-        message: "Donation received: $250.00",
-        time: "2 hours ago",
-        icon: {
-          bg: "bg-green-500",
-          fill: "none",
-          path: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-        }
-      },
-      {
-        message: "Document approved: Vet Authorization",
-        time: "Yesterday",
-        icon: {
-          bg: "bg-green-500",
-          fill: "none",
-          path: "M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
-        }
+    // const notifications = ref([
+    //   {
+    //     message: "New adoption request for Max",
+    //     time: "A few moments ago",
+    //     icon: {
+    //       bg: "bg-blue-600",
+    //       fill: "none",
+    //       path: "M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+    //     }
+    //   },
+    //   {
+    //     message: "Donation received: $250.00",
+    //     time: "2 hours ago",
+    //     icon: {
+    //       bg: "bg-green-500",
+    //       fill: "none",
+    //       path: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+    //     }
+    //   },
+    //   {
+    //     message: "Document approved: Vet Authorization",
+    //     time: "Yesterday",
+    //     icon: {
+    //       bg: "bg-green-500",
+    //       fill: "none",
+    //       path: "M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+    //     }
+    //   }
+    // ]);
+
+    const getNotificationIconBg = (notification) => {
+      if (notification.icon && notification.icon.bg) {
+        return notification.icon.bg;
       }
-    ]);
+      
+      // Handle notifications that come directly from the backend
+      // and don't have the icon property set
+      switch (notification.type) {
+        case 'ADOPTION_REQUEST':
+          return 'bg-blue-600';
+        case 'DONATION':
+          return 'bg-green-600';
+        case 'APPROVAL':
+          return 'bg-green-500';
+        case 'SYSTEM':
+          return 'bg-purple-600';
+        default:
+          return 'bg-gray-500';
+      }
+    };
+
+    const getNotificationIconPath = (notification) => {
+      if (notification.icon && notification.icon.path) {
+        return notification.icon.path;
+      }
+      
+      // Default paths based on notification type
+      switch (notification.type) {
+        case 'ADOPTION_REQUEST':
+          return 'M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9';
+        case 'DONATION':
+          return 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z';
+        case 'APPROVAL':
+          return 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z';
+        case 'SYSTEM':
+          return 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z';
+        default:
+          return 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z';
+      }
+    };
+
+    // Update your existing getNotificationIcon method to ensure it always returns valid values
+    const getNotificationIcon = (type) => {
+      switch (type) {
+        case 'ADOPTION_REQUEST':
+          return {
+            bg: "bg-blue-600",
+            fill: "none",
+            path: "M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+          };
+        case 'DONATION':
+          return {
+            bg: "bg-green-600",
+            fill: "none",
+            path: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          };
+        default:
+          return {
+            bg: "bg-gray-500",
+            fill: "none",
+            path: "M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          };
+      }
+    };
+
+    // Modify the loadNotifications function to add the necessary icon property
+    const loadNotifications = async () => {
+      const shelterId = localStorage.getItem('Id');
+      if (!shelterId) return;
+      
+      try {
+        const notificationsData = await fetchShelterNotifications(shelterId);
+        
+        // Map notifications to add icon property and proper time format
+        notifications.value = notificationsData.map(notification => ({
+          ...notification,
+          icon: getNotificationIcon(notification.type),
+          time: formatRelativeTime(notification.createdAt)
+        }));
+        
+        // Sort by creation time, newest first
+        notifications.value.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      } catch (error) {
+        console.error('Failed to load notifications:', error);
+        notifications.value = [];
+      }
+    };
+
+    const handleNotificationClick = (notification) => {
+      console.log("Clicked notification:", notification);
+      // Optionally mark the notification as read
+      markNotificationAsRead(notification.id)
+        .then(() => {
+          // Update the local notification to show as read
+          notification.read = true;
+          
+          // After marking as read, navigate based on notification type
+          navigateBasedOnNotificationType(notification);
+        })
+        .catch(error => {
+          console.error('Failed to mark notification as read:', error);
+          // Still navigate even if marking as read fails
+          navigateBasedOnNotificationType(notification);
+        });
+    };
+
+    // Helper to navigate based on notification type
+    const navigateBasedOnNotificationType = (notification) => {
+      // Close the notifications dropdown
+      showNotifications.value = false;
+      
+      // Navigate based on notification type
+      switch (notification.type) {
+        case 'NEW_ADOPTION_REQUEST':
+          router.push('/shelter-dashboard/adoption-requests');
+          break;
+        case 'DONATION':
+          router.push('/shelter-dashboard/donations');
+          break;
+        case 'APPROVAL':
+          router.push('/shelter-dashboard/edit-profile');
+          break;
+        case 'PET_UPDATE':
+          router.push('/shelter-dashboard/manage-pets');
+          break;
+        case 'EVENT':
+          router.push('/shelter-dashboard/manage-events');
+          break;
+        default:
+          // For other notifications, just go to the dashboard
+          router.push('/shelter-dashboard/');
+          break;
+      }
+    };
+
+    const formatNotificationLabel = (type) => {
+      switch (type) {
+        case 'NEW_ADOPTION_REQUEST':
+          return 'Pending';
+        // case 'APPROVAL':
+        //   return 'Completed';
+        // case 'DONATION':
+        //   return 'Donation';
+        // case 'EVENT':
+        //   return 'Event';
+        // case 'PET_FAVORITE':
+        //   return 'Favorite';
+        default:
+          return 'Update';
+      }
+    };
 
 
     const isActive = (path) => {
@@ -736,6 +927,9 @@ export default {
 
 
     onUnmounted(() => {
+      console.log("Disconnecting from notifications");
+      disconnectFromNotifications();
+
       window.removeEventListener("popstate", blockBackButton);
       document.removeEventListener('click', handleClickOutside);
       window.removeEventListener('resize', handleResize);
@@ -747,12 +941,24 @@ export default {
     });
 
 
+    const formatRelativeTime = (timestamp) => {
+      const diff = Math.floor((new Date() - new Date(timestamp)) / 1000);
+      if (diff < 60) return 'Just now';
+      if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
+      if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
+      return `${Math.floor(diff / 86400)} days ago`;
+    };
+
+
+
     return {
       shelterUsername,
       sidebarOpen,
       showNotifications,
       unreadNotifications,
       notifications,
+      recentNotifications,
+      formatNotificationLabel,
       isActive,
       toggleSidebar,
       toggleNotifications,
@@ -768,8 +974,12 @@ export default {
       loadUpcomingEvents,
       upcomingEvents,
       loadUrgentPets,
-      urgentPets
-
+      urgentPets,
+      loadNotifications,
+      getNotificationIconBg, 
+      getNotificationIconPath,
+      handleNotificationClick, 
+      navigateBasedOnNotificationType 
     };
   }
 };

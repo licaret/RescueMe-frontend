@@ -855,7 +855,7 @@ export default {
 
     
     const goBack = () => {
-      router.push('/adoption-requests');
+      router.push('/my-adoption-requests');
     };
 
 

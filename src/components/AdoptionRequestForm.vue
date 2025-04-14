@@ -665,12 +665,12 @@ export default {
     
 
     const goToHomePage = () => {
-      router.push('/');
+      router.push('/home');
     };
     
     
     const navigateToAdoptionRequests = () => {
-      router.push('/adoption-requests');
+      router.push('/my-adoption-requests');
     };
     
 

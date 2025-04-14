@@ -966,7 +966,7 @@
       const viewAdoptionDetails = async (adoptionId) => {
         try {
             // You could navigate to a details page
-            router.push(`/adoption-requests/${adoptionId}`);
+            router.push(`/my-adoption-requests/${adoptionId}`);
             
             // Or fetch and show details in a modal
             /*

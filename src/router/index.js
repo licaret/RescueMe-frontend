@@ -182,7 +182,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/adoption-requests',
+      path: '/my-adoption-requests',
       name: 'AdoptionRequests',
       meta: { requiresAuth: true }, 
       component: AdoptionRequestsView,
@@ -198,7 +198,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/adoption-requests/:id',
+      path: '/my-adoption-requests/:id',
       name: 'AdoptionRequestDetail',
       meta: { requiresAuth: true }, 
       component: AdoptionRequestDetail,
