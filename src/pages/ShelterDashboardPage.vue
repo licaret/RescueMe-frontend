@@ -376,7 +376,10 @@
                 </svg>
                 Urgent Adoptions Needed
               </h2>
-              <router-link to="/shelter-dashboard/manage-pets" class="text-sm font-medium text-blue-600 hover:text-blue-800">
+              <router-link 
+                :to="{ path: '/shelter-dashboard/manage-pets', query: { urgent: 'true' } }" 
+                class="text-sm font-medium text-blue-600 hover:text-blue-800"
+              >
                 View all
               </router-link>
             </div>
@@ -445,13 +448,13 @@
         <div class="mt-6 bg-white rounded-lg shadow p-4">
           <h2 class="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h2>
           <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <router-link to="/shelter-dashboard/manage-pets" class="flex flex-col items-center justify-center p-4 border rounded-lg hover:bg-gray-50 transition">
+            <router-link :to="{ path: '/shelter-dashboard/manage-pets', query: { openForm: 'true' } }"  class="flex flex-col items-center justify-center p-4 border rounded-lg hover:bg-gray-50 transition">
               <svg class="w-8 h-8 text-blue-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
               </svg>
               <span class="text-sm font-medium">Add New Pet</span>
             </router-link>
-            <router-link to="/shelter-dashboard/manage-events" class="flex flex-col items-center justify-center p-4 border rounded-lg hover:bg-gray-50 transition">
+            <router-link :to="{ path: '/shelter-dashboard/manage-events', query: { openForm: 'true' } }" class="flex flex-col items-center justify-center p-4 border rounded-lg hover:bg-gray-50 transition">
               <svg class="w-8 h-8 text-purple-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
               </svg>
@@ -564,11 +567,15 @@ export default {
     const loadUpcomingEvents = async () => {
       const shelterId = localStorage.getItem("Id");
       try {
-        upcomingEvents.value = await fetchUpcomingEventsForShelter(shelterId);
+        const events = await fetchUpcomingEventsForShelter(shelterId);
+        upcomingEvents.value = events
+          .filter(e => new Date(e.startDateTime) > new Date()) // doar viitoare
+          .sort((a, b) => new Date(a.startDateTime) - new Date(b.startDateTime)); // sortare crescătoare
       } catch (error) {
         upcomingEvents.value = []; // fallback
       }
     };
+
 
     onMounted(() => {
       loadStats();
@@ -720,9 +727,9 @@ export default {
       window.addEventListener('resize', handleResize);
 
       window.addEventListener('pet-updated', loadUrgentPets);
-
+      window.addEventListener('pet-added', loadUrgentPets);
       window.addEventListener('event-updated', loadUpcomingEvents);
-
+      window.addEventListener('event-added', loadUpcomingEvents);
 
       handleResize();
     });
@@ -734,8 +741,9 @@ export default {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('adoption-status-updated', loadPendingAdoptionCount);
       window.removeEventListener('pet-updated', loadUrgentPets);
+      window.removeEventListener('pet-added', loadUrgentPets);
       window.removeEventListener('event-updated', loadUpcomingEvents);
-
+      window.removeEventListener('event-added', loadUpcomingEvents);
     });
 
 

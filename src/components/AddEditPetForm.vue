@@ -436,6 +436,11 @@ export default {
         console.log("Server response:", updatedPet);
 
         emit(isUpdate ? "pet-updated" : "pet-added", updatedPet);
+        if (isUpdate) {
+          window.dispatchEvent(new Event('pet-updated'));
+        }else{
+          window.dispatchEvent(new Event('pet-added'));
+        }
         emit("close");
       } catch (error) {
         console.error("Error saving pet:", error);

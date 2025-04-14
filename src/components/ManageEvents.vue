@@ -393,6 +393,7 @@
   import AddEditEventForm from '@/components/AddEditEventForm.vue';
   import EventCard from '@/components/EventCard.vue';
   import judete from "@/assets/judete.json";
+  import { useRoute } from 'vue-router';
   
   export default {
     name: 'ManageEvents',
@@ -402,6 +403,8 @@
     },
   
     setup() {
+      const route = useRoute();
+
       const events = ref([]);
       const Id = localStorage.getItem("Id");
       const showAddEditEventForm = ref(false);
@@ -748,7 +751,12 @@
       currentPage.value = 1;
     }, { deep: true });
 
-    onMounted(loadEvents);
+    onMounted(async () => {
+      await loadEvents();
+      if (route.query.openForm === 'true') {
+        showAddEditEventForm.value = true;
+      }
+    });
     
     return { 
       events, 

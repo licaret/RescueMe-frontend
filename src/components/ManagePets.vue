@@ -469,6 +469,7 @@
 
 <script>
 import { ref, computed, onMounted, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import { fetchShelterPets } from "@/services/pet_service.js";
 import AddEditPetForm from '@/components/AddEditPetForm.vue';
 import PetCard from '@/components/PetCard.vue';
@@ -482,6 +483,8 @@ export default {
 
 
   setup() {
+    const route = useRoute();
+
     const pets = ref([]);
     const searchQuery = ref("");
     const Id = localStorage.getItem("Id");
@@ -972,7 +975,19 @@ export default {
 
 
 
-    onMounted(loadPets);
+    onMounted(() => {
+      if (route.query.urgent === 'true') {
+        filters.value.urgentAdoptionNeeded = true;
+        showFilters.value = true;
+      }
+
+      if (route.query.openForm === 'true') {
+        showAddEditPetForm.value = true;
+      }
+
+      loadPets();
+    });
+
     
     return { 
       pets, 

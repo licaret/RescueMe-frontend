@@ -816,8 +816,10 @@ export default {
 
         if (isUpdate) {
           emit("event-updated", savedEvent);
+          window.dispatchEvent(new Event("event-updated"));
         } else {
           emit("event-added", savedEvent);
+          window.dispatchEvent(new Event("event-added"));
         }
 
         emit("close");
