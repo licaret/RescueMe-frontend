@@ -538,7 +538,7 @@ import { getShelterAdoptionRequests } from '@/services/adoption_service';
 import PetAdoptionPieChart from '@/components/PetAdoptionPieChart.vue';
 import { fetchUpcomingEventsForShelter } from '@/services/event_service';
 import PetCard from '@/components/PetCard.vue';
-import { connectToNotifications, disconnectFromNotifications } from '@/services/notification_socket';
+import { connectToShelterNotifications, disconnectFromNotifications } from '@/services/notification_socket';
 import { fetchShelterNotifications, markNotificationAsRead } from '@/services/notification_service';
 
 
@@ -602,7 +602,7 @@ export default {
       const shelterId = localStorage.getItem("Id");
       if (shelterId) {
         console.log("Connecting to notifications for shelter:", shelterId);
-        connectToNotifications(shelterId, (newNotification) => {
+        connectToShelterNotifications(shelterId, (newNotification) => {
           console.log("Received new notification:", newNotification);
           notifications.value.unshift({
             ...newNotification,

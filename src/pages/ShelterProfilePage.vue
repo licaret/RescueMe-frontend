@@ -4,7 +4,9 @@
     <!-- Loading indicator -->
     <div v-if="loading" class="flex justify-center items-center h-48 my-12">
       <div class="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-red-500"></div>
-      <p class="ml-4 text-gray-600 font-medium">Loading shelter profile...</p>
+      <p class="ml-4 text-gray-600 font-medium">
+        Loading shelter profile...
+      </p>
     </div>
 
     <!-- Error message -->

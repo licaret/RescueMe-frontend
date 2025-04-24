@@ -117,7 +117,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { getFavoritesCount } from '../services/favorite_service';
 import { fetchAdopterNotifications, markNotificationAsRead } from '../services/notification_service';
-import { connectToNotifications, disconnectFromNotifications } from '../services/notification_socket';
+import { connectToAdopterNotifications, disconnectFromNotifications } from '../services/notification_socket';
 import SidebarMenu from './SidebarMenu.vue';
 
 export default {
@@ -368,8 +368,7 @@ export default {
       const userId = localStorage.getItem('Id');
       const role = localStorage.getItem('Role');
       if (userId) {
-        const topic = role === 'SHELTER' ? 'shelter' : 'adopter';
-        connectToNotifications(userId, topic, (newNotification) => {
+        connectToAdopterNotifications(userId, (newNotification) => {
           console.log("Received new notification:", newNotification);
           notifications.value.unshift({
             ...newNotification,
