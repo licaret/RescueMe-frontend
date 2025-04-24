@@ -227,7 +227,7 @@
           </button>
           
           <button 
-            @click="messageShelter(request.shelter?.email || request.shelterEmail)"
+            @click="messageShelter(request.shelter?.id || request.shelterId)"
             class="text-center bg-white hover:bg-green-50 text-green-600 font-medium rounded-2xl py-2.5 transition duration-200 border border-green-400"
           >
             Message Shelter
@@ -499,6 +499,31 @@ export default {
     };
 
 
+    const messageShelter = (shelterId) => {
+      // Get the shelter ID from the request
+      const relevantRequest = requests.value.find(req => 
+        (req.shelter && req.shelter.id === shelterId) || req.shelterId === shelterId
+      );
+      
+      if (!relevantRequest || (!relevantRequest.shelter?.id && !relevantRequest.shelterId)) {
+        console.error('No valid shelter ID found for messaging');
+        return;
+      }
+      
+      // Get the actual shelter ID
+      const actualShelterId = relevantRequest.shelter?.id || relevantRequest.shelterId;
+      
+      // Navigate to messages page with shelter ID
+      router.push({
+        path: '/messages',
+        query: { 
+          shelterId: actualShelterId,
+          shelterName: relevantRequest.shelter?.username || 'Shelter'
+        }
+      });
+    };
+
+
 
     return {
       // Data
@@ -519,7 +544,8 @@ export default {
       cancelRequest,
       formatStatus,
       formatDate,
-      getPetPhotoUrl, 
+      getPetPhotoUrl,
+      messageShelter, 
 
       confirmCancelRequest,
       closeCancelPopup, 

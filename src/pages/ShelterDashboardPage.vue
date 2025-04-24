@@ -145,7 +145,9 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
                 </svg>
                 <span class="flex-1 ms-3 whitespace-nowrap">Inbox</span>
-                <span class="inline-flex items-center justify-center w-3 h-3 p-3 ms-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300">3</span>
+                <span v-if="unreadMessagesCount > 0" class="inline-flex items-center justify-center w-3 h-3 p-3 ms-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300">
+                  {{ unreadMessagesCount }}
+                </span>
               </router-link>
             </li>
             <li>
@@ -531,7 +533,7 @@
 </template>
 
 <script>
-import { ref, onMounted, onUnmounted, computed } from "vue";
+import { ref, onMounted, onUnmounted, computed, onBeforeUnmount } from "vue";
 import { useRouter, useRoute, onBeforeRouteUpdate } from "vue-router";
 import {fetchShelterPetStats, fetchShelterPets} from '@/services/pet_service.js';
 import { getShelterAdoptionRequests } from '@/services/adoption_service';
@@ -541,6 +543,7 @@ import PetCard from '@/components/PetCard.vue';
 import { connectToShelterNotifications, disconnectFromNotifications } from '@/services/notification_socket';
 import { fetchShelterNotifications, markNotificationAsRead } from '@/services/notification_service';
 import { logout } from "@/services/user_service";
+import { getUnreadMessagesCount } from '@/services/message_service';
 
 
 export default {
@@ -570,6 +573,21 @@ export default {
         .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
         .slice(0, 3);
     });
+
+    const unreadMessagesCount = ref(0);
+
+
+    const fetchUnreadMessagesCount = async () => {
+      try {
+        const userId = localStorage.getItem('Id');
+        if (userId) {
+          const count = await getUnreadMessagesCount(parseInt(userId));
+          unreadMessagesCount.value = count;
+        }
+      } catch (error) {
+        console.error('Error fetching unread messages count:', error);
+      }
+    };
 
 
     const loadUrgentPets = async () => {
@@ -621,6 +639,16 @@ export default {
       loadPendingAdoptionCount();
       loadUpcomingEvents();
       loadUrgentPets();
+
+      fetchUnreadMessagesCount();
+  
+      // Opțional: Actualizează numărul la fiecare 30 de secunde
+      const interval = setInterval(fetchUnreadMessagesCount, 30000);
+      
+      // Curăță intervalul când componenta se demontează
+      onBeforeUnmount(() => {
+        clearInterval(interval);
+      });
     });
 
 
@@ -984,7 +1012,8 @@ export default {
       getNotificationIconBg, 
       getNotificationIconPath,
       handleNotificationClick, 
-      navigateBasedOnNotificationType 
+      navigateBasedOnNotificationType,
+      unreadMessagesCount,
     };
   }
 };

@@ -160,6 +160,15 @@
                   </span>
                   <div class="text-sm text-gray-500">{{ formatDate(request.requestDate) }}</div>
                   <button 
+                    @click="messageUser(request.adopterId)" 
+                    class="text-blue-600 hover:text-blue-900 text-sm font-medium flex items-center"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8s-9-3.582-9-8 4.03-8 9-8 9 3.582 9 8z" />
+                    </svg>
+                    Message
+                  </button>
+                  <button 
                     @click="viewRequestDetails(request)" 
                     class="text-indigo-600 hover:text-indigo-900 text-sm font-medium"
                   >

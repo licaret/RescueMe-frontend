@@ -23,6 +23,8 @@ import AdoptionRequestForm from '@/components/AdoptionRequestForm.vue';
 import AdoptionRequestsView from '@/pages/AdoptionRequestsView.vue';
 import MyProfilePage from '@/pages/MyProfilePage.vue';
 import EventsPage from '@/pages/EventsPage.vue';
+import MessagesPage from '@/pages/MessagesPage.vue';
+import ShelterMessages from '@/components/ShelterMessages.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -120,6 +122,11 @@ const router = createRouter({
           component: ManageEvents
         },
         {
+          path: 'messages',
+          name: 'shelter-messages',
+          component: ShelterMessages,
+        },
+        {
           path: 'edit-profile',
           name: 'EditShelterProfileVue',
           component: EditShelterProfileVue
@@ -149,6 +156,12 @@ const router = createRouter({
       name: 'WelcomePage',
       component: WelcomePage, 
       meta: { requiresAuth: true },
+    },
+    {
+      path: '/messages',
+      name: 'messages',
+      component: MessagesPage,
+      meta: { requiresAuth: true } // Optional: if you have auth guards
     },
     {
       path: '/adopt/:petId',
