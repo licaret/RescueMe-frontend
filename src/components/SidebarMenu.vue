@@ -197,6 +197,7 @@
 <script>
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { logout } from "@/services/user_service";
 
 export default {
   name: 'SidebarMenu',
@@ -253,15 +254,15 @@ export default {
       logoutConfirmationVisible.value = false;
     };
 
-    const confirmLogout = () => {
-      localStorage.removeItem('token');
-      localStorage.removeItem('Role');
-      localStorage.removeItem('Username');
-      localStorage.removeItem('Id');
-      
-      router.push('/login');
-      emit('close');
-      hideLogoutConfirmation();
+    const confirmLogout = async () => {
+      try {
+        await logout();
+        router.push("/login");
+        emit('close');
+        hideLogoutConfirmation();
+      } catch (e) {
+        console.error("Logout error:", e);
+      }
     };
 
     return {

@@ -66,6 +66,7 @@ async function login(email, password) {
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include",
       body: JSON.stringify({ email, password }),
     });
 
@@ -94,6 +95,29 @@ async function login(email, password) {
     throw error;
   }
 }
+
+async function logout() {
+  try {
+    const response = await fetch("http://localhost:8080/api/v1/auth/logout", {
+      method: "POST",
+      credentials: "include", 
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Logout failed: ${error}`);
+    }
+
+    localStorage.clear();
+
+    window.location.href = "/login";
+  } catch (error) {
+    console.error("Logout error:", error);
+    throw error;
+  }
+}
+
+
 
 
 async function fetchWithAuth(endpoint, options = {}) {
@@ -393,6 +417,7 @@ export {
   registerAdopter, 
   registerShelter, 
   login, 
+  logout,
   fetchWithAuth, 
   checkEmailExists, 
   checkUsernameExists, 

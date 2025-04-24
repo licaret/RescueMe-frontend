@@ -540,6 +540,7 @@ import { fetchUpcomingEventsForShelter } from '@/services/event_service';
 import PetCard from '@/components/PetCard.vue';
 import { connectToShelterNotifications, disconnectFromNotifications } from '@/services/notification_socket';
 import { fetchShelterNotifications, markNotificationAsRead } from '@/services/notification_service';
+import { logout } from "@/services/user_service";
 
 
 export default {
@@ -874,9 +875,13 @@ export default {
       logoutModalVisible.value = false;
     };
 
-    const confirmLogout = () => {
-      localStorage.clear();
-      router.push("/login");
+    const confirmLogout = async () => {
+      try {
+        await logout();
+        router.push("/login");
+      } catch (e) {
+        console.error("Logout error:", e);
+      }
     };
 
     const handleLogout = () => {
