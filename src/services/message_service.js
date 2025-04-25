@@ -1,193 +1,202 @@
+import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
-import Stomp from 'webstomp-client';
+
+const API_URL = 'http://localhost:8080/api/v1/messages';
 
 let stompClient = null;
 let connectedCallback = null;
 let disconnectedCallback = null;
 let messageCallbacks = [];
 let readReceiptCallbacks = [];
+
 let reconnectAttempts = 0;
 const MAX_RECONNECT_ATTEMPTS = 5;
 
-const API_URL = 'http://localhost:8080/api/v1/messages';
-
 export function connectToChat(userId, onConnected, onDisconnected) {
-  connectedCallback = onConnected;
-  disconnectedCallback = onDisconnected;
-  
-  console.log("📡 [Chat] Subscribing to /user/" + userId + "/queue/messages");
+    if (stompClient && stompClient.active) return;
 
-
-  if (stompClient === null || !stompClient.connected) {
-    const socket = new SockJS('http://localhost:8080/ws');
-    stompClient = Stomp.over(socket);
-    
-    // Disable Stomp debug logs
-    stompClient.debug = () => {};
-    
-    stompClient.connect(
-      {},
-      frame => {
-        console.log('Connected to WebSocket: ' + frame);
+    stompClient = new Client({
+      webSocketFactory: () => new SockJS('http://localhost:8080/ws'),
+      reconnectDelay: 5000,
+      heartbeatIncoming: 4000,
+      heartbeatOutgoing: 4000,
+      debug: str => console.log('[CHAT DEBUG]', str),
+      
+      onConnect: (frame) => {
+        console.log('✅ [Chat] Connected:', frame);
         
-        // Subscribe to user's private message queue
-        stompClient.subscribe('/user/' + userId + '/queue/messages', message => {
-          const receivedMessage = JSON.parse(message.body);
-          messageCallbacks.forEach(callback => callback(receivedMessage));
-        });
-        
-        // Subscribe to read receipts
-        stompClient.subscribe('/user/' + userId + '/queue/read-receipts', receipt => {
-          const readReceipt = JSON.parse(receipt.body);
-          readReceiptCallbacks.forEach(callback => callback(readReceipt));
-        });
-        
-        // Reset reconnect attempts on successful connection
-        reconnectAttempts = 0;
-        
-        if (connectedCallback) {
-          connectedCallback();
-        }
-      },
-      error => {
-        console.error('STOMP connection error:', error);
-        
-        if (disconnectedCallback) {
-          disconnectedCallback(error);
-        }
-        
-        // Attempt to reconnect with exponential backoff
-        if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
-          reconnectAttempts++;
-          const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 30000);
-          console.log(`Attempting to reconnect in ${delay / 1000} seconds...`);
+        // Subscrie la mesaje și adaugă MULTE loguri
+        stompClient.subscribe(`/user/${userId}/queue/messages`, (msg) => {
+          console.log("🔔🔔🔔 MESSAGE ARRIVED:", msg);
+          console.log("🔔 MESSAGE CONTENT:", msg.body);
           
-          setTimeout(() => {
-            connectToChat(userId, onConnected, onDisconnected);
-          }, delay);
+          try {
+            const parsed = JSON.parse(msg.body);
+            console.log("📦 PARSED MESSAGE:", parsed);
+            console.log("📦 Callbacks count:", messageCallbacks.length);
+            
+            if (messageCallbacks.length > 0) {
+              messageCallbacks.forEach(cb => {
+                try {
+                  console.log("📞 Executing callback");
+                  cb(parsed);
+                } catch (e) {
+                  console.error("❌ Error executing callback:", e);
+                }
+              });
+            } else {
+              console.warn("⚠️ No callbacks registered to handle messages!");
+            }
+          } catch (e) {
+            console.error("❌ Error parsing message:", e);
+          }
+        });
+        stompClient.subscribe(`/user/${userId}/queue/read-receipts`, (receipt) => {
+            const parsed = JSON.parse(receipt.body);
+            readReceiptCallbacks.forEach(cb => cb(parsed));
+        });
+        onConnected?.();
+        },
+
+        onStompError: frame => {
+        console.error('[Chat STOMP error]', frame);
+        onDisconnected?.(frame);
+        },
+
+        onWebSocketClose: event => {
+        console.warn('[Chat WS closed]', event);
+        },
+
+        onWebSocketError: event => {
+        console.error('[Chat WS error]', event);
         }
-      }
-    );
-  }
-}
+    });
+
+    stompClient.activate();
+    }
 
 export function disconnectFromChat() {
-  if (stompClient !== null && stompClient.connected) {
-    stompClient.disconnect();
+  if (stompClient && stompClient.active) {
+    stompClient.deactivate();
     console.log('Disconnected from WebSocket');
-    
-    if (disconnectedCallback) {
-      disconnectedCallback();
-    }
+    window.existingChatConnection = false;
+    if (disconnectedCallback) disconnectedCallback();
   }
 }
 
 export function onMessageReceived(callback) {
-  messageCallbacks.push(callback);
+  console.log("Registering message callback", callback);
+  
+  // Verifică dacă callback-ul există deja pentru a evita duplicate
+  const exists = messageCallbacks.some(cb => cb.toString() === callback.toString());
+  
+  if (!exists) {
+    messageCallbacks.push(callback);
+    console.log("Callback registered. Total callbacks:", messageCallbacks.length);
+  } else {
+    console.log("Callback already registered");
+  }
+  
   return () => {
-    // Return a cleanup function to remove the callback
+    console.log("Removing message callback");
     messageCallbacks = messageCallbacks.filter(cb => cb !== callback);
+    console.log("Callbacks remaining:", messageCallbacks.length);
   };
 }
 
 export function onReadReceipt(callback) {
+  console.log("Registering read receipt callback", callback);
   readReceiptCallbacks.push(callback);
   return () => {
-    // Return a cleanup function to remove the callback
     readReceiptCallbacks = readReceiptCallbacks.filter(cb => cb !== callback);
   };
 }
 
-export function sendMessage(messageData) {
-    return new Promise((resolve, reject) => {
-      if (stompClient && stompClient.connected) {
-        try {
-          stompClient.send('/app/chat.send', JSON.stringify(messageData), {});
-          resolve(messageData);
-        } catch (e) {
-          console.error("❌ Error sending via WebSocket:", e);
-          reject(e);
-        }
-      } else {
-        console.warn("⚠️ WebSocket not connected. Falling back to REST API.");
-        fetch(`${API_URL}/send`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(messageData)
-        })
-          .then(response => {
-            if (!response.ok) throw new Error('REST send failed');
-            return response.json();
-          })
-          .then(resolve)
-          .catch(reject);
-      }
-    });
-  }
-  
+export function isConnected() {
+  return stompClient && stompClient.active && stompClient.connected;
+}
 
-  export function markConversationAsRead(conversationId, userId) {
-    return new Promise((resolve, reject) => {
-      if (stompClient && stompClient.connected) {
-        try {
-          stompClient.send('/app/chat.read', JSON.stringify({ conversationId, userId }), {});
-          resolve();
-        } catch (e) {
-          console.error("❌ Error sending read receipt via WebSocket:", e);
-          reject(e);
-        }
-      } else {
-        console.warn("⚠️ WebSocket not connected. Using REST fallback for read receipt.");
-        fetch(`${API_URL}/conversation/${conversationId}/read?userId=${userId}`, {
-          method: 'POST',
-        })
-          .then(response => {
-            if (!response.ok) throw new Error('REST read receipt failed');
-            resolve();
-          })
-          .catch(reject);
+export function sendMessage(messageData) {
+  return new Promise((resolve, reject) => {
+    console.log("Attempting to send message, connection status:", stompClient?.connected);
+
+    if (isConnected()) {
+      try {
+        console.log("Sending message via WebSocket:", messageData);
+        stompClient.publish({
+          destination: '/app/chat.send',
+          body: JSON.stringify(messageData)
+        });
+        resolve(messageData);
+      } catch (err) {
+        console.error("WebSocket send error:", err);
+        console.log("Falling back to REST API for sending message");
+        sendViaRest(messageData, resolve, reject);
       }
-    });
-  }
-  
+    } else {
+      console.warn("WebSocket not connected, using REST fallback");
+      sendViaRest(messageData, resolve, reject);
+    }
+  });
+}
+
+function sendViaRest(messageData, resolve, reject) {
+  fetch(`${API_URL}/send`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(messageData)
+  })
+  .then(res => res.ok ? res.json() : Promise.reject(res.statusText))
+  .then(resolve)
+  .catch(reject);
+}
+
+export function markConversationAsRead(conversationId, userId) {
+  return new Promise((resolve, reject) => {
+    if (isConnected()) {
+      try {
+        console.log("Marking conversation as read via WebSocket:", conversationId);
+        stompClient.publish({
+          destination: '/app/chat.read',
+          body: JSON.stringify({ conversationId, userId })
+        });
+        resolve();
+      } catch (e) {
+        console.error("WebSocket read receipt error:", e);
+        markAsReadViaRest(conversationId, userId, resolve, reject);
+      }
+    } else {
+      console.warn("WebSocket not connected, using REST fallback for marking as read");
+      markAsReadViaRest(conversationId, userId, resolve, reject);
+    }
+  });
+}
+
+function markAsReadViaRest(conversationId, userId, resolve, reject) {
+  fetch(`${API_URL}/conversation/${conversationId}/read?userId=${userId}`, {
+    method: 'POST'
+  })
+  .then(res => res.ok ? resolve() : Promise.reject(res.statusText))
+  .catch(reject);
+}
 
 export function getConversationMessages(conversationId, userId) {
   return fetch(`${API_URL}/conversation/${conversationId}?userId=${userId}`)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Failed to fetch conversation messages');
-      }
-      return response.json();
-    });
+    .then(res => res.ok ? res.json() : Promise.reject('Failed to fetch messages'));
 }
 
 export function getUserConversations(userId) {
   return fetch(`${API_URL}/conversations/${userId}`)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Failed to fetch user conversations');
-      }
-      return response.json();
-    });
+    .then(res => res.ok ? res.json() : Promise.reject('Failed to fetch conversations'));
 }
 
 export function getUnreadMessagesCount(userId) {
   return fetch(`${API_URL}/unread/${userId}`)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Failed to fetch unread messages count');
-      }
-      return response.json();
-    });
+    .then(res => res.ok ? res.json() : Promise.reject('Failed to fetch unread count'));
 }
 
 export function getConversationId(user1Id, user2Id) {
   return fetch(`${API_URL}/conversation-id?user1Id=${user1Id}&user2Id=${user2Id}`)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Failed to fetch conversation ID');
-      }
-      return response.json();
-    })
+    .then(res => res.ok ? res.json() : Promise.reject('Failed to fetch conversation ID'))
     .then(data => data.conversationId);
 }
