@@ -354,30 +354,34 @@ export default {
     
     const handleNewMessage = (message) => {
       console.log("📩 New message received in handleNewMessage:", message);
-      console.log("Current selected conversation:", selectedConversationId.value);
-      console.log("Message conversation:", message.conversationId);
       
-      // IMPORTANT - folosește direct Vue.nextTick pentru a forța actualizarea
-      Vue.nextTick(() => {
-        // Dacă mesajul este pentru conversația curentă
-        if (selectedConversationId.value === message.conversationId) {
-          console.log("Adding message to current conversation");
+      // Dacă mesajul este pentru conversația curentă
+      if (selectedConversationId.value === message.conversationId) {
+        console.log("Adding message to current conversation");
+        
+        // Verifică duplicatele
+        const messageExists = messages.value.some(m => 
+          m.id === message.id || 
+          (m.content === message.content && 
+          m.senderId === message.senderId &&
+          m.timestamp === message.timestamp)
+        );
+        
+        if (!messageExists) {
+          // Folosește assign pentru a forța reactivitatea
+          messages.value = [...messages.value, message];
+          // Folosește nextTick direct, nu Vue.nextTick
+          nextTick(scrollToBottom);
           
-          // Clonează array-ul pentru a forța reactivitatea
-          const updatedMessages = [...messages.value, message];
-          messages.value = updatedMessages;
-          
-          // Scrolează după ce DOM-ul a fost actualizat
-          Vue.nextTick(scrollToBottom);
-          
+          // Marchează ca citit dacă suntem destinatarul
           if (message.recipientId === currentUserId.value) {
             markConversationAsRead(message.conversationId, currentUserId.value);
           }
         }
-        
-        // Actualizează lista de conversații
-        updateConversationWithMessage(message);
-      });
+      }
+      
+      // Actualizează lista de conversații
+      updateConversationWithMessage(message);
     };
     
     // Handle read receipts
