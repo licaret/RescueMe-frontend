@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-screen bg-gray-100">
+  <div class="flex h-screen overflow-hidden ">
     <!-- Sidebar with conversation list -->
     <div 
       :class="[
@@ -108,8 +108,8 @@
       </div>
     </div>
     
-    <!-- Chat area -->
-    <div class="flex-1 flex flex-col bg-white">
+    <!-- Chat area - takes full height of the screen -->
+    <div class="flex-1 flex flex-col bg-white ">
       <!-- Mobile toggle button for sidebar -->
       <div 
         v-if="isMobileView && !showSidebar && selectedConversation" 
@@ -172,7 +172,7 @@
         </p>
       </div>
       
-      <!-- Chat messages -->
+      <!-- Chat messages - takes all available space, only scrolls within message area -->
       <div 
         v-else
         ref="messagesContainer"
@@ -201,10 +201,9 @@
               message.senderId === currentUserId ? 'justify-end' : 'justify-start'
             ]"
           >
-            <!-- Show avatar only for first message or if sender changes -->
+            <!-- Show avatar -->
             <div 
-              v-if="message.senderId !== currentUserId && 
-                   (index === 0 || messages[index - 1].senderId !== message.senderId)"
+              v-if="message.senderId !== currentUserId"
               class="h-8 w-8 rounded-full overflow-hidden bg-gray-200 flex-shrink-0 mr-2"
             >
               <img 
@@ -226,7 +225,55 @@
                   : 'bg-white border border-gray-200 rounded-bl-none'
               ]"
             >
-              <p>{{ message.content }}</p>
+              <!-- Text content -->
+              <p v-if="message.content">{{ message.content }}</p>
+              
+              <!-- Attachments -->
+              <div v-if="message.attachments && message.attachments.length > 0" class="mt-2 space-y-2">
+                <!-- Images - clickable for full-screen view -->
+                <div v-for="attachment in message.attachments.filter(a => a.contentType && a.contentType.startsWith('image/'))" 
+                     :key="attachment.id" 
+                     class="relative">
+                  <img 
+                    v-if="attachment.hasThumbnail" 
+                    :src="getAttachmentThumbnailUrl(attachment.id)" 
+                    @click="openAttachment(attachment)" 
+                    class="max-w-full rounded cursor-pointer max-h-40 border border-gray-200 hover:opacity-90 transition-opacity" 
+                    :alt="attachment.fileName"
+                  />
+                  <div v-else 
+                       @click="openAttachment(attachment)"
+                       class="flex items-center justify-center bg-gray-100 rounded p-3 cursor-pointer border border-gray-200 hover:bg-gray-200 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span>{{ attachment.fileName }}</span>
+                  </div>
+                </div>
+                
+                <!-- Files/Documents -->
+                <div v-for="attachment in message.attachments.filter(a => !a.contentType || !a.contentType.startsWith('image/'))" 
+                     :key="attachment.id" 
+                     @click="openAttachment(attachment)"
+                     class="flex items-center p-2 border rounded bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <div class="flex-grow min-w-0">
+                    <div class="text-sm font-medium truncate" :class="message.senderId === currentUserId ? 'text-indigo-100' : 'text-gray-700'">
+                      {{ attachment.fileName }}
+                    </div>
+                    <div class="text-xs" :class="message.senderId === currentUserId ? 'text-indigo-200' : 'text-gray-500'">
+                      {{ formatFileSize(attachment.fileSize) }}
+                    </div>
+                  </div>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                </div>
+              </div>
+              
+              <!-- Timestamp and read status -->
               <div 
                 :class="[
                   'text-xs mt-1 flex items-center space-x-1',
@@ -250,6 +297,19 @@
       
       <!-- Message input -->
       <div v-if="selectedConversation" class="border-t border-gray-200 bg-white p-4">
+        <div class="mb-2" v-if="selectedFiles.length > 0">
+          <div class="flex flex-wrap gap-2">
+            <div v-for="(file, index) in selectedFiles" :key="index" class="relative bg-gray-100 rounded-lg p-2 flex items-center">
+              <span class="text-xs truncate max-w-32">{{ file.name }}</span>
+              <button @click="removeSelectedFile(index)" class="ml-2 text-gray-500 hover:text-red-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        
         <div class="flex items-center space-x-2">
           <textarea
             v-model="newMessage"
@@ -259,12 +319,31 @@
             @keydown.enter.prevent="sendMessage"
           ></textarea>
           
+          <!-- File upload button -->
+          <input 
+            type="file" 
+            ref="fileInput" 
+            @change="handleFileSelect" 
+            multiple 
+            class="hidden" 
+          />
+          
+          <button
+            @click="$refs.fileInput.click()"
+            class="p-2 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200"
+            title="Attach files"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+            </svg>
+          </button>
+          
           <button
             @click="sendMessage"
-            :disabled="!newMessage.trim()"
+            :disabled="!canSendMessage"
             :class="[
               'p-2 rounded-full',
-              newMessage.trim() 
+              canSendMessage 
                 ? 'bg-indigo-500 text-white hover:bg-indigo-600' 
                 : 'bg-gray-200 text-gray-400 cursor-not-allowed'
             ]"
@@ -273,6 +352,49 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
             </svg>
           </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Enhanced image preview modal with download option -->
+    <div v-if="previewAttachment && previewAttachment.contentType && previewAttachment.contentType.startsWith('image/')" 
+         class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90" 
+         @click="previewAttachment = null">
+      <div class="max-w-6xl max-h-full p-4" @click.stop>
+        <div class="bg-white rounded-lg overflow-hidden shadow-2xl">
+          <!-- Image preview container -->
+          <div class="relative">
+            <img :src="getAttachmentDownloadUrl(previewAttachment.id)" 
+                 class="max-h-[80vh] max-w-full object-contain" 
+                 :alt="previewAttachment.fileName" />
+            
+            <!-- Close button -->
+            <button @click.stop="previewAttachment = null" 
+                    class="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md hover:bg-gray-100">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          
+          <!-- Image info and download button -->
+          <div class="p-4 bg-white">
+            <p class="font-medium">{{ previewAttachment.fileName }}</p>
+            <div class="text-sm text-gray-500">{{ formatFileSize(previewAttachment.fileSize) }}</div>
+            
+            <div class="mt-4 flex justify-end">
+              <!-- Download button -->
+              <a :href="getAttachmentDownloadUrl(previewAttachment.id)" 
+                 :download="previewAttachment.fileName" 
+                 class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 inline-flex items-center transition duration-200 ease-in-out"
+                 @click.stop>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Save to device
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -288,10 +410,13 @@ import {
   onMessageReceived,
   onReadReceipt,
   sendMessage as apiSendMessage,
+  sendMessageWithAttachments as apiSendMessageWithAttachments,
   markConversationAsRead,
   getConversationMessages,
   getUserConversations,
-  getConversationId
+  getConversationId,
+  getAttachmentThumbnailUrl,
+  getAttachmentDownloadUrl
 } from '@/services/message_service';
 
 export default {
@@ -324,6 +449,9 @@ export default {
     const showSidebar = ref(true);
     const messageCallback = ref(null);
     const readReceiptCallback = ref(null);
+    const fileInput = ref(null);
+    const selectedFiles = ref([]);
+    const previewAttachment = ref(null);
 
     const initialRecipient = ref({
       id: props.initialRecipientId,
@@ -338,324 +466,6 @@ export default {
       } else {
         // Redirect to login if not logged in
         window.location.href = '/login';
-      }
-    };
-    
-    // Filter conversations based on search
-    const filteredConversations = computed(() => {
-      if (!searchQuery.value) return conversations.value;
-      
-      const query = searchQuery.value.toLowerCase();
-      return conversations.value.filter(conv => 
-        conv.participantUsername.toLowerCase().includes(query) ||
-        conv.lastMessage.toLowerCase().includes(query)
-      );
-    });
-    
-    const handleNewMessage = (message) => {
-      console.log("📩 New message received in handleNewMessage:", message);
-      
-      // Dacă mesajul este pentru conversația curentă
-      if (selectedConversationId.value === message.conversationId) {
-        console.log("Adding message to current conversation");
-        
-        // Verifică duplicatele
-        const messageExists = messages.value.some(m => 
-          m.id === message.id || 
-          (m.content === message.content && 
-          m.senderId === message.senderId &&
-          m.timestamp === message.timestamp)
-        );
-        
-        if (!messageExists) {
-          // Folosește assign pentru a forța reactivitatea
-          messages.value = [...messages.value, message];
-          // Folosește nextTick direct, nu Vue.nextTick
-          nextTick(scrollToBottom);
-          
-          // Marchează ca citit dacă suntem destinatarul
-          if (message.recipientId === currentUserId.value) {
-            markConversationAsRead(message.conversationId, currentUserId.value);
-          }
-        }
-      }
-      
-      // Actualizează lista de conversații
-      updateConversationWithMessage(message);
-    };
-    
-    // Handle read receipts
-    const handleReadReceipt = (receipt) => {
-      console.log("📬 Read receipt received:", receipt);
-      
-      // Update read status of messages in current conversation
-      if (selectedConversationId.value === receipt.conversationId) {
-        messages.value = messages.value.map(msg => {
-          if (msg.senderId === currentUserId.value && !msg.read) {
-            return { ...msg, read: true };
-          }
-          return msg;
-        });
-      }
-      
-      // Update conversation list to remove unread flags
-      fetchConversations();
-    };
-    
-    // Update or add a conversation with a new message
-    const updateConversationWithMessage = (message) => {
-      console.log("Updating conversation with message:", message);
-      
-      // Find the conversation index
-      const existingIndex = conversations.value.findIndex(
-        conv => conv.conversationId === message.conversationId
-      );
-      
-      if (existingIndex !== -1) {
-        // Update existing conversation
-        const updatedConversations = [...conversations.value];
-        const existing = {...updatedConversations[existingIndex]};
-        
-        existing.lastMessage = message.content;
-        existing.lastMessageTime = message.timestamp;
-        
-        // Update unread count if current user is the recipient
-        if (message.recipientId === currentUserId.value) {
-          // Only increment if not currently viewing this conversation
-          if (selectedConversationId.value !== message.conversationId) {
-            existing.unreadCount = (existing.unreadCount || 0) + 1;
-            existing.hasUnreadMessages = true;
-          }
-        }
-        
-        // Remove existing and add to the beginning for proper sorting
-        updatedConversations.splice(existingIndex, 1);
-        updatedConversations.unshift(existing);
-        conversations.value = updatedConversations;
-        
-        // If this is the selected conversation, update that reference too
-        if (selectedConversationId.value === message.conversationId) {
-          selectedConversation.value = existing;
-        }
-      } else {
-        // This is a new conversation we don't have yet
-        fetchConversations();
-      }
-    };
-    
-    const fetchConversations = async () => {
-      try {
-        loading.value = true;
-        
-        // Verifică dacă există conversații în cache
-        const cachedConversations = localStorage.getItem('cachedConversations');
-        if (cachedConversations && conversations.value.length === 0) {
-          try {
-            // Afișează conversațiile din cache în timp ce încărcăm date noi
-            conversations.value = JSON.parse(cachedConversations);
-            loading.value = false;
-          } catch (e) {
-            console.error('Eroare la parsarea cache-ului de conversații:', e);
-          }
-        }
-        
-        // Încarcă date proaspete de la server
-        const data = await getUserConversations(currentUserId.value);
-        conversations.value = data;
-        
-        // Salvează în cache
-        localStorage.setItem('cachedConversations', JSON.stringify(data));
-      } catch (error) {
-        console.error('Error fetching conversations:', error);
-      } finally {
-        loading.value = false;
-      }
-    };
-    
-    // Scroll to bottom of messages
-    const scrollToBottom = () => {
-      nextTick(() => {
-        if (messagesContainer.value) {
-          messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
-        }
-      });
-    };
-    
-    // Format timestamp to a human-readable time
-    const formatTime = (timestamp) => {
-      if (!timestamp) return '';
-      
-      const date = new Date(timestamp);
-      const now = new Date();
-      const yesterday = new Date(now);
-      yesterday.setDate(yesterday.getDate() - 1);
-      
-      const isToday = date.toDateString() === now.toDateString();
-      const isYesterday = date.toDateString() === yesterday.toDateString();
-      
-      if (isToday) {
-        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      } else if (isYesterday) {
-        return 'Yesterday';
-      } else {
-        return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
-      }
-    };
-    
-    // Fetch messages for the selected conversation
-    const fetchMessages = async (conversationId) => {
-      try {
-        loadingMessages.value = true;
-        const data = await getConversationMessages(conversationId, currentUserId.value);
-        messages.value = data;
-        
-        // Mark conversation as read
-        if (data.length > 0) {
-          markConversationAsRead(conversationId, currentUserId.value);
-          
-          // Update conversation list to reflect read status
-          fetchConversations();
-        }
-        
-        // Scroll to bottom
-        scrollToBottom();
-      } catch (error) {
-        console.error('Error fetching messages:', error);
-      } finally {
-        loadingMessages.value = false;
-      }
-    };
-    
-    // Select a conversation
-    const selectConversation = async (conversation) => {
-      selectedConversationId.value = conversation.conversationId;
-      selectedConversation.value = conversation;
-      
-      if (isMobileView.value) {
-        showSidebar.value = false;
-      }
-      
-      // Verifică cache
-      const cacheKey = `messages_${conversation.conversationId}`;
-      const cachedMessages = localStorage.getItem(cacheKey);
-      
-      // Afișează mesajele din cache imediat dacă există
-      if (cachedMessages) {
-        try {
-          messages.value = JSON.parse(cachedMessages);
-          // Continuă să încarci date proaspete în background
-          fetchMessagesInBackground(conversation.conversationId);
-        } catch (e) {
-          console.error('Eroare la parsarea cache-ului de mesaje:', e);
-          await fetchMessages(conversation.conversationId);
-        }
-      } else {
-        // Niciun cache, încarcă normal
-        await fetchMessages(conversation.conversationId);
-      }
-    };
-
-    // Funcție nouă pentru încărcarea mesajelor în background
-    const fetchMessagesInBackground = async (conversationId) => {
-      try {
-        const data = await getConversationMessages(conversationId, currentUserId.value);
-        messages.value = data;
-        
-        // Actualizează cache-ul
-        localStorage.setItem(`messages_${conversationId}`, JSON.stringify(data));
-        
-        // Marchează ca citite
-        if (data.length > 0) {
-          markConversationAsRead(conversationId, currentUserId.value);
-          fetchConversations();
-        }
-        
-        scrollToBottom();
-      } catch (error) {
-        console.error('Error fetching messages in background:', error);
-      }
-    };
-    
-    // Send a new message
-    const sendMessage = async () => {
-      if (!newMessage.value.trim() || !selectedConversationId.value) return;
-      
-      const messageData = {
-        senderId: currentUserId.value,
-        recipientId: selectedConversation.value.participantId,
-        content: newMessage.value.trim(),
-        conversationId: selectedConversationId.value
-      };
-      
-      try {
-        // Optimistically add message to list
-        const optimisticMessage = {
-          ...messageData,
-          id: `temp-${Date.now()}`,
-          timestamp: new Date().toISOString(),
-          read: false,
-          senderUsername: localStorage.getItem('username') || 'You',
-        };
-        
-        messages.value = [...messages.value, optimisticMessage];
-        scrollToBottom();
-        
-        // Clear input
-        newMessage.value = '';
-        
-        // Send message to API
-        const response = await apiSendMessage(messageData);
-        
-        // Replace optimistic message with actual response
-        const index = messages.value.findIndex(m => m.id === optimisticMessage.id);
-        if (index !== -1) {
-          const updatedMessages = [...messages.value];
-          updatedMessages[index] = response;
-          messages.value = updatedMessages;
-        }
-        
-        // Update conversation list
-        updateConversationWithMessage(response);
-      } catch (error) {
-        console.error('Error sending message:', error);
-        // Could add error handling here, e.g. marking failed messages
-      }
-    };
-    
-    // Initialize chat with specific user if provided
-    const initChat = async () => {
-      if (initialRecipient.value.id) {
-        try {
-          const conversationId = await getConversationId(
-            currentUserId.value, 
-            parseInt(initialRecipient.value.id)
-          );
-          
-          const existingConversation = conversations.value.find(
-            c => c.conversationId === conversationId
-          );
-          
-          if (existingConversation) {
-            selectConversation(existingConversation);
-          } else {
-            // Create a temporary conversation object
-            const tempConversation = {
-              conversationId,
-              participantId: parseInt(initialRecipient.value.id),
-              participantUsername: initialRecipient.value.username || 'User',
-              lastMessage: '',
-              lastMessageTime: new Date().toISOString(),
-              hasUnreadMessages: false,
-              unreadCount: 0
-            };
-            
-            // Add to conversations list
-            conversations.value = [tempConversation, ...conversations.value];
-            selectConversation(tempConversation);
-          }
-        } catch (error) {
-          console.error('Error initializing chat:', error);
-        }
       }
     };
     
@@ -713,18 +523,18 @@ export default {
       initUser();
       window.addEventListener('resize', handleResize);
       
-      // Restabilește conversația selectată anterior, dacă există
+      // Restore previously selected conversation, if any
       const lastConversationId = localStorage.getItem('lastConversationId');
       
       setTimeout(() => {
         setupChatConnection();
         
-        // După încărcarea conversațiilor, restabilește selectarea
+        // After loading conversations, restore selection
         fetchConversations().then(() => {
           if (initialRecipient.value.id || route.query.shelterId) {
             initChat();
           } else if (lastConversationId) {
-            // Găsește și selectează ultima conversație deschisă
+            // Find and select the last opened conversation
             const lastConversation = conversations.value.find(
               c => c.conversationId === lastConversationId
             );
@@ -740,6 +550,7 @@ export default {
     onBeforeUnmount(() => {
       window.removeEventListener('resize', handleResize);
       cleanupChatConnection();
+      disconnectFromChat();
     });
     
     // Watch for changes in selected conversation
@@ -763,7 +574,7 @@ export default {
       }
     });
 
-    // Salvează conversația selectată la schimbare
+    // Save selected conversation on change
     watch(selectedConversationId, (newId) => {
       if (newId) {
         localStorage.setItem('lastConversationId', newId);
@@ -775,6 +586,467 @@ export default {
         selectedConversation.value = null;
       }
     });
+
+    // Filter conversations based on search
+    const filteredConversations = computed(() => {
+      if (!searchQuery.value) return conversations.value;
+      
+      const query = searchQuery.value.toLowerCase();
+      return conversations.value.filter(conv => 
+        conv.participantUsername.toLowerCase().includes(query) ||
+        conv.lastMessage.toLowerCase().includes(query)
+      );
+    });
+    
+    // Check if can send message (text or files)
+    const canSendMessage = computed(() => {
+      return newMessage.value.trim() !== '' || selectedFiles.value.length > 0;
+    });
+    
+    const handleNewMessage = (message) => {
+      console.log("📩 New message received in handleNewMessage:", message);
+      
+      // If the message is for the current conversation
+      if (selectedConversationId.value === message.conversationId) {
+        console.log("Adding message to current conversation");
+        
+        // Check for duplicates
+        const messageExists = messages.value.some(m => 
+          m.id === message.id || 
+          (m.content === message.content && 
+          m.senderId === message.senderId &&
+          m.timestamp === message.timestamp)
+        );
+        
+        if (!messageExists) {
+          // Use assign to force reactivity
+          messages.value = [...messages.value, message];
+          // Use nextTick directly, not Vue.nextTick
+          nextTick(scrollToBottom);
+          
+          // Mark as read if we are the recipient
+          if (message.recipientId === currentUserId.value) {
+            markConversationAsRead(message.conversationId, currentUserId.value);
+          }
+        }
+      }
+      
+      // Update the conversation list
+      updateConversationWithMessage(message);
+    };
+    
+    // Handle read receipts
+    const handleReadReceipt = (receipt) => {
+      console.log("📬 Read receipt received:", receipt);
+      
+      // Update read status of messages in current conversation
+      if (selectedConversationId.value === receipt.conversationId) {
+        messages.value = messages.value.map(msg => {
+          if (msg.senderId === currentUserId.value && !msg.read) {
+            return { ...msg, read: true };
+          }
+          return msg;
+        });
+      }
+      
+      // Update conversation list to remove unread flags
+      fetchConversations();
+    };
+    
+    // Update or add a conversation with a new message
+    const updateConversationWithMessage = (message) => {
+      console.log("Updating conversation with message:", message);
+      
+      // Find the conversation index
+      const existingIndex = conversations.value.findIndex(
+        conv => conv.conversationId === message.conversationId
+      );
+      
+      if (existingIndex !== -1) {
+        // Update existing conversation
+        const updatedConversations = [...conversations.value];
+        const existing = {...updatedConversations[existingIndex]};
+        
+        // Format message preview based on type
+        let lastMessagePreview = message.content;
+        if (message.type !== 'TEXT' && message.attachments && message.attachments.length > 0) {
+          const attachmentCount = message.attachments.length;
+          
+          switch (message.type) {
+            case 'IMAGE':
+              lastMessagePreview = attachmentCount > 1 
+                ? `📷 ${attachmentCount} images` 
+                : '📷 Image';
+              break;
+            case 'DOCUMENT':
+              lastMessagePreview = attachmentCount > 1 
+                ? `📄 ${attachmentCount} documents` 
+                : '📄 Document';
+              break;
+            case 'MIXED':
+              lastMessagePreview = `📎 ${attachmentCount} attachments`;
+              break;
+          }
+          
+          if (message.content && message.content.trim() !== '') {
+            lastMessagePreview = `${message.content} [${lastMessagePreview}]`;
+          }
+        }
+        
+        existing.lastMessage = lastMessagePreview;
+        existing.lastMessageTime = message.timestamp;
+        
+        // Update unread count if current user is the recipient
+        if (message.recipientId === currentUserId.value) {
+          // Only increment if not currently viewing this conversation
+          if (selectedConversationId.value !== message.conversationId) {
+            existing.unreadCount = (existing.unreadCount || 0) + 1;
+            existing.hasUnreadMessages = true;
+          }
+        }
+        
+        // Remove existing and add to the beginning for proper sorting
+        updatedConversations.splice(existingIndex, 1);
+        updatedConversations.unshift(existing);
+        conversations.value = updatedConversations;
+        
+        // If this is the selected conversation, update that reference too
+        if (selectedConversationId.value === message.conversationId) {
+          selectedConversation.value = existing;
+        }
+      } else {
+        // This is a new conversation we don't have yet
+        fetchConversations();
+      }
+    };
+    
+    const fetchConversations = async () => {
+      try {
+        loading.value = true;
+        
+        // Check if there are conversations in cache
+        const cachedConversations = localStorage.getItem('cachedConversations');
+        if (cachedConversations && conversations.value.length === 0) {
+          try {
+            // Display conversations from cache while loading new data
+            conversations.value = JSON.parse(cachedConversations);
+            loading.value = false;
+          } catch (e) {
+            console.error('Error parsing conversation cache:', e);
+          }
+        }
+        
+        // Load fresh data from server
+        const data = await getUserConversations(currentUserId.value);
+        conversations.value = data;
+        
+        // Save to cache
+        localStorage.setItem('cachedConversations', JSON.stringify(data));
+      } catch (error) {
+        console.error('Error fetching conversations:', error);
+      } finally {
+        loading.value = false;
+      }
+    };
+    
+    // Scroll to bottom of messages
+    const scrollToBottom = () => {
+      nextTick(() => {
+        if (messagesContainer.value) {
+          messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
+        }
+      });
+    };
+    
+    // Format timestamp to a human-readable time
+    const formatTime = (timestamp) => {
+      if (!timestamp) return '';
+      
+      const date = new Date(timestamp);
+      const now = new Date();
+      const yesterday = new Date(now);
+      yesterday.setDate(yesterday.getDate() - 1);
+      
+      const isToday = date.toDateString() === now.toDateString();
+      const isYesterday = date.toDateString() === yesterday.toDateString();
+      
+      if (isToday) {
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      } else if (isYesterday) {
+        return 'Yesterday';
+      } else {
+        return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+      }
+    };
+    
+    // Format file size to human-readable format
+    const formatFileSize = (sizeInBytes) => {
+      if (!sizeInBytes) return '0 B';
+      
+      const units = ['B', 'KB', 'MB', 'GB'];
+      let size = sizeInBytes;
+      let unitIndex = 0;
+      
+      while (size >= 1024 && unitIndex < units.length - 1) {
+        size /= 1024;
+        unitIndex++;
+      }
+      
+      return `${size.toFixed(1)} ${units[unitIndex]}`;
+    };
+    
+    // Fetch messages for the selected conversation
+    const fetchMessages = async (conversationId) => {
+      try {
+        loadingMessages.value = true;
+        const data = await getConversationMessages(conversationId, currentUserId.value);
+        messages.value = data;
+        
+        // Mark conversation as read
+        if (data.length > 0) {
+          markConversationAsRead(conversationId, currentUserId.value);
+          
+          // Update conversation list to reflect read status
+          fetchConversations();
+        }
+        
+        // Scroll to bottom
+        scrollToBottom();
+      } catch (error) {
+        console.error('Error fetching messages:', error);
+      } finally {
+        loadingMessages.value = false;
+      }
+    };
+    
+    // Select a conversation
+    const selectConversation = async (conversation) => {
+      selectedConversationId.value = conversation.conversationId;
+      selectedConversation.value = conversation;
+      
+      if (isMobileView.value) {
+        showSidebar.value = false;
+      }
+      
+      // Check cache
+      const cacheKey = `messages_${conversation.conversationId}`;
+      const cachedMessages = localStorage.getItem(cacheKey);
+      
+      // Display cached messages immediately if they exist
+      if (cachedMessages) {
+        try {
+          messages.value = JSON.parse(cachedMessages);
+          // Continue loading fresh data in the background
+          fetchMessagesInBackground(conversation.conversationId);
+        } catch (e) {
+          console.error('Error parsing message cache:', e);
+          await fetchMessages(conversation.conversationId);
+        }
+      } else {
+        // No cache, load normally
+        await fetchMessages(conversation.conversationId);
+      }
+    };
+
+    // New function for loading messages in background
+    const fetchMessagesInBackground = async (conversationId) => {
+      try {
+        const data = await getConversationMessages(conversationId, currentUserId.value);
+        messages.value = data;
+        
+        // Update cache
+        localStorage.setItem(`messages_${conversationId}`, JSON.stringify(data));
+        
+        // Mark as read
+        if (data.length > 0) {
+          markConversationAsRead(conversationId, currentUserId.value);
+          fetchConversations();
+        }
+        
+        scrollToBottom();
+      } catch (error) {
+        console.error('Error fetching messages in background:', error);
+      }
+    };
+    
+    // Handle file selection
+    const handleFileSelect = (event) => {
+      const files = Array.from(event.target.files);
+      
+      if (files.length === 0) return;
+      
+      // Check total size (max 10MB)
+      const totalSize = files.reduce((total, file) => total + file.size, 0);
+      const MAX_TOTAL_SIZE = 10 * 1024 * 1024; // 10MB
+      
+      if (totalSize > MAX_TOTAL_SIZE) {
+        alert('Total file size cannot exceed 10MB');
+        event.target.value = null; // Reset input
+        return;
+      }
+      
+      // Add selected files
+      selectedFiles.value = [...selectedFiles.value, ...files];
+      
+      // Reset input to allow selecting the same files again
+      event.target.value = null;
+    };
+    
+    // Remove a selected file
+    const removeSelectedFile = (index) => {
+      const newFiles = [...selectedFiles.value];
+      newFiles.splice(index, 1);
+      selectedFiles.value = newFiles;
+    };
+    
+    // Open attachment
+    const openAttachment = (attachment) => {
+      console.log('Opening attachment:', attachment);
+      
+      // For images, display in modal
+      if (attachment.contentType && attachment.contentType.startsWith('image/')) {
+        previewAttachment.value = attachment;
+      } else {
+        // For documents, download directly
+        window.open(getAttachmentDownloadUrl(attachment.id), '_blank');
+      }
+    };
+    
+    // Send a new message
+    const sendMessage = async () => {
+      if (!canSendMessage.value || !selectedConversationId.value) return;
+      
+      try {
+        // Build message data
+        const messageData = {
+          senderId: currentUserId.value,
+          recipientId: selectedConversation.value.participantId,
+          content: newMessage.value.trim(),
+          conversationId: selectedConversationId.value,
+          type: 'TEXT'
+        };
+        
+        // Determine if we're sending a simple message or with attachments
+        if (selectedFiles.value.length > 0) {
+          // Display an optimistic message
+          const optimisticMessage = {
+            ...messageData,
+            id: `temp-${Date.now()}`,
+            timestamp: new Date().toISOString(),
+            read: false,
+            senderUsername: localStorage.getItem('username') || 'You',
+            attachments: selectedFiles.value.map((file, index) => ({
+              id: `temp-attachment-${index}`,
+              fileName: file.name,
+              contentType: file.type,
+              fileSize: file.size,
+              hasThumbnail: file.type.startsWith('image/')
+            })),
+            type: determineMessageType(selectedFiles.value)
+          };
+          
+          messages.value = [...messages.value, optimisticMessage];
+          scrollToBottom();
+          
+          // Send message with attachments
+          const response = await apiSendMessageWithAttachments(messageData, selectedFiles.value);
+          
+          // Replace optimistic message with real response
+          const index = messages.value.findIndex(m => m.id === optimisticMessage.id);
+          if (index !== -1) {
+            const updatedMessages = [...messages.value];
+            updatedMessages[index] = response;
+            messages.value = updatedMessages;
+          }
+          
+          // Update conversation list
+          updateConversationWithMessage(response);
+          
+          // Reset selected files
+          selectedFiles.value = [];
+        } else {
+          // Send a simple text message
+          const optimisticMessage = {
+            ...messageData,
+            id: `temp-${Date.now()}`,
+            timestamp: new Date().toISOString(),
+            read: false,
+            senderUsername: localStorage.getItem('username') || 'You',
+          };
+          
+          messages.value = [...messages.value, optimisticMessage];
+          scrollToBottom();
+          
+          const response = await apiSendMessage(messageData);
+          
+          // Replace optimistic message with real response
+          const index = messages.value.findIndex(m => m.id === optimisticMessage.id);
+          if (index !== -1) {
+            const updatedMessages = [...messages.value];
+            updatedMessages[index] = response;
+            messages.value = updatedMessages;
+          }
+          
+          // Update conversation list
+          updateConversationWithMessage(response);
+        }
+        
+        // Clear message input
+        newMessage.value = '';
+      } catch (error) {
+        console.error('Error sending message:', error);
+        // Here we can add error handling, for example, marking failed messages
+      }
+    };
+    
+    // Determine message type based on attachments
+    const determineMessageType = (files) => {
+      if (files.length === 0) return 'TEXT';
+      
+      const hasImages = files.some(file => file.type.startsWith('image/'));
+      const hasDocs = files.some(file => !file.type.startsWith('image/'));
+      
+      if (hasImages && hasDocs) return 'MIXED';
+      if (hasImages) return 'IMAGE';
+      return 'DOCUMENT';
+    };
+    
+    // Initialize chat with specific user if provided
+    const initChat = async () => {
+      if (initialRecipient.value.id) {
+        try {
+          const conversationId = await getConversationId(
+            currentUserId.value, 
+            parseInt(initialRecipient.value.id)
+          );
+          
+          const existingConversation = conversations.value.find(
+            c => c.conversationId === conversationId
+          );
+          
+          if (existingConversation) {
+            selectConversation(existingConversation);
+          } else {
+            // Create a temporary conversation object
+            const tempConversation = {
+              conversationId,
+              participantId: parseInt(initialRecipient.value.id),
+              participantUsername: initialRecipient.value.username || 'User',
+              lastMessage: '',
+              lastMessageTime: new Date().toISOString(),
+              hasUnreadMessages: false,
+              unreadCount: 0
+            };
+            
+            // Add to conversations list
+            conversations.value = [tempConversation, ...conversations.value];
+            selectConversation(tempConversation);
+          }
+        } catch (error) {
+          console.error('Error initializing chat:', error);
+        }
+      }
+    };
     
     return {
       currentUserId,
@@ -790,11 +1062,20 @@ export default {
       searchQuery,
       isMobileView,
       showSidebar,
+      fileInput,
+      selectedFiles,
+      previewAttachment,
+      canSendMessage,
       selectConversation,
       sendMessage,
       formatTime,
+      formatFileSize,
       scrollToBottom,
-      fetchMessagesInBackground
+      handleFileSelect,
+      removeSelectedFile,
+      openAttachment,
+      getAttachmentThumbnailUrl,
+      getAttachmentDownloadUrl
     };
   }
 }
@@ -839,5 +1120,10 @@ export default {
 .flex.justify-end > div,
 .flex.justify-start > div {
   animation: fadeIn 0.2s ease-out forwards;
+}
+
+/* File upload previews */
+.max-w-32 {
+  max-width: 8rem;
 }
 </style>
