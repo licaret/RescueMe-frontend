@@ -96,14 +96,14 @@
               <span>Messages</span>
             </a>
           </li>
-          <li>
+          <!-- <li>
             <a @click="navigateTo('/volunteer')" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-red-600 rounded cursor-pointer">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z" />
               </svg>
               <span>Volunteer</span>
             </a>
-          </li>
+          </li> -->
           <li>
             <a @click="navigateTo('/donate')" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-red-600 rounded cursor-pointer">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">

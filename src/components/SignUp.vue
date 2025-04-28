@@ -625,7 +625,7 @@ export default {
 
             console.log("Shelter registration response:", response);
 
-            this.showToast("Account created successfully! Redirecting to complete your profile...");
+            this.showToast("Account created successfully! Redirecting to login...");
             this.isLoading = true;
             setTimeout(() => {
               this.$router.push('/shelter-profile-completion');

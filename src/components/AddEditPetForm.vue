@@ -235,8 +235,10 @@
           </button>
           <button
             type="submit"
-            class="px-4 py-2 bg-red-600 text-white rounded-3xl hover:bg-red-700"
+            :disabled="isSubmitting"
+            class="px-4 py-2 bg-red-600 text-white rounded-3xl hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
           >
+            <span v-if="isSubmitting" class="w-4 h-4 border-2 border-t-white border-white/30 rounded-full animate-spin mr-2"></span>
             {{ petToEdit ? 'Update Pet' : 'Add Pet' }}
           </button>
         </div>
@@ -282,6 +284,8 @@ export default {
     const photoFiles = ref([]);
     const existingPhotos = ref([]);
     const photoIdsToDelete = ref([]);
+
+    const isSubmitting = ref(false);
 
 
     watch(() => props.petToEdit, (newPet) => {
@@ -374,6 +378,8 @@ export default {
 
     const handleSubmit = async () => {
       try {
+        // isSubmitting.value = true;
+
         const formData = new FormData();
         const isUpdate = !!props.petToEdit;
 
@@ -444,6 +450,8 @@ export default {
         emit("close");
       } catch (error) {
         console.error("Error saving pet:", error);
+      // } finally {
+      //   isSubmitting.value = false;
       }
     };
 
@@ -454,6 +462,7 @@ export default {
       handlePhotoUpload,
       handleRemovePhoto,
       handleSubmit,
+      isSubmitting, 
     };
   },
 };

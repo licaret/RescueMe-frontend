@@ -311,6 +311,14 @@
         </transition>
       </div>
 
+      <!-- Loading Overlay -->
+      <div v-if="isLoading" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+        <div class="bg-white p-5 rounded-lg flex flex-col items-center">
+          <div class="w-16 h-16 border-4 border-t-red-500 border-gray-200 rounded-full animate-spin mb-3"></div>
+          <p class="text-gray-700 font-medium">Loading...</p>
+        </div>
+      </div>
+
       <!-- Pets Grid Section -->
       <div v-if="filteredPets.length > 0" class="space-y-6">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pb-8 ml-0 pr-2 mt-8">
@@ -457,7 +465,7 @@
     <Teleport to="body" v-if="showAddEditPetForm">
       <div class="fixed inset-0 z-[10001] bg-black/10 backdrop-blur-sm flex items-center justify-center p-4">
         <AddEditPetForm 
-          @close="showAddEditPetForm = false"
+          @close="handleCloseForm"
           @pet-added="handlePetAdded"
           :key="formKey"
         />
@@ -468,7 +476,7 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, watch, nextTick  } from 'vue';
 import { useRoute } from 'vue-router';
 import { fetchShelterPets } from "@/services/pet_service.js";
 import AddEditPetForm from '@/components/AddEditPetForm.vue';
@@ -492,8 +500,10 @@ export default {
     const formKey = ref(0);
     const showBreedMessage = ref(false);
 
+    const isLoading = ref(false);
+
     // pagination
-    const itemsPerPage = 16;
+    const itemsPerPage = 12;
     const currentPage = ref(1);
 
     const filters = ref({
@@ -510,6 +520,11 @@ export default {
       status: "", // AVAILABLE, PENDING, ADOPTED
       ageRange: "" // Added new filter for age ranges
     });
+
+    const handleCloseForm = () => {
+      showAddEditPetForm.value = false;
+      isLoading.value = true; // imediat când se închide formularul pornești spinnerul
+    };
 
     const resetFilters = () => {
       filters.value = {
@@ -724,9 +739,17 @@ export default {
 
 
     const handlePetAdded = async (newPet) => {   
-      await new Promise(resolve => setTimeout(resolve, 1000)); 
-      await loadPets(); 
+      isLoading.value = true;
+
+      await nextTick(); // 🔥 aici forțezi Vue să facă update-ul DOM (să afișeze spinnerul înainte de loadPets)
+
+      await new Promise(resolve => setTimeout(resolve, 100)); // mic delay ca să fie sigur (300ms)
+
+      await loadPets();
+
+      isLoading.value = false;
     };
+
 
 
     
@@ -738,6 +761,7 @@ export default {
 
 
     const updatePetInList = (updatedPet) => {
+      isLoading.value = true;
       const index = pets.value.findIndex((p) => p.id === updatedPet.id);
       if (index !== -1) {
         pets.value = [
@@ -754,6 +778,9 @@ export default {
           ...pets.value.slice(index + 1)
         ];
       }
+      setTimeout(() => {
+        isLoading.value = false;
+      }, 1000);
     };
 
 
@@ -1020,7 +1047,8 @@ export default {
       selectSortOption,
       getSortLabel,
       toggleFilters,
-      applyAgeRangeFilter
+      applyAgeRangeFilter,
+      handleCloseForm
     };
     },
   };

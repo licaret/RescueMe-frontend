@@ -573,7 +573,8 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, reactive, watch } from 'vue';
+import { ref, computed, onMounted, reactive, watch} from 'vue';
+import { useRoute } from 'vue-router';
 import Navbar from "@/components/Navbar.vue";
 import PetCard from "@/components/PetCard.vue";
 import judete from "@/assets/judete.json";
@@ -593,6 +594,8 @@ export default {
     const sortBy = ref("");
     const photoIndices = reactive({});
     const storyVisibility = reactive({});
+
+    const route = useRoute();
     
     // pagination 
     const paginationState = reactive({});
@@ -1124,6 +1127,12 @@ export default {
     onMounted(() => {
       loadData();
       processLocationData();
+      // Handle urgent filter from query params
+      if (route.query.urgent === 'true') {
+        filters.value.urgentAdoptionNeeded = true;
+        showFilters.value = true;
+      }
+      
       const savedFavorites = localStorage.getItem('favoritePets');
       if (savedFavorites) {
         try {

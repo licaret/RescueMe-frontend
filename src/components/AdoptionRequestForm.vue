@@ -1,6 +1,12 @@
 <template>
   <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-[9999] p-4 overflow-y-auto backdrop-blur-sm"
        @click="handleBackdropClick">
+    <!-- Progress bar at the top -->
+    <div class="absolute top-0 left-0 right-0 h-1 bg-gray-200">
+      <div class="h-full bg-pink-600 transition-all duration-300"
+           :style="{ width: `${formProgress}%` }"></div>
+    </div>
+    
     <div class="bg-white rounded-3xl max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl transform transition-all duration-300"
          @click.stop>
       <!-- Form Header -->
@@ -31,13 +37,13 @@
               @click="navigateToAdoptionRequests" 
               class="px-4 py-2 bg-pink-600 text-white rounded-2xl font-medium hover:bg-pink-700 transition-colors"
             >
-              View My Adoption Requests
+              View Your Adoption Requests
             </button>
             <button 
-              @click="goToHomePage" 
+              @click="goToAvailablePetsPage" 
               class="px-4 py-2 bg-gray-200 text-gray-800 rounded-2xl font-medium hover:bg-gray-300 transition-colors"
             >
-              Back to Home
+              Back to Available Pets 
             </button>
           </div>
         </div>
@@ -96,7 +102,6 @@
                 </div>
               </div>
 
-              
               <!-- Pet Details -->
               <div class="flex-1">
                 <h4 class="text-lg font-bold text-gray-800">{{ pet.name }}</h4>
@@ -181,29 +186,33 @@
                 />
               </div>
               
+              <!-- County and City Selection (Updated to match the event form) -->
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label for="city" class="block text-sm font-medium text-gray-700 mb-1">City</label>
-                  <input
-                    type="text"
-                    id="city"
-                    v-model="form.city"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-2xl shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
-                    placeholder="Your city"
-                    required
-                  />
-                </div>
-                
-                <div>
                   <label for="county" class="block text-sm font-medium text-gray-700 mb-1">County</label>
-                  <input
-                    type="text"
+                  <select
                     id="county"
                     v-model="form.county"
                     class="w-full px-3 py-2 border border-gray-300 rounded-2xl shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
-                    placeholder="Your county"
                     required
-                  />
+                  >
+                    <option value="">Select County</option>
+                    <option v-for="county in counties" :key="county" :value="county">{{ county }}</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label for="city" class="block text-sm font-medium text-gray-700 mb-1">City</label>
+                  <select
+                    id="city"
+                    v-model="form.city"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-2xl shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 sm:text-sm"
+                    :disabled="!form.county"
+                    required
+                  >
+                    <option value="">Select City</option>
+                    <option v-for="city in filteredCities" :key="city" :value="city">{{ city }}</option>
+                  </select>
                 </div>
               </div>
             </form>
@@ -507,12 +516,13 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { getUserById } from '../services/user_service';
 import { getPetById } from '../services/pet_service';
 import { submitAdoptionRequest } from '../services/adoption_service';
 import { getCurrentAdoptionPet, clearCurrentAdoptionPet } from '../services/adoption_state_service';
+import judete from '@/assets/judete.json';
 
 export default {
   name: 'AdoptionRequestForm',
@@ -528,9 +538,48 @@ export default {
     const route = useRoute();
     const userProfile = ref(null);
     const isSubmitting = ref(false);
+
     const pet = ref(null);
     const errorMessage = ref('');
     const successMessage = ref('');
+    
+    // Calculate form progress
+    const formProgress = computed(() => {
+      if (!pet.value) return 5;
+      if (successMessage.value) return 100;
+      if (errorMessage.value) return 25;
+      
+      let progress = 10; // Start with 10% just for loading the form
+      
+      // Basic information section (worth 20%)
+      if (form.value.phone) progress += 5;
+      if (form.value.county) progress += 5;
+      if (form.value.city) progress += 10;
+      
+      // Housing section (worth 20%)
+      if (form.value.housingType) progress += 5;
+      if (form.value.ownRent) progress += 5;
+      if (form.value.hasYard) progress += 5;
+      if (form.value.hasYard === 'yes' && form.value.fencedYard) progress += 5;
+      
+      // Household section (worth 20%)
+      if (form.value.householdMembers) progress += 5;
+      if (form.value.hasChildren) progress += 5;
+      if (form.value.hasOtherPets) progress += 5;
+      if (form.value.hasOtherPets === 'yes' && form.value.otherPetsDescription) progress += 5;
+      
+      // Experience & Expectations section (worth 20%)
+      if (form.value.petExperience) progress += 5;
+      if (form.value.activityLevel) progress += 5;
+      if (form.value.timeAlone) progress += 5;
+      if (form.value.adoptReason) progress += 5;
+      
+      // Terms & Additional (worth 10%)
+      if (form.value.additionalInfo) progress += 5;
+      if (form.value.agreeToTerms) progress += 5;
+      
+      return Math.min(progress, 95); // Cap at 95% until form is actually submitted
+    });
     
     // Form data
     const form = ref({
@@ -564,6 +613,29 @@ export default {
       agreeToTerms: false
     });
     
+    // Counties and cities data from Romanian judete
+    const counties = computed(() => 
+      judete.judete.map(judet => judet.nume).sort()
+    );
+    
+    // Get cities based on selected county
+    const filteredCities = computed(() => {
+      if (!form.value.county) return [];
+      
+      const selectedCounty = judete.judete.find(judet => 
+        judet.nume === form.value.county
+      );
+      
+      return selectedCounty 
+        ? selectedCounty.localitati.map(loc => loc.nume).sort() 
+        : [];
+    });
+    
+    // Reset city when county changes
+    watch(() => form.value.county, () => {
+      form.value.city = '';
+    });
+    
     // Form validation
     const isFormValid = computed(() => {
       return form.value.phone && 
@@ -585,8 +657,6 @@ export default {
              form.value.adoptReason &&
              form.value.agreeToTerms;
     });
-    
-
     
     const loadPet = async () => {
       console.log("Loading pet data for ID:", props.petId);
@@ -610,8 +680,6 @@ export default {
       }
     };
     
-
-
     onMounted(async () => {
       console.log("AdoptionRequestForm component mounted");
       
@@ -639,10 +707,9 @@ export default {
       } catch (error) {
         console.error('Error in component setup:', error);
         errorMessage.value = "Failed to load user information. Please try again.";
+        isLoading.value = false;
       }
     });
-    
-
     
     onBeforeUnmount(() => {
       if (!successMessage.value) {
@@ -650,31 +717,24 @@ export default {
       }
     });
     
-
-
     const handleBackdropClick = (event) => {
       if (event.target === event.currentTarget) {
         goBack();
       }
     };
     
-
     const goBack = () => {
       router.go(-1);
     };
     
-
-    const goToHomePage = () => {
-      router.push('/home');
+    const goToAvailablePetsPage = () => {
+      router.push('/available-pets');
     };
-    
     
     const navigateToAdoptionRequests = () => {
       router.push('/my-adoption-requests');
     };
     
-
-
     const formatAge = (age) => {
       if (!age && age !== 0) return 'Unknown';
       
@@ -686,8 +746,6 @@ export default {
       }
     };
     
-    
-
     const submitForm = async () => {
       if (!isFormValid.value || !userProfile.value || !pet.value) {
         if (!pet.value) {
@@ -758,18 +816,21 @@ export default {
       }
     };
     
-    
     return {
       pet,
       userProfile,
       form,
       isFormValid,
       isSubmitting,
+
       errorMessage,
       successMessage,
+      formProgress,
+      counties,
+      filteredCities,
       handleBackdropClick,
       goBack,
-      goToHomePage,
+      goToAvailablePetsPage,
       navigateToAdoptionRequests,
       formatAge,
       submitForm

@@ -49,7 +49,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8s-9-3.582-9-8 4.03-8 9-8 9 3.582 9 8z" />
           </svg>
           <p>No conversations yet</p>
-          <p class="text-sm mt-1">Start by messaging a shelter</p>
+          <!-- <p class="text-sm mt-1">Start by messaging a shelter</p> -->
         </div>
         
         <div v-else>
@@ -168,7 +168,7 @@
         </svg>
         <h3 class="text-xl font-medium text-gray-700 mb-2">No conversation selected</h3>
         <p class="text-gray-500 text-center max-w-md">
-          Select a conversation from the sidebar or start a new conversation by messaging a shelter
+          Select a conversation from the sidebar or start a new conversation
         </p>
       </div>
       

@@ -16,7 +16,7 @@
           <ul class="space-y-2">
             <li><router-link to="/about-us" class="text-gray-400 hover:text-black transition-colors">About us</router-link></li>
             <li><router-link to="/contact" class="text-gray-400 hover:text-black transition-colors">Contact us</router-link></li>
-            <li><router-link to="/volunteer" class="text-gray-400 hover:text-black transition-colors">Volunteer</router-link></li>
+            <!-- <li><router-link to="/volunteer" class="text-gray-400 hover:text-black transition-colors">Volunteer</router-link></li> -->
           </ul>
         </div>
         

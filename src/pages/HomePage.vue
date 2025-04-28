@@ -213,11 +213,11 @@
         <div class="text-center bg-white p-6 rounded-3xl shadow-md">
           <div class="bg-red-600 w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4 text-white">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
           </div>
-          <h3 class="text-xl font-bold mb-2">Volunteer</h3>
-          <p class="text-gray-700">Dedicate your time and help animals in need of care and attention.</p>
+          <h3 class="text-xl font-bold mb-2">Attend Events</h3>
+          <p class="text-gray-700">Join adoption events and fundraising activities to support animal welfare.</p>
         </div>
         
         <!-- Option 4 -->
@@ -261,6 +261,7 @@
   </section>
 
   <!-- Emergency Banner-->
+  <!-- Emergency Banner-->
   <section class="py-4 bg-red-600 text-white">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex flex-col md:flex-row items-center justify-between">
@@ -268,7 +269,7 @@
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
-          <p class="font-bold">Emergency: We urgently need foster homes for 5 puppies rescued yesterday!</p>
+          <p class="font-bold">Emergency: We urgently need foster homes for {{ urgentPetsCount }} {{ urgentPetsCount === 1 ? 'pet' : 'pets' }} needing immediate adoption!</p>
         </div>
         <button
           @click="handleEmergencyFoster"
@@ -342,12 +343,14 @@ export default {
       activeEvents: [],
       displayedEvents: [],
       eventIntervalId: null,
+      urgentPetsCount: 0,
     }
   },
 
   mounted() {
     this.fetchAvailablePets();
     this.fetchActiveEvents();
+    this.fetchUrgentPetsCount();
   },
 
   beforeUnmount() {
@@ -370,7 +373,14 @@ export default {
       this.$router.push(this.isLoggedIn ? '/events' : '/login');
     },
     handleEmergencyFoster() {
-      this.$router.push(this.isLoggedIn ? '/emergency-foster' : '/login');
+      if (this.isLoggedIn) {
+        this.$router.push({ 
+          path: '/available-pets',
+          query: { urgent: 'true' } 
+        });
+      } else {
+        this.$router.push('/login');
+      }
     },
     subscribeNewsletter() {
       alert('Thank you for subscribing!');
@@ -445,7 +455,20 @@ export default {
       if (activeIndex !== -1) {
         this.activeEvents[activeIndex] = updatedEvent;
       }
-    }
+    },
+    async fetchUrgentPetsCount() {
+      try {
+        const response = await fetch('http://localhost:8080/pets/available');
+        if (!response.ok) {
+          console.error("Failed to fetch pets for emergency banner");
+          return;
+        }
+        const pets = await response.json();
+        this.urgentPetsCount = pets.filter(pet => pet.urgentAdoptionNeeded).length;
+      } catch (error) {
+        console.error("Error fetching urgent pets count:", error);
+      }
+    },
   }
 }
 </script>
