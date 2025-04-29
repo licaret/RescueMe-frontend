@@ -781,51 +781,81 @@ export default {
       responseNote.value = request.notes || '';
     };
 
+    // const processApproval = async () => {
+    //   if (!selectedRequest.value) return;
+
+    //   try {
+    //     isLoading.value = true;
+
+    //     // Aprobă requestul în backend
+    //     await updateAdoptionRequestStatus(
+    //       selectedRequest.value.id,
+    //       'APPROVED',
+    //       responseNote.value
+    //     );
+
+    //     // Trigger pentru alte componente (dacă e nevoie)
+    //     window.dispatchEvent(new Event('adoption-status-updated'));
+
+    //     // Update local pentru lista de requesturi
+    //     const index = requests.value.findIndex(r => r.id === selectedRequest.value.id);
+    //     if (index !== -1) {
+    //       requests.value[index].status = 'APPROVED';
+    //       requests.value[index].notes = responseNote.value;
+
+    //       // Update și statusul pet-ului în lista de requesturi
+    //       if (requests.value[index].pet) {
+    //         requests.value[index].pet.status = 'PENDING';
+    //       }
+    //     }
+
+    //     // Update și în selectedRequest ca să se afișeze "Complete Adoption" fără refresh
+    //     if (selectedRequest.value.pet) {
+    //       selectedRequest.value.pet.status = 'PENDING';
+    //     }
+
+    //     // Închide modalul
+    //     selectedRequest.value = null;
+
+    //   } catch (error) {
+    //     console.error('Error approving adoption request:', error);
+    //     alert('Failed to approve adoption request. Please try again.');
+    //   } finally {
+    //     isLoading.value = false;
+    //   }
+    // };
+
     const processApproval = async () => {
-      if (!selectedRequest.value) return;
+  if (!selectedRequest.value) return;
 
-      try {
-        isLoading.value = true;
+  try {
+    isLoading.value = true;
 
-        // Aprobă requestul în backend
-        await updateAdoptionRequestStatus(
-          selectedRequest.value.id,
-          'APPROVED',
-          responseNote.value
-        );
+    // Approve the request in backend
+    // The backend should already be handling:
+    // 1. Setting this request to APPROVED
+    // 2. Auto-rejecting other pending requests for this pet
+    // 3. Creating notifications for rejected users
+    // 4. Setting pet status to PENDING
+    await updateAdoptionRequestStatus(
+      selectedRequest.value.id,
+      'APPROVED',
+      responseNote.value
+    );
 
-        // Trigger pentru alte componente (dacă e nevoie)
-        window.dispatchEvent(new Event('adoption-status-updated'));
+    // Reload all adoption requests from the server to see the updates including auto-rejected requests
+    await fetchRequests();
+    
+    // Close the modal after refresh is complete
+    selectedRequest.value = null;
 
-        // Update local pentru lista de requesturi
-        const index = requests.value.findIndex(r => r.id === selectedRequest.value.id);
-        if (index !== -1) {
-          requests.value[index].status = 'APPROVED';
-          requests.value[index].notes = responseNote.value;
-
-          // Update și statusul pet-ului în lista de requesturi
-          if (requests.value[index].pet) {
-            requests.value[index].pet.status = 'PENDING';
-          }
-        }
-
-        // Update și în selectedRequest ca să se afișeze "Complete Adoption" fără refresh
-        if (selectedRequest.value.pet) {
-          selectedRequest.value.pet.status = 'PENDING';
-        }
-
-        // Închide modalul
-        selectedRequest.value = null;
-
-      } catch (error) {
-        console.error('Error approving adoption request:', error);
-        alert('Failed to approve adoption request. Please try again.');
-      } finally {
-        isLoading.value = false;
-      }
-    };
-
-
+  } catch (error) {
+    console.error('Error approving adoption request:', error);
+    alert('Failed to approve adoption request. Please try again.');
+  } finally {
+    isLoading.value = false;
+  }
+};
 
     const processRejection = async () => {
       if (!selectedRequest.value) return;

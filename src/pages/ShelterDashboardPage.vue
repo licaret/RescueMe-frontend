@@ -145,7 +145,11 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
                 </svg>
                 <span class="flex-1 ms-3 whitespace-nowrap">Inbox</span>
-                <span v-if="unreadMessagesCount > 0" class="inline-flex items-center justify-center w-3 h-3 p-3 ms-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300">
+                <span 
+                  v-if="unreadMessagesCount > 0" 
+                  :key="unreadMessagesCount"
+                  class="inline-flex items-center justify-center w-3 h-3 p-3 ms-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300"
+                >
                   {{ unreadMessagesCount }}
                 </span>
               </router-link>
@@ -533,7 +537,7 @@
 </template>
 
 <script>
-import { ref, onMounted, onUnmounted, computed, onBeforeUnmount } from "vue";
+import { ref, onMounted, onUnmounted, computed, onBeforeUnmount, watch } from "vue";
 import { useRouter, useRoute, onBeforeRouteUpdate } from "vue-router";
 import {fetchShelterPetStats, fetchShelterPets} from '@/services/pet_service.js';
 import { getShelterAdoptionRequests } from '@/services/adoption_service';
@@ -544,7 +548,6 @@ import { connectToShelterNotifications, disconnectFromNotifications } from '@/se
 import { fetchShelterNotifications, markNotificationAsRead } from '@/services/notification_service';
 import { logout } from "@/services/user_service";
 import { getUnreadMessagesCount } from '@/services/message_service';
-
 
 export default {
   name: 'ShelterDashboardLayout',
@@ -613,6 +616,11 @@ export default {
       }
     };
 
+    watch(() => route.path, (newPath) => {
+      if (newPath === '/shelter-dashboard/messages') {
+        unreadMessagesCount.value = 0;
+      }
+    });
 
     onMounted(() => {
       const username = localStorage.getItem("Username");
@@ -629,8 +637,14 @@ export default {
             time: formatRelativeTime(newNotification.createdAt),
             read: false
           });
+          
         });
-        
+        // connectToChat(shelterId);
+        //   // când primești un mesaj nou
+        //   onMessageReceived((newMessage) => {
+        //     console.log("📨 Mesaj nou primit:", newMessage);
+        //     unreadMessagesCount.value++; // 👈 incrementăm badge-ul de inbox
+        //   });
         // Încarcă notificările existente
         loadNotifications();
       }
@@ -941,19 +955,16 @@ export default {
       }
 
       window.addEventListener('adoption-status-updated', loadPendingAdoptionCount);
-
-
       window.history.pushState(null, "", window.location.href);
       window.addEventListener("popstate", blockBackButton);
-      
       document.addEventListener('click', handleClickOutside);
-      
       window.addEventListener('resize', handleResize);
-
       window.addEventListener('pet-updated', loadUrgentPets);
       window.addEventListener('pet-added', loadUrgentPets);
       window.addEventListener('event-updated', loadUpcomingEvents);
       window.addEventListener('event-added', loadUpcomingEvents);
+      window.addEventListener('new-message', handleNewMessageEvent);
+      window.addEventListener('message-read', handleMessageReadEvent);
 
       handleResize();
     });
@@ -971,7 +982,33 @@ export default {
       window.removeEventListener('pet-added', loadUrgentPets);
       window.removeEventListener('event-updated', loadUpcomingEvents);
       window.removeEventListener('event-added', loadUpcomingEvents);
+      window.removeEventListener('new-message', handleNewMessageEvent);
+      window.removeEventListener('message-read', handleMessageReadEvent);
     });
+
+    const handleNewMessageEvent = async (event) => {
+      const message = event.detail;
+      const shelterId = localStorage.getItem('Id');
+      
+      if (message.recipientId === parseInt(shelterId)) {
+        try {
+          const count = await getUnreadMessagesCount(parseInt(shelterId));
+          unreadMessagesCount.value = count;
+        } catch (error) {
+          console.error('Error updating unread messages count:', error);
+        }
+      }
+    };
+
+    const handleMessageReadEvent = async () => {
+      const shelterId = localStorage.getItem('Id');
+      try {
+        const count = await getUnreadMessagesCount(parseInt(shelterId));
+        unreadMessagesCount.value = count;
+      } catch (error) {
+        console.error('Error updating unread messages count:', error);
+      }
+    };
 
 
     const formatRelativeTime = (timestamp) => {
@@ -1014,6 +1051,8 @@ export default {
       handleNotificationClick, 
       navigateBasedOnNotificationType,
       unreadMessagesCount,
+      handleNewMessageEvent,
+      handleMessageReadEvent
     };
   }
 };

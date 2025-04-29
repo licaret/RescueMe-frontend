@@ -479,29 +479,30 @@ export default {
     
     // Set up WebSocket connection and listeners
     const setupChatConnection = () => {
-      if (!currentUserId.value) return;
-      
-      console.log("Setting up chat connection for user:", currentUserId.value);
-      
-      connectToChat(
-        currentUserId.value,
-        () => {
-          console.log('✅ Chat WebSocket connected successfully');
-          
-          // Store the callback removal functions
-          messageCallback.value = onMessageReceived(handleNewMessage);
-          readReceiptCallback.value = onReadReceipt(handleReadReceipt);
-          
-          // Fetch conversations
-          fetchConversations().then(() => {
-            if (initialRecipient.value.id || route.query.shelterId) {
-              initChat();
-            }
-          });
-        },
-        (err) => console.error('❌ WebSocket error', err)
-      );
-    };
+  if (!currentUserId.value) return;
+  
+  console.log("Setting up chat connection for user:", currentUserId.value);
+  
+  return new Promise((resolve) => {
+    connectToChat(
+      currentUserId.value,
+      async () => {
+        console.log('✅ Chat WebSocket connected successfully');
+        
+        messageCallback.value = onMessageReceived(handleNewMessage);
+        readReceiptCallback.value = onReadReceipt(handleReadReceipt);
+        
+        await fetchConversations();  // Așteaptă să se încarce conversațiile
+        resolve(); // Rezolvăm promisiunea când conexiunea este stabilită
+      },
+      (err) => {
+        console.error('❌ WebSocket error', err);
+        resolve(); // Rezolvăm promisiunea chiar și în caz de eroare
+      }
+    );
+  });
+};
+
     
     // Cleanup WebSocket connection and listeners
     const cleanupChatConnection = () => {
@@ -519,32 +520,19 @@ export default {
       }
     };
     
-    onMounted(() => {
-      initUser();
-      window.addEventListener('resize', handleResize);
-      
-      // Restore previously selected conversation, if any
-      const lastConversationId = localStorage.getItem('lastConversationId');
-      
-      setTimeout(() => {
-        setupChatConnection();
-        
-        // After loading conversations, restore selection
-        fetchConversations().then(() => {
-          if (initialRecipient.value.id || route.query.shelterId) {
-            initChat();
-          } else if (lastConversationId) {
-            // Find and select the last opened conversation
-            const lastConversation = conversations.value.find(
-              c => c.conversationId === lastConversationId
-            );
-            if (lastConversation) {
-              selectConversation(lastConversation);
-            }
-          }
-        });
-      }, 200);
-    });
+    onMounted(async () => {
+  initUser();
+  window.addEventListener('resize', handleResize);
+
+  // Folosim await pentru a aștepta conectarea la chat
+  await setupChatConnection();
+  
+  // După ce conectarea la chat s-a finalizat, verificăm dacă avem un recipient inițial
+  if (initialRecipient.value.id || route.query.shelterId) {
+    initChat();
+  }
+});
+
     
     // Clean up on unmount
     onBeforeUnmount(() => {
@@ -1013,40 +1001,76 @@ export default {
     
     // Initialize chat with specific user if provided
     const initChat = async () => {
-      if (initialRecipient.value.id) {
-        try {
-          const conversationId = await getConversationId(
-            currentUserId.value, 
-            parseInt(initialRecipient.value.id)
-          );
-          
-          const existingConversation = conversations.value.find(
-            c => c.conversationId === conversationId
-          );
-          
-          if (existingConversation) {
-            selectConversation(existingConversation);
-          } else {
-            // Create a temporary conversation object
-            const tempConversation = {
-              conversationId,
-              participantId: parseInt(initialRecipient.value.id),
-              participantUsername: initialRecipient.value.username || 'User',
-              lastMessage: '',
-              lastMessageTime: new Date().toISOString(),
-              hasUnreadMessages: false,
-              unreadCount: 0
-            };
-            
-            // Add to conversations list
-            conversations.value = [tempConversation, ...conversations.value];
-            selectConversation(tempConversation);
-          }
-        } catch (error) {
-          console.error('Error initializing chat:', error);
-        }
-      }
-    };
+  // Asigură-te că userID-ul și ID-ul recipientului sunt disponibile
+  if (!currentUserId.value) {
+    console.error("Current user ID is not available");
+    return;
+  }
+  
+  const recipientId = initialRecipient.value.id || route.query.shelterId;
+  if (!recipientId) {
+    console.error("No recipient ID provided");
+    return;
+  }
+
+  try {
+    console.log("Initializing chat with recipient:", recipientId);
+    
+    // Încercăm să găsim o conversație existentă
+    const existingConversation = conversations.value.find(
+      c => c.participantId === parseInt(recipientId)
+    );
+
+    if (existingConversation) {
+      console.log("Found existing conversation:", existingConversation);
+      selectConversation(existingConversation);
+      return;
+    }
+
+    // Dacă nu există, obținem/creăm un ID de conversație
+    console.log("Creating new conversation with:", recipientId);
+    const conversationId = await getConversationId(
+      currentUserId.value, 
+      parseInt(recipientId)
+    );
+
+    // Verificăm din nou conversațiile (ar putea fi actualizate între timp)
+    const existingById = conversations.value.find(
+      c => c.conversationId === conversationId
+    );
+
+    if (existingById) {
+      console.log("Found conversation by ID:", existingById);
+      selectConversation(existingById);
+    } else {
+      // Creăm o nouă conversație temporară
+      console.log("Creating temporary conversation with ID:", conversationId);
+      const recipientUsername = initialRecipient.value.username || 
+                               route.query.shelterName || 
+                               'User';
+                               
+      const tempConversation = {
+        conversationId,
+        participantId: parseInt(recipientId),
+        participantUsername: recipientUsername,
+        lastMessage: '',
+        lastMessageTime: new Date().toISOString(),
+        hasUnreadMessages: false,
+        unreadCount: 0
+      };
+      
+      // Adăugăm conversația temporară la lista
+      conversations.value = [tempConversation, ...conversations.value];
+      selectConversation(tempConversation);
+      
+      // Actualizăm lista de conversații după ce am creat una nouă
+      fetchConversations();
+    }
+  } catch (error) {
+    console.error('Error initializing chat:', error);
+  }
+};
+
     
     return {
       currentUserId,
@@ -1075,7 +1099,8 @@ export default {
       removeSelectedFile,
       openAttachment,
       getAttachmentThumbnailUrl,
-      getAttachmentDownloadUrl
+      getAttachmentDownloadUrl,
+      initChat
     };
   }
 }

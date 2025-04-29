@@ -87,11 +87,18 @@
               </a>
             </li>
             <li>
-              <a @click="navigateToMessages" style="cursor: pointer;">
+              <a @click="navigateToMessages" style="cursor: pointer;" class="relative">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6">
                   <path d="M22 12h-6l-2 3h-4l-2-3H2"/>
                   <path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>
                 </svg>
+                <span 
+                  v-if="unreadMessagesCount > 0" 
+                  :key="unreadMessagesCount"
+                  class="absolute -top-2.5 -right-3 bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"
+                >
+                  {{ unreadMessagesCount }}
+                </span>
               </a>
             </li>
             <li>
@@ -113,12 +120,13 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted , onBeforeUnmount} from 'vue';
 import { useRouter } from 'vue-router';
 import { getFavoritesCount } from '../services/favorite_service';
 import { fetchAdopterNotifications, markNotificationAsRead } from '../services/notification_service';
 import { connectToAdopterNotifications, disconnectFromNotifications } from '../services/notification_socket';
 import SidebarMenu from './SidebarMenu.vue';
+import { getUnreadMessagesCount } from '@/services/message_service'; 
 
 export default {
   components: {
@@ -131,6 +139,7 @@ export default {
     const showNotifications = ref(false);
     const notifications = ref([]);
     const unreadNotifications = computed(() => notifications.value.filter(n => !n.read).length);
+    const unreadMessagesCount = ref(0);
 
     const loadFavoritesCount = async () => {
       const userId = localStorage.getItem('Id');
@@ -141,6 +150,18 @@ export default {
         } catch (error) {
           console.error('Error loading favorites count:', error);
         }
+      }
+    };
+
+    const fetchUnreadMessagesCount = async () => {
+      try {
+        const userId = localStorage.getItem('Id');
+        if (userId) {
+          const count = await getUnreadMessagesCount(parseInt(userId));
+          unreadMessagesCount.value = count;
+        }
+      } catch (error) {
+        console.error('Error fetching unread messages count:', error);
       }
     };
 
@@ -361,10 +382,13 @@ export default {
     onMounted(() => {
       loadFavoritesCount();
       loadNotifications();
+
       
       window.addEventListener('favorites-updated', handleFavoritesUpdated);
       document.addEventListener('click', handleClickOutside);
-      
+      // window.addEventListener('new-message', loadUnreadMessagesCount);
+      // window.addEventListener('message-read', loadUnreadMessagesCount);
+
       const userId = localStorage.getItem('Id');
       const role = localStorage.getItem('Role');
       if (userId) {
@@ -378,10 +402,22 @@ export default {
           });
         });
       }
+
+      
+      fetchUnreadMessagesCount();
+  
+      // Opțional: Actualizează numărul la fiecare 30 de secunde
+      const interval = setInterval(fetchUnreadMessagesCount, 30000);
+
+      onBeforeUnmount(() => {
+        clearInterval(interval);
+      });
     });
 
     onUnmounted(() => {
       window.removeEventListener('favorites-updated', handleFavoritesUpdated);
+      // window.removeEventListener('new-message', loadUnreadMessagesCount);
+      // window.removeEventListener('message-read', loadUnreadMessagesCount);
       document.removeEventListener('click', handleClickOutside);
       disconnectFromNotifications();
     });
@@ -398,7 +434,9 @@ export default {
       toggleNotifications,
       formatRelativeTime,
       markAllAsRead,
-      isRejectedNotification
+      isRejectedNotification,
+      unreadMessagesCount,
+      fetchUnreadMessagesCount
     };
   },
   methods: {

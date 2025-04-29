@@ -27,6 +27,11 @@ export function connectToChat(userId, onConnected, onDisconnected) {
         try {
           const parsed = JSON.parse(msg.body);
           console.log("📦 PARSED MESSAGE:", parsed);
+
+          // Dispatch a custom event for new messages
+          const event = new CustomEvent('new-message', { detail: parsed });
+          window.dispatchEvent(event);
+
           messageCallbacks.forEach(cb => cb(parsed));
         } catch (e) {
           console.error("❌ Error parsing message:", e);
