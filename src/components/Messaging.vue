@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-screen">
+  <div class="flex h-[85vh] overflow-hidden rounded-2xl">
     <!-- Sidebar with conversation list -->
     <div 
       :class="[
@@ -168,7 +168,7 @@
         </svg>
         <h3 class="text-xl font-medium text-gray-700 mb-2">No conversation selected</h3>
         <p class="text-gray-500 text-center max-w-md">
-          Select a conversation from the sidebar or start a new conversation
+          Select a conversation from the sidebar
         </p>
       </div>
       

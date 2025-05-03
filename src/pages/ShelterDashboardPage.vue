@@ -62,9 +62,9 @@
                       </div>
                     </div>
                   </div>
-                  <a href="#" class="block py-2 text-sm font-medium text-center text-gray-900 bg-gray-50 hover:bg-gray-100">
+                  <!-- <a href="#" class="block py-2 text-sm font-medium text-center text-gray-900 bg-gray-50 hover:bg-gray-100">
                     View all notifications
-                  </a>
+                  </a> -->
                 </div>
               </div>
               <!-- User Menu -->
