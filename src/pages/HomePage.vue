@@ -261,7 +261,6 @@
   </section>
 
   <!-- Emergency Banner-->
-  <!-- Emergency Banner-->
   <section class="py-4 bg-red-600 text-white">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex flex-col md:flex-row items-center justify-between">

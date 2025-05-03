@@ -67,9 +67,9 @@
                     </div>
                   </div>
                 </div>
-                <a @click="markAllAsRead" class="block py-2 text-sm font-medium text-center text-gray-900 bg-gray-50 hover:bg-gray-100 cursor-pointer">
+                <!-- <a @click="markAllAsRead" class="block py-2 text-sm font-medium text-center text-gray-900 bg-gray-50 hover:bg-gray-100 cursor-pointer">
                   Mark all as read
-                </a>
+                </a> -->
               </div>
             </li>
             
@@ -339,32 +339,32 @@ export default {
       }
     };
     
-    const markAllAsRead = async () => {
-      const userId = localStorage.getItem('Id');
-      if (!userId) return;
+    // const markAllAsRead = async () => {
+    //   const userId = localStorage.getItem('Id');
+    //   if (!userId) return;
       
-      try {
-        // Mark all notifications as read in the UI
-        notifications.value.forEach(notification => {
-          notification.read = true;
-        });
+    //   try {
+    //     // Mark all notifications as read in the UI
+    //     notifications.value.forEach(notification => {
+    //       notification.read = true;
+    //     });
         
-        // Here you would make an API call to mark all as read
-        // For example: await markAllNotificationsAsRead(userId);
+    //     // Here you would make an API call to mark all as read
+    //     // For example: await markAllNotificationsAsRead(userId);
         
-        // For now, we'll just mark each individual notification
-        const promises = notifications.value.map(notification => {
-          if (!notification.read) {
-            return markNotificationAsRead(notification.id);
-          }
-          return Promise.resolve();
-        });
+    //     // For now, we'll just mark each individual notification
+    //     const promises = notifications.value.map(notification => {
+    //       if (!notification.read) {
+    //         return markNotificationAsRead(notification.id);
+    //       }
+    //       return Promise.resolve();
+    //     });
         
-        await Promise.all(promises);
-      } catch (error) {
-        console.error('Failed to mark all notifications as read:', error);
-      }
-    };
+    //     await Promise.all(promises);
+    //   } catch (error) {
+    //     console.error('Failed to mark all notifications as read:', error);
+    //   }
+    // };
 
     const formatRelativeTime = (timestamp) => {
       const diff = Math.floor((new Date() - new Date(timestamp)) / 1000);
@@ -443,7 +443,7 @@ export default {
       handleNotificationClick,
       toggleNotifications,
       formatRelativeTime,
-      markAllAsRead,
+      // markAllAsRead,
       isRejectedNotification,
       unreadMessagesCount,
       fetchUnreadMessagesCount

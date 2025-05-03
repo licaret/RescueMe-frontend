@@ -160,7 +160,7 @@
                   </span>
                   <div class="text-sm text-gray-500">{{ formatDate(request.requestDate) }}</div>
                   <button 
-                    @click="messageUser(request.adopterId)" 
+                    @click="messageUser(request.userId)" 
                     class="text-blue-600 hover:text-blue-900 text-sm font-medium flex items-center"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -924,6 +924,31 @@ export default {
       fetchRequests();
     });
 
+    const messageUser = (adopterId) => {
+  if (!adopterId) {
+    console.error('No adopter ID provided');
+    return;
+  }
+  
+  // Găsim requestul care conține acest ID
+  const relevantRequest = requests.value.find(req => req.userId === adopterId || req.adopterId === adopterId);
+  
+  if (!relevantRequest) {
+    console.error('Could not find request information for this adopter');
+    
+    // Dacă nu găsim cererea, navigăm oricum folosind doar ID-ul
+    window.location.href = `/messages?shelterId=${adopterId}`;
+    return;
+  }
+  
+  // Obține numele utilizatorului dacă este disponibil
+  const adopterName = relevantRequest.requestDetails?.contactInfo?.name || 
+                      'Adopter';
+  
+  // Navighează către pagina de mesaje, transmițând ID-ul și numele utilizatorului
+  window.location.href = `/messages?shelterId=${adopterId}&shelterName=${encodeURIComponent(adopterName)}`;
+};
+
     return {
       requests,
       isLoading,
@@ -955,6 +980,7 @@ export default {
       paginatedPetGroups,
       totalPetGroupPages,
       searchQuery,
+      messageUser
     };
   }
 };

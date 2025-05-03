@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-screen overflow-hidden ">
+  <div class="flex h-screen">
     <!-- Sidebar with conversation list -->
     <div 
       :class="[
@@ -111,7 +111,7 @@
     <!-- Chat area - takes full height of the screen -->
     <div class="flex-1 flex flex-col bg-white ">
       <!-- Mobile toggle button for sidebar -->
-      <div 
+      <!-- <div 
         v-if="isMobileView && !showSidebar && selectedConversation" 
         class="md:hidden p-2 bg-gray-50 border-b border-gray-200"
       >
@@ -124,7 +124,7 @@
           </svg>
           All conversations
         </button>
-      </div>
+      </div> -->
       
       <!-- Header -->
       <div v-if="selectedConversation" class="p-4 border-b border-gray-200 flex items-center bg-white shadow-sm">

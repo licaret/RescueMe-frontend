@@ -27,6 +27,7 @@
           <option value="APPROVED">Approved</option>
           <option value="REJECTED">Rejected</option>
           <option value="CANCELED">Canceled</option>
+          <option value="COMPLETED">Completed</option>
         </select>
 
         <select 
