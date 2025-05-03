@@ -234,13 +234,13 @@
                 <div v-for="attachment in message.attachments.filter(a => a.contentType && a.contentType.startsWith('image/'))" 
                      :key="attachment.id" 
                      class="relative">
-                  <img 
-                    v-if="attachment.hasThumbnail" 
-                    :src="getAttachmentThumbnailUrl(attachment.id)" 
-                    @click="openAttachment(attachment)" 
-                    class="max-w-full rounded cursor-pointer max-h-40 border border-gray-200 hover:opacity-90 transition-opacity" 
-                    :alt="attachment.fileName"
-                  />
+                     <img
+                        v-if="attachment.hasThumbnail"
+                        :src="getAttachmentThumbnailUrl(attachment.id)"
+                        @click="openAttachment(attachment)"
+                        class="max-w-full rounded max-h-40 border border-gray-200 hover:opacity-90 transition-opacity cursor-pointer pointer-events-auto"
+                        :alt="attachment.fileName"
+                     />
                   <div v-else 
                        @click="openAttachment(attachment)"
                        class="flex items-center justify-center bg-gray-100 rounded p-3 cursor-pointer border border-gray-200 hover:bg-gray-200 transition-colors">
@@ -260,14 +260,14 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                   <div class="flex-grow min-w-0">
-                    <div class="text-sm font-medium truncate" :class="message.senderId === currentUserId ? 'text-indigo-100' : 'text-gray-700'">
+                    <div class="text-sm font-medium truncate" :class="message.senderId === currentUserId ? 'text-indigo-400' : 'text-gray-700'">
                       {{ attachment.fileName }}
                     </div>
-                    <div class="text-xs" :class="message.senderId === currentUserId ? 'text-indigo-200' : 'text-gray-500'">
+                    <div class="text-xs" :class="message.senderId === currentUserId ? 'text-indigo-400' : 'text-gray-500'">
                       {{ formatFileSize(attachment.fileSize) }}
                     </div>
                   </div>
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                   </svg>
                 </div>
@@ -356,17 +356,17 @@
       </div>
     </div>
     
-    <!-- Enhanced image preview modal with download option -->
+    <!-- Image preview modal with consistent dimensions -->
     <div v-if="previewAttachment && previewAttachment.contentType && previewAttachment.contentType.startsWith('image/')" 
-         class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90" 
-         @click="previewAttachment = null">
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90" 
+        @click="previewAttachment = null">
       <div class="max-w-6xl max-h-full p-4" @click.stop>
-        <div class="bg-white rounded-lg overflow-hidden shadow-2xl">
-          <!-- Image preview container -->
-          <div class="relative">
+        <div class="bg-white rounded-2xl overflow-hidden shadow-2xl">
+          <!-- Image preview container with fixed height and width -->
+          <div class="relative flex items-center justify-center" style="height: 70vh;">
             <img :src="getAttachmentDownloadUrl(previewAttachment.id)" 
-                 class="max-h-[80vh] max-w-full object-contain" 
-                 :alt="previewAttachment.fileName" />
+              class="h-full w-full object-contain" 
+              :alt="previewAttachment.fileName" />
             
             <!-- Close button -->
             <button @click.stop="previewAttachment = null" 
@@ -385,9 +385,9 @@
             <div class="mt-4 flex justify-end">
               <!-- Download button -->
               <a :href="getAttachmentDownloadUrl(previewAttachment.id)" 
-                 :download="previewAttachment.fileName" 
-                 class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 inline-flex items-center transition duration-200 ease-in-out"
-                 @click.stop>
+                :download="previewAttachment.fileName" 
+                class="px-4 py-2 bg-indigo-500 text-white rounded-2xl hover:bg-indigo-600 inline-flex items-center transition duration-200 ease-in-out"
+                @click.stop>
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                 </svg>
@@ -398,6 +398,7 @@
         </div>
       </div>
     </div>
+
   </div>
 </template>
 
@@ -891,12 +892,19 @@ export default {
     const openAttachment = (attachment) => {
       console.log('Opening attachment:', attachment);
       
+      // Add defensive checks
+      if (!attachment || !attachment.id) {
+        console.error('Invalid attachment data:', attachment);
+        return;
+      }
+      
       // For images, display in modal
       if (attachment.contentType && attachment.contentType.startsWith('image/')) {
-        previewAttachment.value = attachment;
+        previewAttachment.value = {...attachment}; // Create a copy to avoid reference issues
       } else {
         // For documents, download directly
-        window.open(getAttachmentDownloadUrl(attachment.id), '_blank');
+        const url = getAttachmentDownloadUrl(attachment.id);
+        window.open(url, '_blank');
       }
     };
     
@@ -1150,5 +1158,31 @@ export default {
 /* File upload previews */
 .max-w-32 {
   max-width: 8rem;
+}
+
+/* Add these styles to ensure your modal displays correctly */
+.fixed {
+  position: fixed;
+}
+
+.inset-0 {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.z-50 {
+  z-index: 50;
+}
+
+/* .modal-image {
+  max-height: 80vh;
+  max-width: 100%;
+  object-fit: contain;
+} */
+
+.object-contain {
+  object-fit: contain;
 }
 </style>

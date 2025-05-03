@@ -548,6 +548,8 @@ import { connectToShelterNotifications, disconnectFromNotifications } from '@/se
 import { fetchShelterNotifications, markNotificationAsRead } from '@/services/notification_service';
 import { logout } from "@/services/user_service";
 import { getUnreadMessagesCount } from '@/services/message_service';
+import { connectToMessageSocket, disconnectFromMessageSocket } from '@/services/message_socket';
+
 
 export default {
   name: 'ShelterDashboardLayout',
@@ -639,14 +641,17 @@ export default {
           });
           
         });
-        // connectToChat(shelterId);
-        //   // când primești un mesaj nou
-        //   onMessageReceived((newMessage) => {
-        //     console.log("📨 Mesaj nou primit:", newMessage);
-        //     unreadMessagesCount.value++; // 👈 incrementăm badge-ul de inbox
-        //   });
-        // Încarcă notificările existente
         loadNotifications();
+        connectToMessageSocket(shelterId, (newMessage) => {
+          console.log("New message received in shelter dashboard:", newMessage);
+          // Update unread count
+          unreadMessagesCount.value++;
+          
+          // Dispatch event for other components
+          window.dispatchEvent(new CustomEvent('new-message', { 
+            detail: newMessage 
+          }));
+        });
       }
 
       loadStats();
@@ -664,7 +669,6 @@ export default {
         clearInterval(interval);
       });
     });
-
 
     onBeforeRouteUpdate((to, from, next) => {
       if (to.path === "/shelter-dashboard/") {
@@ -973,6 +977,7 @@ export default {
     onUnmounted(() => {
       console.log("Disconnecting from notifications");
       disconnectFromNotifications();
+      disconnectFromMessageSocket();
 
       window.removeEventListener("popstate", blockBackButton);
       document.removeEventListener('click', handleClickOutside);

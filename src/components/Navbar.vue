@@ -127,6 +127,7 @@ import { fetchAdopterNotifications, markNotificationAsRead } from '../services/n
 import { connectToAdopterNotifications, disconnectFromNotifications } from '../services/notification_socket';
 import SidebarMenu from './SidebarMenu.vue';
 import { getUnreadMessagesCount } from '@/services/message_service'; 
+import { connectToMessageSocket, disconnectFromMessageSocket } from '@/services/message_socket';
 
 export default {
   components: {
@@ -401,6 +402,14 @@ export default {
             read: false
           });
         });
+        connectToMessageSocket(userId, (newMessage) => {
+          console.log("New message received in navbar:", newMessage);
+          unreadMessagesCount.value++;
+          
+          window.dispatchEvent(new CustomEvent('new-message', { 
+            detail: newMessage 
+          }));
+        });
       }
 
       
@@ -420,6 +429,7 @@ export default {
       // window.removeEventListener('message-read', loadUnreadMessagesCount);
       document.removeEventListener('click', handleClickOutside);
       disconnectFromNotifications();
+      disconnectFromMessageSocket();
     });
 
     return {
