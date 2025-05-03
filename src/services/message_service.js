@@ -11,6 +11,8 @@ let readReceiptCallbacks = [];
 export function connectToChat(userId, onConnected, onDisconnected) {
   if (stompClient && stompClient.active) return;
 
+  console.log("Connecting to chat for user ID:", userId);
+
   stompClient = new Client({
     webSocketFactory: () => new SockJS('http://localhost:8080/ws'),
     reconnectDelay: 5000,
@@ -46,6 +48,22 @@ export function connectToChat(userId, onConnected, onDisconnected) {
           readReceiptCallbacks.forEach(cb => cb(parsed));
         } catch (e) {
           console.error("❌ Error parsing read receipt:", e);
+        }
+      });
+      
+      // Subscribe to system events like new conversations
+      stompClient.subscribe(`/topic/system/${userId}`, (event) => {
+        console.log("🔄 SYSTEM EVENT RECEIVED:", event);
+        try {
+          const parsed = JSON.parse(event.body);
+          
+          // Trigger event based on type
+          if (parsed.type === 'NEW_CONVERSATION') {
+            const refreshEvent = new CustomEvent('refresh-conversations');
+            window.dispatchEvent(refreshEvent);
+          }
+        } catch (e) {
+          console.error("❌ Error parsing system event:", e);
         }
       });
       
@@ -108,6 +126,7 @@ export function sendMessage(messageData) {
           destination: '/app/chat.send',
           body: JSON.stringify(messageData)
         });
+        // Rezolvăm direct cu datele trimise prin WebSocket
         resolve(messageData);
       } catch (err) {
         console.error("WebSocket send error:", err);
@@ -233,11 +252,45 @@ export function getUserConversations(userId) {
       }
       return res.json();
     })
+    .then(conversations => {
+      // Adăugăm profilePicture pentru fiecare conversație dacă nu există
+      const conversationsWithPromises = conversations.map(async conversation => {
+        if (!conversation.participantProfilePicture && conversation.participantId) {
+          try {
+            // Încercăm să obținem poza de profil pentru acest participant
+            const response = await fetch(`http://localhost:8080/users/${conversation.participantId}/profilePicture`);
+            if (response.ok) {
+              const blob = await response.blob();
+              const base64data = await blobToBase64(blob);
+              // Eliminăm prefixul data:image
+              const base64Clean = base64data.split(',')[1] || base64data;
+              conversation.participantProfilePicture = base64Clean;
+            }
+          } catch (e) {
+            console.warn(`Could not fetch profile picture for user ${conversation.participantId}:`, e);
+          }
+        }
+        return conversation;
+      });
+      
+      // Așteptăm toate promisiunile să se rezolve
+      return Promise.all(conversationsWithPromises);
+    })
     .catch(error => {
       console.error("Error fetching conversations:", error);
       // Returnează o listă goală în caz de eroare
       return [];
     });
+}
+
+// Helper function to convert Blob to Base64
+function blobToBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
 }
 
 export function getUnreadMessagesCount(userId) {

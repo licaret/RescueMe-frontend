@@ -521,23 +521,30 @@ export default {
       }
     };
     
-    onMounted(async () => {
-  initUser();
-  window.addEventListener('resize', handleResize);
+    onMounted(() => {
+      initUser();
+      window.addEventListener('resize', handleResize);
+      
+      // Adăugăm event listener pentru actualizarea conversațiilor
+      window.addEventListener('refresh-conversations', handleRefreshConversations);
+      
+      setupChatConnection().then(() => {
+        if (initialRecipient.value.id || route.query.shelterId) {
+          initChat();
+        }
+      });
+    });
 
-  // Folosim await pentru a aștepta conectarea la chat
-  await setupChatConnection();
-  
-  // După ce conectarea la chat s-a finalizat, verificăm dacă avem un recipient inițial
-  if (initialRecipient.value.id || route.query.shelterId) {
-    initChat();
-  }
-});
-
+    // Funcția pentru actualizarea conversațiilor
+    const handleRefreshConversations = () => {
+      console.log("🔄 Refresh conversations event received");
+      fetchConversations();
+    };
     
     // Clean up on unmount
     onBeforeUnmount(() => {
       window.removeEventListener('resize', handleResize);
+      window.removeEventListener('refresh-conversations', handleRefreshConversations);
       cleanupChatConnection();
       disconnectFromChat();
     });
@@ -644,99 +651,120 @@ export default {
     
     // Update or add a conversation with a new message
     const updateConversationWithMessage = (message) => {
-      console.log("Updating conversation with message:", message);
-      
-      // Find the conversation index
-      const existingIndex = conversations.value.findIndex(
-        conv => conv.conversationId === message.conversationId
-      );
-      
-      if (existingIndex !== -1) {
-        // Update existing conversation
-        const updatedConversations = [...conversations.value];
-        const existing = {...updatedConversations[existingIndex]};
-        
-        // Format message preview based on type
-        let lastMessagePreview = message.content;
-        if (message.type !== 'TEXT' && message.attachments && message.attachments.length > 0) {
-          const attachmentCount = message.attachments.length;
-          
-          switch (message.type) {
-            case 'IMAGE':
-              lastMessagePreview = attachmentCount > 1 
-                ? `📷 ${attachmentCount} images` 
-                : '📷 Image';
-              break;
-            case 'DOCUMENT':
-              lastMessagePreview = attachmentCount > 1 
-                ? `📄 ${attachmentCount} documents` 
-                : '📄 Document';
-              break;
-            case 'MIXED':
-              lastMessagePreview = `📎 ${attachmentCount} attachments`;
-              break;
-          }
-          
-          if (message.content && message.content.trim() !== '') {
-            lastMessagePreview = `${message.content} [${lastMessagePreview}]`;
-          }
-        }
-        
-        existing.lastMessage = lastMessagePreview;
-        existing.lastMessageTime = message.timestamp;
-        
-        // Update unread count if current user is the recipient
-        if (message.recipientId === currentUserId.value) {
-          // Only increment if not currently viewing this conversation
-          if (selectedConversationId.value !== message.conversationId) {
-            existing.unreadCount = (existing.unreadCount || 0) + 1;
-            existing.hasUnreadMessages = true;
-          }
-        }
-        
-        // Remove existing and add to the beginning for proper sorting
-        updatedConversations.splice(existingIndex, 1);
-        updatedConversations.unshift(existing);
-        conversations.value = updatedConversations;
-        
-        // If this is the selected conversation, update that reference too
-        if (selectedConversationId.value === message.conversationId) {
-          selectedConversation.value = existing;
-        }
-      } else {
-        // This is a new conversation we don't have yet
-        fetchConversations();
-      }
-    };
+  console.log("Updating conversation with message:", message);
+  
+  // Check if this is a new conversation that doesn't exist yet
+  const existingConversationIndex = conversations.value.findIndex(
+    conv => conv.conversationId === message.conversationId
+  );
+  
+  // If it's a completely new conversation, fetch all conversations
+  if (existingConversationIndex === -1) {
+    console.log("New conversation detected, refreshing conversation list");
+    fetchConversations();
+    return;
+  }
+  
+  // Find the conversation index
+  const updatedConversations = [...conversations.value];
+  const existing = {...updatedConversations[existingConversationIndex]};
+  
+  // Format message preview based on type
+  let lastMessagePreview = message.content;
+  if (message.type !== 'TEXT' && message.attachments && message.attachments.length > 0) {
+    const attachmentCount = message.attachments.length;
     
-    const fetchConversations = async () => {
+    switch (message.type) {
+      case 'IMAGE':
+        lastMessagePreview = attachmentCount > 1 
+          ? `📷 ${attachmentCount} images` 
+          : '📷 Image';
+        break;
+      case 'DOCUMENT':
+        lastMessagePreview = attachmentCount > 1 
+          ? `📄 ${attachmentCount} documents` 
+          : '📄 Document';
+        break;
+      case 'MIXED':
+        lastMessagePreview = `📎 ${attachmentCount} attachments`;
+        break;
+    }
+    
+    if (message.content && message.content.trim() !== '') {
+      lastMessagePreview = `${message.content} [${lastMessagePreview}]`;
+    }
+  }
+  
+  existing.lastMessage = lastMessagePreview;
+  existing.lastMessageTime = message.timestamp;
+  
+  // Update unread count if current user is the recipient
+  if (message.recipientId === currentUserId.value) {
+    // Only increment if not currently viewing this conversation
+    if (selectedConversationId.value !== message.conversationId) {
+      existing.unreadCount = (existing.unreadCount || 0) + 1;
+      existing.hasUnreadMessages = true;
+    }
+  }
+  
+  // Remove existing and add to the beginning for proper sorting
+  updatedConversations.splice(existingConversationIndex, 1);
+  updatedConversations.unshift(existing);
+  conversations.value = updatedConversations;
+  
+  // If this is the selected conversation, update that reference too
+  if (selectedConversationId.value === message.conversationId) {
+    selectedConversation.value = existing;
+  }
+};
+    
+const fetchConversations = async () => {
+  try {
+    loading.value = true;
+    
+    // Check if there are conversations in cache
+    const cachedConversations = localStorage.getItem('cachedConversations');
+    if (cachedConversations && conversations.value.length === 0) {
       try {
-        loading.value = true;
-        
-        // Check if there are conversations in cache
-        const cachedConversations = localStorage.getItem('cachedConversations');
-        if (cachedConversations && conversations.value.length === 0) {
-          try {
-            // Display conversations from cache while loading new data
-            conversations.value = JSON.parse(cachedConversations);
-            loading.value = false;
-          } catch (e) {
-            console.error('Error parsing conversation cache:', e);
-          }
-        }
-        
-        // Load fresh data from server
-        const data = await getUserConversations(currentUserId.value);
-        conversations.value = data;
-        
-        // Save to cache
-        localStorage.setItem('cachedConversations', JSON.stringify(data));
-      } catch (error) {
-        console.error('Error fetching conversations:', error);
-      } finally {
+        // Display conversations from cache while loading new data
+        conversations.value = JSON.parse(cachedConversations);
         loading.value = false;
+      } catch (e) {
+        console.error('Error parsing conversation cache:', e);
       }
-    };
+    }
+    
+    // Load fresh data from server
+    const data = await getUserConversations(currentUserId.value);
+    
+    // Păstrăm selecția conversației curente
+    const currentSelectedId = selectedConversationId.value;
+    
+    conversations.value = data;
+    
+    // Save to cache
+    localStorage.setItem('cachedConversations', JSON.stringify(data));
+    
+    // Dacă aveam o conversație selectată, dar acum nu mai este în listă (e.g. după refresh)
+    // și conversația temporară nu mai există, trebuie să găsim și să selectăm din nou
+    if (currentSelectedId && !conversations.value.find(c => c.conversationId === currentSelectedId)) {
+      const tempConversation = selectedConversation.value;
+      if (tempConversation) {
+        const newMatchingConversation = conversations.value.find(
+          c => c.participantId === tempConversation.participantId
+        );
+        
+        if (newMatchingConversation) {
+          selectConversation(newMatchingConversation);
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error fetching conversations:', error);
+  } finally {
+    loading.value = false;
+  }
+};
     
     // Scroll to bottom of messages
     const scrollToBottom = () => {
@@ -910,90 +938,96 @@ export default {
     
     // Send a new message
     const sendMessage = async () => {
-      if (!canSendMessage.value || !selectedConversationId.value) return;
-      
-      try {
-        // Build message data
-        const messageData = {
-          senderId: currentUserId.value,
-          recipientId: selectedConversation.value.participantId,
-          content: newMessage.value.trim(),
-          conversationId: selectedConversationId.value,
-          type: 'TEXT'
-        };
-        
-        // Determine if we're sending a simple message or with attachments
-        if (selectedFiles.value.length > 0) {
-          // Display an optimistic message
-          const optimisticMessage = {
-            ...messageData,
-            id: `temp-${Date.now()}`,
-            timestamp: new Date().toISOString(),
-            read: false,
-            senderUsername: localStorage.getItem('username') || 'You',
-            attachments: selectedFiles.value.map((file, index) => ({
-              id: `temp-attachment-${index}`,
-              fileName: file.name,
-              contentType: file.type,
-              fileSize: file.size,
-              hasThumbnail: file.type.startsWith('image/')
-            })),
-            type: determineMessageType(selectedFiles.value)
-          };
-          
-          messages.value = [...messages.value, optimisticMessage];
-          scrollToBottom();
-          
-          // Send message with attachments
-          const response = await apiSendMessageWithAttachments(messageData, selectedFiles.value);
-          
-          // Replace optimistic message with real response
-          const index = messages.value.findIndex(m => m.id === optimisticMessage.id);
-          if (index !== -1) {
-            const updatedMessages = [...messages.value];
-            updatedMessages[index] = response;
-            messages.value = updatedMessages;
-          }
-          
-          // Update conversation list
-          updateConversationWithMessage(response);
-          
-          // Reset selected files
-          selectedFiles.value = [];
-        } else {
-          // Send a simple text message
-          const optimisticMessage = {
-            ...messageData,
-            id: `temp-${Date.now()}`,
-            timestamp: new Date().toISOString(),
-            read: false,
-            senderUsername: localStorage.getItem('username') || 'You',
-          };
-          
-          messages.value = [...messages.value, optimisticMessage];
-          scrollToBottom();
-          
-          const response = await apiSendMessage(messageData);
-          
-          // Replace optimistic message with real response
-          const index = messages.value.findIndex(m => m.id === optimisticMessage.id);
-          if (index !== -1) {
-            const updatedMessages = [...messages.value];
-            updatedMessages[index] = response;
-            messages.value = updatedMessages;
-          }
-          
-          // Update conversation list
-          updateConversationWithMessage(response);
-        }
-        
-        // Clear message input
-        newMessage.value = '';
-      } catch (error) {
-        console.error('Error sending message:', error);
-        // Here we can add error handling, for example, marking failed messages
-      }
+  if (!canSendMessage.value || !selectedConversationId.value) return;
+  
+  try {
+    // Build message data
+    const messageData = {
+      senderId: currentUserId.value,
+      recipientId: selectedConversation.value.participantId,
+      content: newMessage.value.trim(),
+      conversationId: selectedConversationId.value,
+      type: 'TEXT'
     };
+    
+    // Determine if we're sending a simple message or with attachments
+    if (selectedFiles.value.length > 0) {
+      // Display an optimistic message
+      const optimisticMessage = {
+        ...messageData,
+        id: `temp-${Date.now()}`,
+        timestamp: new Date().toISOString(),
+        read: false,
+        senderUsername: localStorage.getItem('username') || 'You',
+        attachments: selectedFiles.value.map((file, index) => ({
+          id: `temp-attachment-${index}`,
+          fileName: file.name,
+          contentType: file.type,
+          fileSize: file.size,
+          hasThumbnail: file.type.startsWith('image/')
+        })),
+        type: determineMessageType(selectedFiles.value)
+      };
+      
+      messages.value = [...messages.value, optimisticMessage];
+      scrollToBottom();
+      
+      // Send message with attachments
+      const response = await apiSendMessageWithAttachments(messageData, selectedFiles.value);
+      
+      // Replace optimistic message with real response
+      const index = messages.value.findIndex(m => m.id === optimisticMessage.id);
+      if (index !== -1) {
+        const updatedMessages = [...messages.value];
+        updatedMessages[index] = response;
+        messages.value = updatedMessages;
+      }
+      
+      // Update conversation list
+      updateConversationWithMessage(response);
+      
+      // Refresh conversations to ensure the new one appears
+      await fetchConversations();
+      
+      // Reset selected files
+      selectedFiles.value = [];
+    } else {
+      // Send a simple text message
+      const optimisticMessage = {
+        ...messageData,
+        id: `temp-${Date.now()}`,
+        timestamp: new Date().toISOString(),
+        read: false,
+        senderUsername: localStorage.getItem('username') || 'You',
+      };
+      
+      messages.value = [...messages.value, optimisticMessage];
+      scrollToBottom();
+      
+      const response = await apiSendMessage(messageData);
+      
+      // Replace optimistic message with real response
+      const index = messages.value.findIndex(m => m.id === optimisticMessage.id);
+      if (index !== -1) {
+        const updatedMessages = [...messages.value];
+        updatedMessages[index] = response;
+        messages.value = updatedMessages;
+      }
+      
+      // Update conversation list
+      updateConversationWithMessage(response);
+      
+      // Refresh conversations to ensure the new one appears
+      await fetchConversations();
+    }
+    
+    // Clear message input
+    newMessage.value = '';
+  } catch (error) {
+    console.error('Error sending message:', error);
+    // Here we can add error handling, for example, marking failed messages
+  }
+};
     
     // Determine message type based on attachments
     const determineMessageType = (files) => {
@@ -1051,6 +1085,17 @@ export default {
       console.log("Found conversation by ID:", existingById);
       selectConversation(existingById);
     } else {
+      // Obținem profilul shelterului pentru poza de profil
+      let shelterData = null;
+      try {
+        const response = await fetch(`http://localhost:8080/users/${recipientId}`);
+        if (response.ok) {
+          shelterData = await response.json();
+        }
+      } catch (err) {
+        console.warn("Could not fetch shelter profile data:", err);
+      }
+      
       // Creăm o nouă conversație temporară
       console.log("Creating temporary conversation with ID:", conversationId);
       const recipientUsername = initialRecipient.value.username || 
@@ -1061,10 +1106,12 @@ export default {
         conversationId,
         participantId: parseInt(recipientId),
         participantUsername: recipientUsername,
+        participantRole: 2, // Presupunem că e shelter
         lastMessage: '',
         lastMessageTime: new Date().toISOString(),
         hasUnreadMessages: false,
-        unreadCount: 0
+        unreadCount: 0,
+        participantProfilePicture: shelterData?.profilePicture || null
       };
       
       // Adăugăm conversația temporară la lista
@@ -1108,7 +1155,8 @@ export default {
       openAttachment,
       getAttachmentThumbnailUrl,
       getAttachmentDownloadUrl,
-      initChat
+      initChat,
+      handleRefreshConversations
     };
   }
 }
