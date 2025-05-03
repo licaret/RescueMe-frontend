@@ -47,10 +47,6 @@ async function registerShelter(shelterData) {
 
     const data = await response.json();
 
-    // if (data.Id) {
-    //   localStorage.setItem("Id", data.Id);
-    // }
-
     return data;
   } catch (error) {
     console.error("Error registering shelter:", error);
@@ -98,7 +94,7 @@ async function login(email, password) {
 
 async function logout() {
   try {
-    const response = await fetch("http://localhost:8080/api/v1/auth/logout", {
+    const response = await fetch(`${API_URL}/logout`, {
       method: "POST",
       credentials: "include", 
     });
@@ -118,7 +114,38 @@ async function logout() {
 }
 
 
+async function checkEmailExists(email) {
+  try {
+    const response = await fetch(`${API_URL}/check-email?email=${encodeURIComponent(email)}`);
+    if (!response.ok) {
+      console.error("Raw response:", response);
+      throw new Error("Failed to check email: " + response.status);
+    }
 
+    const data = await response.json();
+    return data.emailExists;
+  } catch (error) {
+    console.error("Error in checkEmailExists:", error);
+    throw new Error("Failed to check email: " + error.message);
+  }
+}
+
+
+async function checkUsernameExists(username) {
+  try {
+    const response = await fetch(`${API_URL}/check-username?username=${encodeURIComponent(username)}`);
+    if (!response.ok) {
+      console.error("Raw response:", response);
+      throw new Error("Failed to check username: " + response.status);
+    }
+
+    const data = await response.json();
+    return data.usernameExists;
+  } catch (error) {
+    console.error("Error in checkUsernameExists:", error);
+    throw new Error("Failed to check username: " + error.message);
+  }
+}
 
 async function fetchWithAuth(endpoint, options = {}) {
   const token = localStorage.getItem("token");
@@ -140,37 +167,123 @@ async function fetchWithAuth(endpoint, options = {}) {
   return await response.json();
 }
 
+async function resetPassword(token, newPassword) {
+  console.log("Service called with token:", token, "and password:", newPassword);
+  const response = await fetch(`${API_URL}/reset-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token, newPassword }),
+  });
 
-async function checkEmailExists(email) {
+  if (!response.ok) {
+    throw new Error("Failed to reset password");
+  }
+
+  return await response.json();
+}
+
+async function requestPasswordReset(email) {
   try {
-    const response = await fetch(`http://localhost:8080/api/v1/auth/check-email?email=${encodeURIComponent(email)}`);
-    if (!response.ok) {
-      console.error("Raw response:", response);
-      throw new Error("Failed to check email: " + response.status);
+    const response = await fetch(`${API_URL}/request-reset`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email }),
+    });
+
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      throw new Error("Server returned an invalid response.");
     }
 
     const data = await response.json();
-    return data.emailExists;
+
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to send reset link");
+    }
+
+    return { success: true, message: data.message };
   } catch (error) {
-    console.error("Error in checkEmailExists:", error);
-    throw new Error("Failed to check email: " + error.message);
+    console.error("Error sending reset link:", error);
+    return { success: false, message: error.message };
   }
 }
 
 
-async function checkUsernameExists(username) {
+async function changePassword(userId, currentPassword, newPassword) {
+  console.log("Sending password change request:", { userId, currentPassword, newPassword });
   try {
-    const response = await fetch(`http://localhost:8080/api/v1/auth/check-username?username=${encodeURIComponent(username)}`);
+    const response = await fetch(`http://localhost:8080/users/${userId}/change-password`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify({
+        currentPassword: currentPassword,
+        newPassword: newPassword,
+      }),
+    });
+    
+    console.log("Response status:", response.status);
+    console.log("Response headers:", response.headers);
+
     if (!response.ok) {
-      console.error("Raw response:", response);
-      throw new Error("Failed to check username: " + response.status);
+      const contentType = response.headers.get("content-type");
+      console.log("Error content type:", contentType);
+      
+      if (contentType && contentType.includes("application/json")) {
+        const errorData = await response.json();
+        console.log("Error data received:", errorData);
+        throw new Error(errorData.message || "Failed to change password");
+      } else {
+        const textResponse = await response.text();
+        console.log("Error text response:", textResponse);
+        throw new Error(`Server responded with status: ${response.status}`);
+      }
     }
 
-    const data = await response.json();
-    return data.usernameExists;
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+      const data = await response.json();
+      console.log("Success response:", data);
+      return data;
+    } else {
+      console.log("Non-JSON success response");
+      return { success: true };
+    }
   } catch (error) {
-    console.error("Error in checkUsernameExists:", error);
-    throw new Error("Failed to check username: " + error.message);
+    console.error("Error changing password:", error);
+    throw error;
+  }
+}
+
+
+
+const uploadShelterDocument = async (Id, documentType, file) => {
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('documentType', documentType);
+    
+    const response = await fetch(`${API_BASE_URL}/shelters/${Id}/documents`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
+      body: formData
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to upload document');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error(`Error uploading ${documentType} document:`, error);
+    throw error;
   }
 }
 
@@ -270,127 +383,6 @@ async function deleteProfilePicture(userId) {
   }
 }
 
-
-async function requestPasswordReset(email) {
-  try {
-    const response = await fetch("http://localhost:8080/api/v1/auth/request-reset", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email }),
-    });
-
-    const contentType = response.headers.get("content-type");
-    if (!contentType || !contentType.includes("application/json")) {
-      throw new Error("Server returned an invalid response.");
-    }
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to send reset link");
-    }
-
-    return { success: true, message: data.message };
-  } catch (error) {
-    console.error("Error sending reset link:", error);
-    return { success: false, message: error.message };
-  }
-}
-
-
-async function resetPassword(token, newPassword) {
-  console.log("Service called with token:", token, "and password:", newPassword);
-  const response = await fetch(`http://localhost:8080/api/v1/auth/reset-password`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ token, newPassword }),
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to reset password");
-  }
-
-  return await response.json();
-}
-
-
-async function changePassword(userId, currentPassword, newPassword) {
-  console.log("Sending password change request:", { userId, currentPassword, newPassword });
-  try {
-    const response = await fetch(`http://localhost:8080/users/${userId}/change-password`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-      body: JSON.stringify({
-        currentPassword: currentPassword,
-        newPassword: newPassword,
-      }),
-    });
-    
-    console.log("Response status:", response.status);
-    console.log("Response headers:", response.headers);
-
-    if (!response.ok) {
-      const contentType = response.headers.get("content-type");
-      console.log("Error content type:", contentType);
-      
-      if (contentType && contentType.includes("application/json")) {
-        const errorData = await response.json();
-        console.log("Error data received:", errorData);
-        throw new Error(errorData.message || "Failed to change password");
-      } else {
-        const textResponse = await response.text();
-        console.log("Error text response:", textResponse);
-        throw new Error(`Server responded with status: ${response.status}`);
-      }
-    }
-
-    const contentType = response.headers.get("content-type");
-    if (contentType && contentType.includes("application/json")) {
-      const data = await response.json();
-      console.log("Success response:", data);
-      return data;
-    } else {
-      console.log("Non-JSON success response");
-      return { success: true };
-    }
-  } catch (error) {
-    console.error("Error changing password:", error);
-    throw error;
-  }
-}
-
-
-
-const uploadShelterDocument = async (Id, documentType, file) => {
-  try {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('documentType', documentType);
-    
-    const response = await fetch(`${API_BASE_URL}/shelters/${Id}/documents`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      },
-      body: formData
-    });
-    
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Failed to upload document');
-    }
-    
-    return await response.json();
-  } catch (error) {
-    console.error(`Error uploading ${documentType} document:`, error);
-    throw error;
-  }
-}
 
 const getShelterByPetId = async (petId) => {
   try {

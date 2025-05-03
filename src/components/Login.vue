@@ -135,7 +135,7 @@
 
 <script>
 import {login} from '@/services/user_service.js';
-import { getShelterProfile, checkWelcomeStatus } from "@/services/shelter_profile_service";
+import {getShelterProfile, checkWelcomeStatus } from "@/services/shelter_profile_service";
 
 
 export default {
@@ -175,8 +175,6 @@ export default {
         this.emailError = ""; 
       }
     },
-
-
 
     async handleLogin() {
       this.loginError = "";

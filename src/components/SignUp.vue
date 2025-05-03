@@ -447,12 +447,14 @@ import { registerAdopter, registerShelter, checkEmailExists, checkUsernameExists
 import TermsModal from '@/components/TermsModal.vue';
 
 export default {
+
   components: {
     TermsModal,
   },
 
   data() {
     return {
+
       isAdopter: true,
       showPassword: false,
       showTermsModal: false,
@@ -463,6 +465,7 @@ export default {
       wrongFormatedEmail: "", // daca lipseste @ sau .
       errorMessageEmail: "", //pt invalid or taken email
       usernameError: "",
+
       phoneNumberError: "",
       formData: {
         username: "",
@@ -485,6 +488,7 @@ export default {
         'Specialized Shelter (specific breeds/species)',
         'Emergency/Temporary Shelter'
       ],
+
       showSuccessToast: false,
       successMessage: "",
       toastTimeout: null,
@@ -493,13 +497,35 @@ export default {
   },
 
   methods: {
+    
+    navigateToLogin() {
+      this.$router.push('/login'); 
+    },
 
     togglePasswordVisibility() {
       this.showPassword = !this.showPassword;
     },
 
-    navigateToLogin() {
-      this.$router.push('/login'); 
+    showToast(message) {
+      if (this.toastTimeout) {
+        clearTimeout(this.toastTimeout);
+      }
+      
+      this.successMessage = message;
+      this.showSuccessToast = true;
+      
+      this.toastTimeout = setTimeout(() => {
+        this.showSuccessToast = false;
+      }, 3000);
+    },
+
+    validateUsername() {
+      const usernameRegex = /^[^\s]{3,20}$/;
+      if (!usernameRegex.test(this.formData.username)) {
+        this.usernameError = "Username must be 3-20 characters long and cannot contain spaces.";
+      } else {
+        this.usernameError = ""; 
+      }
     },
 
     validateEmail() {
@@ -510,6 +536,15 @@ export default {
         this.wrongFormatedEmail = "Invalid email format. Please include '@' and a domain.";
       } else {
         this.wrongFormatedEmail = ""; 
+      }
+    },
+
+    validatePassword(password) {
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,20}$/;
+      if (!passwordRegex.test(password)) {
+        this.passwordError = "Password must be 8-20 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character.";
+      } else {
+        this.passwordError = "";
       }
     },
 
@@ -530,37 +565,6 @@ export default {
           this.formData.phoneNumber = "7" + phoneValue.substring(1);
         }
       }
-    },
-
-    validateUsername() {
-      const usernameRegex = /^[^\s]{3,20}$/;
-      if (!usernameRegex.test(this.formData.username)) {
-        this.usernameError = "Username must be 3-20 characters long and cannot contain spaces.";
-      } else {
-        this.usernameError = ""; 
-      }
-    },
-
-    validatePassword(password) {
-      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,20}$/;
-      if (!passwordRegex.test(password)) {
-        this.passwordError = "Password must be 8-20 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character.";
-      } else {
-        this.passwordError = "";
-      }
-    },
-
-    showToast(message) {
-      if (this.toastTimeout) {
-        clearTimeout(this.toastTimeout);
-      }
-      
-      this.successMessage = message;
-      this.showSuccessToast = true;
-      
-      this.toastTimeout = setTimeout(() => {
-        this.showSuccessToast = false;
-      }, 3000);
     },
 
     async handleSubmit() {
@@ -642,6 +646,7 @@ export default {
         this.isLoading = false; 
       }
     }
+    
   }
 };
 </script>
