@@ -236,13 +236,14 @@
             </h2>
             
             <div class="space-y-4">
-              <button class="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-medium py-3 px-4 rounded-2xl transition-all shadow-sm hover:shadow-md transform hover:-translate-y-1 flex justify-center items-center">
+              <button 
+                @click="openDonationModal" 
+                class="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-medium py-3 px-4 rounded-2xl transition-all shadow-sm hover:shadow-md transform hover:-translate-y-1 flex justify-center items-center">
                 <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                 </svg>
                 Donate Now
               </button>
-              
               <!-- <button class="w-full bg-white border-2 border-gray-300 hover:border-red-500 hover:bg-red-50 text-gray-700 hover:text-red-600 font-medium py-3 px-4 rounded-2xl transition-all shadow-sm hover:shadow-md transform hover:-translate-y-1 flex justify-center items-center">
                 <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -408,6 +409,12 @@
       </div>
     </div>
   </div>
+  <DonationModal 
+    :is-open="isDonationModalOpen"
+    :shelter-id="shelter.id"
+    :shelter-name="shelter.username"
+    @close="closeDonationModal"
+  />
 </template>
 
 <script>
@@ -416,13 +423,15 @@ import { useRouter, useRoute } from 'vue-router';
 import Navbar from "@/components/Navbar.vue";
 import PetCard from "@/components/PetCard.vue";
 import EventCard from "@/components/EventCard.vue";
+import DonationModal from "@/components/DonationModal.vue";
 
 export default {
   name: 'ShelterProfile',
   components: {
     Navbar,
     PetCard, 
-    EventCard
+    EventCard,
+    DonationModal
   },
   setup() {
     const router = useRouter();
@@ -437,6 +446,38 @@ export default {
     // Pets pagination
     const currentPage = ref(0);
     const petsPerPage = 3;
+
+    // Donation modal state
+    const isDonationModalOpen = ref(false);
+
+    // Donation statistics
+    const donationStats = ref({
+      totalDonations: 0,
+      totalAmountRaised: 0,
+      recentDonations: []
+    });
+
+    // Open donation modal
+    const openDonationModal = () => {
+      isDonationModalOpen.value = true;
+    };
+
+    // Close donation modal
+    const closeDonationModal = () => {
+      isDonationModalOpen.value = false;
+    };
+
+    // Function to load donation statistics
+    const loadDonationStats = async () => {
+      try {
+        const response = await fetch(`http://localhost:8080/api/v1/donations/statistics/${shelterId}`);
+        if (response.ok) {
+          donationStats.value = await response.json();
+        }
+      } catch (err) {
+        console.error("Error loading donation statistics:", err);
+      }
+    };
 
     const availablePetsCount = computed(() => {
       if (!shelter.value.pets) return 0;
@@ -636,7 +677,7 @@ export default {
           console.error("Failed to fetch events for this shelter");
           shelter.value.events = [];
         }
-
+        await loadDonationStats();
       } catch (err) {
         console.error("Error loading shelter data:", err);
         error.value = "Could not load shelter information. Please try again later.";
@@ -670,7 +711,11 @@ export default {
       nextEventPage,
       prevEventPage,
       updateEventStatus,
-      onEventUpdated
+      onEventUpdated,
+      isDonationModalOpen,
+      openDonationModal,
+      closeDonationModal,
+      donationStats
     };
   }
 };

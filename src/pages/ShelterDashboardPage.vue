@@ -166,7 +166,7 @@
                 <span class="flex-1 ms-3 whitespace-nowrap">Donations</span>
               </router-link>
             </li>
-            <li>
+            <!-- <li>
               <router-link 
                 to="/shelter-dashboard/reports" 
                 class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
@@ -177,7 +177,7 @@
                 </svg>
                 <span class="flex-1 ms-3 whitespace-nowrap">Reports & Analytics</span>
               </router-link>
-            </li>
+            </li> -->
             <li>
               <router-link 
                 to="/shelter-dashboard/edit-profile" 
@@ -413,44 +413,33 @@
 
           <!-- Recent Donations -->
           <div class="bg-white rounded-lg shadow">
-            <div class="p-4 border-b">
+            <div class="p-4 border-b flex items-center justify-between">
               <h2 class="text-lg font-semibold text-gray-800">Recent Donations</h2>
+              <router-link to="/shelter-dashboard/donations" class="text-sm font-medium text-blue-600 hover:text-blue-800">
+                View all
+              </router-link>
             </div>
             <div class="p-4">
               <ul class="divide-y">
-                <li class="py-2 flex justify-between items-center">
+                <li v-for="(donation, index) in donationStats.recentDonations?.slice(0, 3)" :key="index" class="py-2 flex justify-between items-center">
                   <div>
-                    <p class="text-sm font-medium">Sarah Johnson</p>
-                    <p class="text-xs text-gray-500">Yesterday</p>
+                    <p class="text-sm font-medium">{{ donation.isAnonymous ? 'Anonymous' : (donation.donorName || 'Unknown') }}</p>
+                    <p class="text-xs text-gray-500">{{ formatRelativeTime(donation.donationDate) }}</p>
                   </div>
-                  <span class="font-semibold text-green-600">$120.00</span>
+                  <span class="font-semibold text-green-600">{{ formatCurrency(donation.amount) }}</span>
                 </li>
-                <li class="py-2 flex justify-between items-center">
-                  <div>
-                    <p class="text-sm font-medium">Anonymous</p>
-                    <p class="text-xs text-gray-500">2 days ago</p>
-                  </div>
-                  <span class="font-semibold text-green-600">$50.00</span>
-                </li>
-                <li class="py-2 flex justify-between items-center">
-                  <div>
-                    <p class="text-sm font-medium">Robert Williams</p>
-                    <p class="text-xs text-gray-500">3 days ago</p>
-                  </div>
-                  <span class="font-semibold text-green-600">$75.00</span>
+                <li v-if="!donationStats.recentDonations || donationStats.recentDonations.length === 0" class="py-4 text-center text-gray-500">
+                  No donations yet
                 </li>
               </ul>
               <div class="mt-4 p-3 bg-gray-50 rounded-lg">
                 <div class="flex justify-between items-center">
                   <p class="text-sm font-medium">Month Total</p>
-                  <p class="text-lg font-bold text-green-600">$1,245.00</p>
+                  <p class="text-lg font-bold text-green-600">{{ formatCurrency(donationStats.totalAmountRaised || 0) }}</p>
                 </div>
-                <div class="mt-2">
-                  <div class="h-2 bg-gray-200 rounded-full">
-                    <div class="h-2 bg-green-500 rounded-full" style="width: 45%"></div>
-                  </div>
-                  <p class="text-xs text-gray-500 mt-1">45% of monthly goal</p>
-                </div>
+                <router-link to="/shelter-dashboard/donations" class="mt-3 text-sm text-center block w-full py-2 bg-red-600 text-white rounded-2xl hover:bg-red-700 transition-colors">
+                  View All Donations
+                </router-link>
               </div>
             </div>
           </div>
@@ -581,6 +570,32 @@ export default {
 
     const unreadMessagesCount = ref(0);
 
+    const donationStats = ref({
+      totalDonations: 0,
+      totalAmountRaised: 0,
+      recentDonations: []
+    });
+
+    const loadDonationStats = async () => {
+      try {
+        const shelterId = localStorage.getItem('Id');
+        const response = await fetch(`http://localhost:8080/api/v1/donations/statistics/${shelterId}`);
+        if (response.ok) {
+          donationStats.value = await response.json();
+        }
+      } catch (error) {
+        console.error('Error loading donation statistics:', error);
+      }
+    };
+
+    const formatCurrency = (amount) => {
+      return new Intl.NumberFormat('ro-RO', {
+        style: 'currency',
+        currency: 'RON',
+        minimumFractionDigits: 2
+      }).format(amount || 0);
+    };
+
 
     const fetchUnreadMessagesCount = async () => {
       try {
@@ -642,6 +657,7 @@ export default {
           
         });
         loadNotifications();
+        loadDonationStats();
         connectToMessageSocket(shelterId, (newMessage) => {
           console.log("New message received in shelter dashboard:", newMessage);
           // Update unread count
@@ -1057,7 +1073,10 @@ export default {
       navigateBasedOnNotificationType,
       unreadMessagesCount,
       handleNewMessageEvent,
-      handleMessageReadEvent
+      handleMessageReadEvent,
+      donationStats,
+      formatCurrency,
+      formatRelativeTime
     };
   }
 };

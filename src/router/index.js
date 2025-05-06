@@ -25,6 +25,9 @@ import MyProfilePage from '@/pages/MyProfilePage.vue';
 import EventsPage from '@/pages/EventsPage.vue';
 import MessagesPage from '@/pages/MessagesPage.vue';
 import ShelterMessages from '@/components/ShelterMessages.vue';
+import DonationComplete from '@/pages/DonationComplete.vue';
+import ShelterDonations from '@/components/ShelterDonations.vue';
+import DonationsPage from '@/pages/DonationsPage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -98,6 +101,12 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: '/donate',
+      name: 'Donations',
+      component: DonationsPage,
+      meta: { requiresAuth: true }
+    },
+    {
       path: '/shelter-dashboard/',
       name: 'ShelterDashboardPage',
       component: ShelterDashboardPage, 
@@ -125,6 +134,11 @@ const router = createRouter({
           path: 'messages',
           name: 'shelter-messages',
           component: ShelterMessages,
+        },
+        {
+          path: 'donations',
+          name: 'ShelterDonations',
+          component: ShelterDonations
         },
         {
           path: 'edit-profile',
@@ -162,6 +176,12 @@ const router = createRouter({
       name: 'messages',
       component: MessagesPage,
       meta: { requiresAuth: true } // Optional: if you have auth guards
+    },
+    {
+      path: '/donation-complete',
+      name: 'DonationComplete',
+      component: DonationComplete,
+      meta: { requiresAuth: true } 
     },
     {
       path: '/adopt/:petId',
