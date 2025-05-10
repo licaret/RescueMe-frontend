@@ -4,6 +4,7 @@
     <IntroNavbar v-else />
     
     <div class="max-w-6xl mx-auto px-4 py-12 mt-28">
+
       <!-- Header Section -->
       <div class="text-center mb-12">
         <h1 class="text-gray-800 text-3xl font-bold mb-4">Connect with Our Team</h1>
@@ -15,51 +16,52 @@
   
       <!-- Contact Grid -->
       <div class="grid md:grid-cols-2 gap-10 mb-16">
-        <!-- Contact Form -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-          <h2 class="text-gray-800 text-xl font-semibold mb-6">Get in Touch with Us</h2>
-          <form @submit.prevent="handleSubmit">
-            <div class="space-y-4">
+
+        <!-- Emergency Contact -->
+        <div class="bg-red-50 rounded-2xl p-4 border border-red-100 shadow-sm">
+          <h3 class="text-gray-800 font-medium mb-2">Emergency Animal Services</h3>
+          <p class="text-gray-600 text-sm mb-3">
+            For urgent animal welfare concerns or emergency rescue situations, please contact:
+          </p>
+          <div class="bg-white rounded-md p-3 border border-red-100 shadow-inner">
+            <div class="grid gap-2">
               <div>
-                <input 
-                  v-model="form.fullName"
-                  type="text"
-                  placeholder="Full name"
-                  class="text-sm w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  required
-                />
+                <div class="flex items-center space-x-2 mb-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-600" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                  </svg>
+                  <span class="text-gray-800 font-medium">Animal Police:</span>
+                </div>
+                <p class="text-gray-800 font-bold ml-7">1091</p>
               </div>
+              
               <div>
-                <input 
-                  v-model="form.email"
-                  type="email"
-                  placeholder="Enter your email"
-                  class="text-sm w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  required
-                />
+                <div class="flex items-center space-x-2 mb-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-600" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                  </svg>
+                  <span class="text-gray-800 font-medium">ASPA Bucharest:</span>
+                </div>
+                <p class="text-gray-800 font-bold ml-7">+40 21 312 95 55</p>
               </div>
+              
               <div>
-                <textarea
-                  v-model="form.message"
-                  rows="4"
-                  placeholder="About your message/request"
-                  class="text-sm w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  required
-                ></textarea>
+                <div class="flex items-center space-x-2 mb-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-600" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                  </svg>
+                  <span class="text-gray-800 font-medium">ARCA (Romanian Association for Animal Conservation):</span>
+                </div>
+                <p class="text-gray-800 font-bold ml-7">+40 733 103 786</p>
               </div>
-              <button
-                type="submit"
-                class="w-full bg-black text-white py-2 px-6 rounded-md hover:bg-gray-800 transition duration-200"
-              >
-                Send Message
-              </button>
             </div>
-          </form>
+            <p class="text-gray-600 text-xs mt-3">Available 24/7 for animal emergencies</p>
+          </div>
         </div>
         
   
         <!-- Contact Details -->
-        <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="bg-white rounded-2xl shadow-md p-6">
           <h2 class="text-gray-800 text-xl font-semibold mb-6">Contact Details</h2>
           <p class="text-sm text-gray-600 mb-6">
             Whether you're looking to apply, partner, or have questions,
@@ -130,9 +132,10 @@
   
       <!-- FAQ Section with Image -->
       <div class="grid md:grid-cols-2 gap-8">
+
         <!-- FAQ List -->
         <div class="space-y-4">
-          <div v-for="(faq, index) in faqs" :key="index" class="border rounded-lg shadow-md">
+          <div v-for="(faq, index) in faqs" :key="index" class="border rounded-2xl shadow-md">
             <button
               @click="toggleFaq(index)"
               class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50"
@@ -156,7 +159,7 @@
 
         <!-- Image Section -->
         <div class="flex justify-center items-center">
-          <img src="@/assets/faq-image.png" alt="Dog with phones" class="rounded-lg shadow-lg w-full md:w-3/4">
+          <img src="@/assets/faq-image.png" alt="Dog with phones" class="rounded-2xl shadow-lg w-full md:w-3/4">
         </div>
       </div>
     </div>
@@ -186,7 +189,7 @@
         faqs: [
           {
             question: 'Can I donate directly to a specific shelter?',
-            answer: 'Yes, you can donate directly to a specific shelter. Please contact us with your preferred shelter details.',
+            answer: 'Yes, you can donate directly to a specific shelter. You can do this from the shelter’s profile page, where you will find a donation button, or from the main "Donations" section, where you can select the shelter you want to support.',
             isOpen: false
           },
           {
@@ -201,7 +204,7 @@
           },
           {
             question: "Are there any fees associated with the adoption process?",
-            answer: "Yes, adoption fees vary depending on the shelter and the type of pet. These fees cover vaccinations, spaying/neutering, and other medical costs to ensure the pet is healthy.",
+            answer: "No, the platform doesn’t charge any adoption fees. However, some shelters may suggest a donation to help cover care costs. While not mandatory, you can choose to support the shelter if you’d like to help other animals in need.",
             isOpen: false,
           },
           {
@@ -211,7 +214,7 @@
           },
           {
             question: "Can I volunteer to help at the shelters?",
-            answer: "Yes, most shelters welcome volunteers! You can contact the shelter directly through our platform or visit their profile to see available volunteer opportunities.",
+            answer: "Yes, most shelters need volunteers! You can contact the shelter directly through their profile to see how you can help.",
             isOpen: false,
           }
         ]

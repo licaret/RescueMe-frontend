@@ -24,8 +24,8 @@
         <div>
           <h3 class="text-xl  mb-4">Contact</h3>
           <ul class="space-y-2 text-gray-400">
-            <li>Str. Romanilor, Nr. 1A</li>
-            <li>Timisoara, Romania</li>
+            <!-- <li>Str. Romanilor, Nr. 1A</li>
+            <li>Timisoara, Romania</li> -->
             <li>rescueme.care@gmail.com</li>
             <li>+40 743 060 122</li>
           </ul>

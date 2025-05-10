@@ -39,29 +39,6 @@
       </div>
     </div>
 
-    <!-- Stats Section -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-20">
-      <div class="bg-white p-6 rounded-2xl shadow-md text-center">
-        <h3 class="text-3xl font-bold text-gray-800 mb-2">300+</h3>
-        <p class="text-gray-600 uppercase text-sm font-medium">Adoptions</p>
-      </div>
-      
-      <div class="bg-white p-6 rounded-2xl shadow-md text-center">
-        <h3 class="text-3xl font-bold text-gray-800 mb-2">1,000+</h3>
-        <p class="text-gray-600 uppercase text-sm font-medium">Rescues</p>
-      </div>
-      
-      <div class="bg-white p-6 rounded-2xl shadow-md text-center">
-        <h3 class="text-3xl font-bold text-gray-800 mb-2">1,000+</h3>
-        <p class="text-gray-600 uppercase text-sm font-medium">Available Pets</p>
-      </div>
-      
-      <div class="bg-white p-6 rounded-2xl shadow-md text-center">
-        <h3 class="text-3xl font-bold text-gray-800 mb-2">28</h3>
-        <p class="text-gray-600 uppercase text-sm font-medium">Shelters</p>
-      </div>
-    </div>
-
     <!-- Our Story -->
     <div class="mb-20">
       <h2 class="text-2xl font-bold text-red-600 mb-6">OUR STORY</h2>
@@ -206,11 +183,27 @@
         Whether you're looking to adopt, volunteer, or partner with us as a shelter, we welcome you to become part of our community dedicated to helping animals find their forever homes.
       </p>
       <div class="flex flex-wrap justify-center gap-4">
-        <a href="#" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-2xl font-medium inline-block transition-colors">Adopt a Pet</a>
-        <a href="#" class="bg-white border border-red-600 text-red-600 hover:bg-red-50 px-6 py-3 rounded-2xl font-medium inline-block transition-colors">Partner as a Shelter</a>
-        <a href="#" class="bg-gray-800 hover:bg-gray-900 text-white px-6 py-3 rounded-2xl font-medium inline-block transition-colors">Volunteer with Us</a>
+        <button 
+          @click="navigateToAdopt"
+          class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-2xl font-medium inline-block transition-colors transform hover:-translate-y-1"
+        >
+          Adopt a Pet
+        </button>
+        <button 
+          @click="navigateToShelter"
+          class="bg-white border border-red-600 text-red-600 hover:bg-red-50 px-6 py-3 rounded-2xl font-medium inline-block transition-colors transform hover:-translate-y-1"
+        >
+          Partner as a Shelter
+        </button>
+        <button 
+          @click="navigateToDonate"
+          class="bg-gray-800 hover:bg-gray-900 text-white px-6 py-3 rounded-2xl font-medium inline-block transition-colors transform hover:-translate-y-1"
+        >
+          Donate
+        </button>
       </div>
     </div>
+
   </div>
   <Footer></Footer>
 </template>
@@ -235,11 +228,20 @@ export default {
     isLoggedIn() {
       return !!localStorage.getItem('Id');
     }
+  },
+  methods: {
+    navigateToAdopt() {
+      this.$router.push(this.isLoggedIn ? '/available-pets' : '/login');
+    },
+    navigateToShelter() {
+      this.$router.push(this.isLoggedIn ? '/shelter-dashboard' : '/login');
+    },
+    navigateToDonate() {
+      this.$router.push(this.isLoggedIn ? '/donate' : '/login');
+    }
   }
-
 }
 </script>
-
 
 
 <style scoped>

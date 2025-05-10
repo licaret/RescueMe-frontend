@@ -11,18 +11,20 @@ export async function fetchAllEvents() {
   try {
     const userId = localStorage.getItem("Id");
     
-    // If no user ID is available, user might not be logged in
-    if (!userId) {
-      console.warn("No user ID found in localStorage. User might not be logged in.");
+    // Create basic headers
+    const headers = {
+      'Content-Type': 'application/json'
+    };
+    
+    // Only add auth and userId headers if user is logged in
+    if (userId) {
+      headers['Authorization'] = `Bearer ${localStorage.getItem('token')}`;
+      headers['userId'] = userId;
     }
     
     const response = await fetch(API_BASE_URL, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        'userId': userId // Always send the userId header if available
-      },
+      headers: headers,
     });
 
     if (!response.ok) {
