@@ -115,7 +115,7 @@
               class="w-16 h-16 object-cover rounded-lg"
               onerror="this.src='https://via.placeholder.com/64?text=Dog'"
             />
-            <p class="text-sm text-gray-500 ml-3">Adopted Max in 2024</p>
+            <p class="text-sm text-gray-500 ml-3">Adopted Max in 2025</p>
           </div>
         </div>
 
@@ -193,7 +193,7 @@
               class="w-16 h-16 object-cover rounded-lg"
               onerror="this.src='https://via.placeholder.com/64?text=Cat'"
             />
-            <p class="text-sm text-gray-500 ml-3">Adopted Luna in 2023</p>
+            <p class="text-sm text-gray-500 ml-3">Adopted Luna in 2025</p>
           </div>
         </div>
       </div>

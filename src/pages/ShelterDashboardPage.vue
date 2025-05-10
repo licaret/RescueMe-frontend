@@ -412,67 +412,81 @@
 
 
           <!-- Recent Donations -->
-          <div class="bg-white rounded-lg shadow">
-            <div class="p-4 border-b flex items-center justify-between">
+          <div class="bg-white rounded-2xl shadow overflow-hidden">
+            <!-- Header -->
+            <div class="p-5 border-b flex items-center justify-between">
               <h2 class="text-lg font-semibold text-gray-800">Recent Donations</h2>
-              <router-link to="/shelter-dashboard/donations" class="text-sm font-medium text-blue-600 hover:text-blue-800">
+              <router-link to="/shelter-dashboard/donations" class="text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors">
                 View all
               </router-link>
             </div>
-            <div class="p-4">
-              <ul class="divide-y">
-                <li v-for="(donation, index) in donationStats.recentDonations?.slice(0, 3)" :key="index" class="py-2 flex justify-between items-center">
+            
+            <!-- Donations List -->
+            <div class="p-5">
+              <ul class="divide-y divide-gray-100">
+                <li v-for="(donation, index) in donationStats.recentDonations?.slice(0, 3)" :key="index" 
+                    class="py-3 flex justify-between items-center">
                   <div>
-                    <p class="text-sm font-medium">{{ donation.isAnonymous ? 'Anonymous' : (donation.donorName || 'Unknown') }}</p>
-                    <p class="text-xs text-gray-500">{{ formatRelativeTime(donation.donationDate) }}</p>
+                    <p class="text-sm font-medium text-gray-800">{{ donation.isAnonymous ? 'Anonymous' : (donation.donorName || 'Unknown') }}</p>
+                    <p class="text-xs text-gray-500 mt-1">{{ formatRelativeTime(donation.donationDate) }}</p>
                   </div>
-                  <span class="font-semibold text-green-600">{{ formatCurrency(donation.amount) }}</span>
+                  <span class="font-semibold text-green-600 text-sm">{{ formatCurrency(donation.amount) }}</span>
                 </li>
-                <li v-if="!donationStats.recentDonations || donationStats.recentDonations.length === 0" class="py-4 text-center text-gray-500">
-                  No donations yet
+                
+                <!-- Empty State -->
+                <li v-if="!donationStats.recentDonations || donationStats.recentDonations.length === 0" 
+                    class="py-6 text-center text-gray-500 flex flex-col items-center">
+                  <!-- <span class="text-3xl mb-2">🐾</span> -->
+                  <p>No donations received yet</p>
                 </li>
               </ul>
-              <div class="mt-4 p-3 bg-gray-50 rounded-lg">
+              
+              <!-- Monthly Summary -->
+              <div class="mt-5 p-4 bg-gray-50 rounded-xl">
                 <div class="flex justify-between items-center">
-                  <p class="text-sm font-medium">Month Total</p>
+                  <p class="text-sm font-medium text-gray-700">Month Total</p>
                   <p class="text-lg font-bold text-green-600">{{ formatCurrency(donationStats.totalAmountRaised || 0) }}</p>
                 </div>
-                <router-link to="/shelter-dashboard/donations" class="mt-3 text-sm text-center block w-full py-2 bg-red-600 text-white rounded-2xl hover:bg-red-700 transition-colors">
+                
+                <!-- Improved Button -->
+                <router-link to="/shelter-dashboard/donations" 
+                            class="mt-4 text-sm font-medium block w-full py-2.5 bg-red-600 text-white rounded-2xl hover:bg-red-700 active:bg-red-800 transition-colors duration-200 text-center shadow-sm">
                   View All Donations
                 </router-link>
               </div>
             </div>
           </div>
+
         </div>
 
         <!-- Quick Actions -->
-        <div class="mt-6 bg-white rounded-lg shadow p-4">
+        <div class="mt-6 bg-white rounded-2xl shadow p-4">
           <h2 class="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h2>
           <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <router-link :to="{ path: '/shelter-dashboard/manage-pets', query: { openForm: 'true' } }"  class="flex flex-col items-center justify-center p-4 border rounded-lg hover:bg-gray-50 transition">
+            <router-link :to="{ path: '/shelter-dashboard/manage-pets', query: { openForm: 'true' } }" class="flex flex-col items-center justify-center p-4 border rounded-2xl hover:bg-gray-50 transition">
               <svg class="w-8 h-8 text-blue-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
               </svg>
               <span class="text-sm font-medium">Add New Pet</span>
             </router-link>
-            <router-link :to="{ path: '/shelter-dashboard/manage-events', query: { openForm: 'true' } }" class="flex flex-col items-center justify-center p-4 border rounded-lg hover:bg-gray-50 transition">
+            <router-link :to="{ path: '/shelter-dashboard/manage-events', query: { openForm: 'true' } }" class="flex flex-col items-center justify-center p-4 border rounded-2xl hover:bg-gray-50 transition">
               <svg class="w-8 h-8 text-purple-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
               </svg>
               <span class="text-sm font-medium">Create Event</span>
             </router-link>
-            <a href="#" class="flex flex-col items-center justify-center p-4 border rounded-lg hover:bg-gray-50 transition">
+            <router-link to="/shelter-dashboard/donations" class="flex flex-col items-center justify-center p-4 border rounded-2xl hover:bg-gray-50 transition">
               <svg class="w-8 h-8 text-green-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
-              <span class="text-sm font-medium">Generate Report</span>
-            </a>
-            <a href="#" class="flex flex-col items-center justify-center p-4 border rounded-lg hover:bg-gray-50 transition">
+              <span class="text-sm font-medium">Donations</span>
+            </router-link>
+            <router-link to="/shelter-dashboard/messages" class="flex flex-col items-center justify-center p-4 border rounded-2xl hover:bg-gray-50 transition">
               <svg class="w-8 h-8 text-red-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
               </svg>
-              <span class="text-sm font-medium">Send Updates</span>
-            </a>
+              <span class="text-sm font-medium">Chat Messages</span>
+            </router-link>
           </div>
         </div>
       </div>

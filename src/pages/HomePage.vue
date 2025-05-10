@@ -25,7 +25,7 @@
   </section>
 
  <!-- Quick Stats Section - New section with original colors -->
- <section class="py-10 bg-gray-100 border-y border-gray-200">
+ <!-- <section class="py-10 bg-gray-100 border-y border-gray-200">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
         <div class="bg-white p-4 rounded-2xl shadow-md">
@@ -46,7 +46,7 @@
         </div>
       </div>
     </div>
-  </section>
+  </section> -->
 
   <!-- Mission Statement-->
   <section class="py-16 bg-white">
