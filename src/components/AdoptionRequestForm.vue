@@ -1,14 +1,12 @@
 <template>
-  <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-[9999] p-4 overflow-y-auto backdrop-blur-sm"
-       @click="handleBackdropClick">
-    <!-- Progress bar at the top -->
+  <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-[9999] p-4 overflow-y-auto backdrop-blur-sm" @click="handleBackdropClick">
+    <!-- Progress bar -->
     <div class="absolute top-0 left-0 right-0 h-1 bg-gray-200">
       <div class="h-full bg-pink-600 transition-all duration-300"
            :style="{ width: `${formProgress}%` }"></div>
     </div>
     
-    <div class="bg-white rounded-3xl max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl transform transition-all duration-300"
-         @click.stop>
+    <div class="bg-white rounded-3xl max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl transform transition-all duration-300" @click.stop>
       <!-- Form Header -->
       <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
         <h2 v-if="pet" class="text-xl font-bold text-gray-800">
@@ -76,7 +74,7 @@
         </div>
       </div>
       
-      <!-- Form Content (Only show when pet data is loaded) -->
+      <!-- Form Content -->
       <div v-else class="overflow-y-auto flex-1 p-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
           <!-- Pet Overview -->
@@ -109,19 +107,19 @@
                 
                 <div class="grid grid-cols-2 gap-2 text-sm">
                   <div>
-                    <span class="text-gray-500">Age:</span>
+                    <span class="text-gray-500">Age: </span>
                     <span class="text-gray-700 font-medium">{{ formatAge(pet.age) }}</span>
                   </div>
                   <div>
-                    <span class="text-gray-500">Sex:</span>
+                    <span class="text-gray-500">Sex: </span>
                     <span class="text-gray-700 font-medium">{{ pet.sex }}</span>
                   </div>
                   <div>
-                    <span class="text-gray-500">Size:</span>
+                    <span class="text-gray-500">Size: </span>
                     <span class="text-gray-700 font-medium">{{ pet.size }}</span>
                   </div>
                   <div>
-                    <span class="text-gray-500">Status:</span>
+                    <span class="text-gray-500">Status: </span>
                     <span class="text-gray-700 font-medium">{{ pet.status }}</span>
                   </div>
                 </div>
@@ -172,7 +170,7 @@
               </div>
             </div>
             
-            <!-- Contact Form (Additional Information) -->
+            <!-- Contact Form -->
             <form @submit.prevent="submitForm" class="space-y-4">
               <div>
                 <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
@@ -186,7 +184,7 @@
                 />
               </div>
               
-              <!-- County and City Selection (Updated to match the event form) -->
+              <!-- County and City Selection -->
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label for="county" class="block text-sm font-medium text-gray-700 mb-1">County</label>
@@ -526,6 +524,7 @@ import judete from '@/assets/judete.json';
 
 export default {
   name: 'AdoptionRequestForm',
+
   props: {
     petId: {
       type: [String, Number],
@@ -535,7 +534,6 @@ export default {
   
   setup(props) {
     const router = useRouter();
-    const route = useRoute();
     const userProfile = ref(null);
     const isSubmitting = ref(false);
 
@@ -543,82 +541,72 @@ export default {
     const errorMessage = ref('');
     const successMessage = ref('');
     
-    // Calculate form progress
+
     const formProgress = computed(() => {
       if (!pet.value) return 5;
       if (successMessage.value) return 100;
       if (errorMessage.value) return 25;
       
-      let progress = 10; // Start with 10% just for loading the form
+      let progress = 10; 
       
-      // Basic information section (worth 20%)
       if (form.value.phone) progress += 5;
       if (form.value.county) progress += 5;
       if (form.value.city) progress += 10;
       
-      // Housing section (worth 20%)
       if (form.value.housingType) progress += 5;
       if (form.value.ownRent) progress += 5;
       if (form.value.hasYard) progress += 5;
       if (form.value.hasYard === 'yes' && form.value.fencedYard) progress += 5;
       
-      // Household section (worth 20%)
       if (form.value.householdMembers) progress += 5;
       if (form.value.hasChildren) progress += 5;
       if (form.value.hasOtherPets) progress += 5;
       if (form.value.hasOtherPets === 'yes' && form.value.otherPetsDescription) progress += 5;
       
-      // Experience & Expectations section (worth 20%)
       if (form.value.petExperience) progress += 5;
       if (form.value.activityLevel) progress += 5;
       if (form.value.timeAlone) progress += 5;
       if (form.value.adoptReason) progress += 5;
       
-      // Terms & Additional (worth 10%)
       if (form.value.additionalInfo) progress += 5;
       if (form.value.agreeToTerms) progress += 5;
       
-      return Math.min(progress, 95); // Cap at 95% until form is actually submitted
+      return Math.min(progress, 95);
     });
+
     
-    // Form data
     const form = ref({
-      // Contact information
       phone: '',
       city: '',
       county: '',
       
-      // Housing
       housingType: '',
       ownRent: '',
       landlordPermission: '',
       hasYard: '',
       fencedYard: '',
       
-      // Household
       householdMembers: 1,
       hasChildren: '',
       childrenAges: '',
       hasOtherPets: '',
       otherPetsDescription: '',
       
-      // Experience & Expectations
       petExperience: '',
       activityLevel: '',
       timeAlone: '',
       adoptReason: '',
       
-      // Additional
       additionalInfo: '',
       agreeToTerms: false
     });
     
-    // Counties and cities data from Romanian judete
+
     const counties = computed(() => 
       judete.judete.map(judet => judet.nume).sort()
     );
     
-    // Get cities based on selected county
+
     const filteredCities = computed(() => {
       if (!form.value.county) return [];
       
@@ -631,12 +619,12 @@ export default {
         : [];
     });
     
-    // Reset city when county changes
+    
     watch(() => form.value.county, () => {
       form.value.city = '';
     });
     
-    // Form validation
+    
     const isFormValid = computed(() => {
       return form.value.phone && 
              form.value.city && 
@@ -658,6 +646,7 @@ export default {
              form.value.agreeToTerms;
     });
     
+
     const loadPet = async () => {
       console.log("Loading pet data for ID:", props.petId);
       
@@ -669,7 +658,6 @@ export default {
         return;
       }
       
-      console.log("Fetching pet from API");
       try {
         const petData = await getPetById(props.petId);
         console.log("Fetched pet data from API:", petData);
@@ -680,6 +668,7 @@ export default {
       }
     };
     
+
     onMounted(async () => {
       console.log("AdoptionRequestForm component mounted");
       
@@ -711,29 +700,36 @@ export default {
       }
     });
     
+
+
     onBeforeUnmount(() => {
       if (!successMessage.value) {
         clearCurrentAdoptionPet();
       }
     });
     
+
     const handleBackdropClick = (event) => {
       if (event.target === event.currentTarget) {
         goBack();
       }
     };
+
     
     const goBack = () => {
       router.go(-1);
     };
     
+
     const goToAvailablePetsPage = () => {
       router.push('/available-pets');
     };
     
+
     const navigateToAdoptionRequests = () => {
       router.push('/my-adoption-requests');
     };
+
     
     const formatAge = (age) => {
       if (!age && age !== 0) return 'Unknown';
@@ -745,6 +741,7 @@ export default {
         return `${ageInMonths} ${ageInMonths === 1 ? 'month' : 'months'}`;
       }
     };
+
     
     const submitForm = async () => {
       if (!isFormValid.value || !userProfile.value || !pet.value) {
@@ -822,12 +819,12 @@ export default {
       form,
       isFormValid,
       isSubmitting,
-
       errorMessage,
       successMessage,
       formProgress,
       counties,
       filteredCities,
+
       handleBackdropClick,
       goBack,
       goToAvailablePetsPage,

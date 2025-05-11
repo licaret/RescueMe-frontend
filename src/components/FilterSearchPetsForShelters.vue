@@ -450,14 +450,15 @@
         sortOrder,
         showFilters,
         breedOptions,
+        isAnyFilterApplied,
+        activeFilterCount,
+        
         toggleFilters,
         resetFilters,
         clearSingleFilter,
         getActiveFilters,
         formatFilterName,
-        formatFilterValue,
-        isAnyFilterApplied,
-        activeFilterCount
+        formatFilterValue
       };
     }
   };

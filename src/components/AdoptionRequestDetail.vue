@@ -3,6 +3,7 @@
     <Navbar />
 
     <div class="container mx-auto px-4 py-8 min-h-screen">
+
       <!-- Loading State -->
       <div v-if="loading" class="flex justify-center items-center py-20">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
@@ -407,255 +408,15 @@
         </div>
       </div>
     </div>
+
     <Teleport to="body">
-      <div 
-        v-if="isExpanded" 
-        class="fixed inset-0 bg-black/70 flex items-center justify-center z-[9999] p-4 overflow-y-auto backdrop-blur-sm"
-        @click="handleBackdropClick"
-      >
-        <div 
-          class="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl transform transition-all duration-300 modal-content"
-          @click.stop
-        >
-          <!-- Modal Header -->
-          <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
-            <h2 class="text-xl font-bold text-gray-800">{{ pet.name }}'s Profile</h2>
-            <button @click="toggleExpandedView" class="text-gray-400 hover:text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-full p-2 transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-          
-          <!-- Modal Content -->
-          <div class="overflow-y-auto flex-1 p-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <!-- Image Gallery -->
-              <div class="relative">
-                <div class="h-80 overflow-hidden bg-gray-100 rounded-lg">
-                  <img
-                    v-if="pet.photos && pet.photos.length > 0"
-                    :src="pet.photos[currentIndex]?.url"
-                    alt="Pet Photo"
-                    class="w-full h-full object-cover"
-                  />
-                  <div v-else class="w-full h-full flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                </div>
-                
-                <!-- Navigation Controls -->
-                <div v-if="pet.photos && pet.photos.length > 1" class="flex justify-center mt-4 gap-2">
-                  <button
-                    class="w-8 h-8 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center hover:bg-gray-300 transition-all"
-                    @click.stop="prevImage"
-                    aria-label="Previous image"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                    </svg>
-                  </button>
-                  
-                  <!-- Thumbnails -->
-                  <div class="flex items-center gap-2 overflow-x-auto px-2 max-w-xs">
-                    <div 
-                      v-for="(photo, index) in pet.photos" 
-                      :key="index"
-                      @click.stop="goToImage(index)"
-                      class="h-8 w-8 rounded-md overflow-hidden cursor-pointer transition-all duration-300"
-                      :class="index === currentIndex ? 'ring-2 ring-indigo-500' : ''"
-                    >
-                      <img :src="photo.url" alt="Thumbnail" class="w-full h-full object-cover" />
-                    </div>
-                  </div>
-                  
-                  <button
-                    class="w-8 h-8 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center hover:bg-gray-300 transition-all"
-                    @click.stop="nextImage"
-                    aria-label="Next image"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-              
-              <!-- Pet Details -->
-              <div class="space-y-6">
-                <div>
-                  <h3 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                    {{ pet.name }}
-                    <span 
-                      class="px-2 py-0.5 text-xs rounded-full"
-                      :class="{
-                        'bg-green-100 text-green-800': pet.status === 'AVAILABLE',
-                        'bg-yellow-100 text-yellow-800': pet.status === 'PENDING',
-                        'bg-gray-100 text-gray-800': pet.status === 'ADOPTED'
-                      }"
-                    >
-                      {{ pet.status }}
-                    </span>
-                    <span v-if="pet.urgentAdoptionNeeded" class="bg-red-100 text-red-700 px-2 py-0.5 rounded-full text-xs font-medium">
-                      Urgent
-                    </span>
-                  </h3>
-                  <div class="flex items-center gap-2 text-gray-600 mt-1">
-                    <span class="font-medium">{{ pet.species }}</span>
-                    <span>•</span>
-                    <span>{{ pet.breed || 'Mixed Breed' }}</span>
-                  </div>
-                </div>
-                
-                <!-- Primary Attributes -->
-                <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                  <!-- Age -->
-                  <div class="bg-gray-50 p-3 rounded-lg">
-                    <div class="text-amber-500 mb-1">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                    </div>
-                    <span class="text-xs text-gray-500 block">Age</span>
-                    <span class="text-sm font-medium text-gray-800">{{ formatAge(pet.age) }}</span>
-                  </div>
-                  
-                  <!-- Sex -->
-                  <div class="bg-gray-50 p-3 rounded-lg">
-                    <div class="text-purple-500 mb-1">
-                      <svg v-if="pet.sex === 'Male'" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="10.5" cy="10.5" r="7.5" />
-                        <line x1="21" y1="21" x2="16.5" y2="16.5" />
-                        <line x1="21" y1="10.5" x2="16.5" y2="10.5" />
-                        <line x1="18.75" y1="7.75" x2="18.75" y2="13.25" />
-                      </svg>
-                      <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="9.5" r="7.5" />
-                        <line x1="12" y1="17" x2="12" y2="22" />
-                        <line x1="9" y1="19.5" x2="15" y2="19.5" />
-                      </svg>
-                    </div>
-                    <span class="text-xs text-gray-500 block">Sex</span>
-                    <span class="text-sm font-medium text-gray-800">{{ pet.sex || 'Unknown' }}</span>
-                  </div>
-                  
-                  <!-- Size -->
-                  <div class="bg-gray-50 p-3 rounded-lg">
-                    <div class="text-blue-500 mb-1">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
-                      </svg>
-                    </div>
-                    <span class="text-xs text-gray-500 block">Size</span>
-                    <span class="text-sm font-medium text-gray-800">{{ pet.size || 'Unknown' }}</span>
-                  </div>
-                </div>
-                
-                <!-- Health Status -->
-                <div class="flex items-center p-4 rounded-lg" 
-                    :class="pet.healthStatus === 'Healthy' ? 'bg-green-50' : pet.healthStatus === 'Minor Issues' ? 'bg-yellow-50' : 'bg-red-50'">
-                  <div :class="pet.healthStatus === 'Healthy' ? 'text-green-500' : pet.healthStatus === 'Minor Issues' ? 'text-yellow-500' : 'text-red-500'" class="mr-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <div class="text-xs text-gray-500">Health Status</div>
-                    <div class="text-sm font-medium"
-                        :class="pet.healthStatus === 'Healthy' ? 'text-green-700' : pet.healthStatus === 'Minor Issues' ? 'text-yellow-700' : 'text-red-700'">
-                      {{ pet.healthStatus || 'Unknown' }}
-                    </div>
-                  </div>
-                  <div class="ml-auto flex gap-4">
-                    <!-- Vaccinated -->
-                    <div class="flex flex-col items-center">
-                      <div class="text-xs text-gray-500">Vaccinated</div>
-                      <div class="flex items-center justify-center">
-                        <svg v-if="pet.vaccinated" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                        </svg>
-                        <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </div>
-                    </div>
-                    
-                    <!-- Neutered -->
-                    <div class="flex flex-col items-center">
-                      <div class="text-xs text-gray-500">Neutered</div>
-                      <div class="flex items-center justify-center">
-                        <svg v-if="pet.neutered" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                        </svg>
-                        <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                <!-- Shelter Time -->
-                <div class="flex items-center p-4 bg-blue-50 rounded-lg">
-                  <div class="text-blue-500 mr-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <div class="text-xs text-gray-500">Time in Shelter</div>
-                    <div class="text-sm font-medium text-blue-700">{{ formatShelterTime(pet.timeSpentInShelter) }}</div>
-                  </div>
-                </div>
-                
-                <!-- Story -->
-                <div class="bg-gray-50 p-4 rounded-lg">
-                  <div class="flex items-center mb-2 text-indigo-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                    </svg>
-                    <h4 class="font-medium text-gray-800">{{ pet.name }}'s Story</h4>
-                  </div>
-                  <p class="text-gray-700 text-sm leading-relaxed">
-                    {{ pet.story || `${pet.name} doesn't have a story yet, but is excited to find a loving home!` }}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Modal Footer -->
-          <div class="px-6 py-4 border-t border-gray-100 flex justify-between">
-            <!-- Shelter buttons -->
-            <template v-if="isShelter">
-              <div>
-                <button
-                  @click.stop="showDeleteModal"
-                  class="flex items-center gap-1.5 bg-red-50 text-red-600 px-4 py-2 rounded-md text-sm font-medium hover:bg-red-100 transition-colors"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                  Remove
-                </button>
-              </div>
-              <div class="flex gap-3">
-                <button 
-                  @click.stop="openEditForm"
-                  class="flex items-center gap-1.5 bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 transition-colors"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                  </svg>
-                  Edit Pet
-                </button>
-              </div>
-            </template>
-          </div>
-        </div>
-      </div>
+      <PetDetailsModal
+        v-if="isExpanded"
+        :pet="pet"
+        :isFavorite="false"
+        :hasExistingRequest="true"
+        @close="isExpanded = false"
+      />
     </Teleport>
   </div>
 </template>
@@ -664,12 +425,17 @@
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { getAdoptionRequestById, cancelAdoptionRequest } from '../services/adoption_service';
+import { getShelterByPetId } from '@/services/user_service';
+import { getPetPhotosFromIds } from '@/services/pet_service';
 import Navbar from '@/components/Navbar.vue';
+import PetDetailsModal from '@/components/PetDetailsModal.vue';
 
 export default {
   name: 'AdoptionRequestDetail',
+
   components: {
-    Navbar
+    Navbar,
+    PetDetailsModal
   },
   
   setup() {
@@ -688,44 +454,19 @@ export default {
     const shelter = ref(null);
 
 
-
     const fetchShelterByPetId = async (petId) => {
       try {
-        const response = await fetch(`http://localhost:8080/users/shelter/by-pet/${petId}`);
-        const data = await response.json();
-        console.log('Fetched shelter:', data); 
-        shelter.value = data;
+        shelter.value = await getShelterByPetId(petId);
+        console.log('Fetched shelter:', shelter.value);
       } catch (err) {
         console.error('Error fetching shelter:', err);
       }
     };
 
 
-    const openPetModal = async (petData) => {
-      pet.value = { ...petData };
-      currentIndex.value = 0; 
-
-      if (pet.value.photoIds?.length) {
-        pet.value.photos = await Promise.all(
-          pet.value.photoIds.map(async (id) => {
-            const response = await fetch(`http://localhost:8080/pet-photos/${id}`);
-            const data = await response.json();
-            return { url: data.url };
-          })
-        );
-      }
-
+    const openPetModal = async () => {
+      pet.value = { ...request.value.pet };
       isExpanded.value = true;
-    };
-
-
-    const toggleExpandedView = () => {
-      isExpanded.value = !isExpanded.value;
-    };
-
-
-    const handleBackdropClick = () => {
-      isExpanded.value = false;
     };
 
 
@@ -759,17 +500,11 @@ export default {
         request.value = data;
 
         if (request.value.pet?.photoIds?.length) {
-          request.value.pet.photos = await Promise.all(
-            request.value.pet.photoIds.map(async (id) => {
-              const response = await fetch(`http://localhost:8080/pet-photos/${id}`);
-              const data = await response.json(); 
-              return { url: data.url };
-            })
-          );
+          request.value.pet.photos = await getPetPhotosFromIds(request.value.pet.photoIds);
         }
 
         if (data && data.pet && data.pet.id) {
-          await fetchShelterByPetId(data.pet.id);
+          shelter.value = await getShelterByPetId(data.pet.id);
         }
 
         if (!data) {
@@ -782,7 +517,6 @@ export default {
         loading.value = false;
       }
     };
-    
 
 
     const formatStatus = (status) => {
@@ -826,8 +560,14 @@ export default {
       if (!dateString) return 'Unknown date';
       
       try {
-        const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-        return new Date(dateString).toLocaleDateString(undefined, options);
+        const options = { 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric', 
+          hour: '2-digit', 
+          minute: '2-digit'
+        };
+        return new Date(dateString).toLocaleDateString('en-US', options);
       } catch (e) {
         console.error('Error formatting date:', e);
         return dateString;
@@ -852,13 +592,6 @@ export default {
       }
     };
 
-
-    
-    const goBack = () => {
-      router.push('/my-adoption-requests');
-    };
-
-
     
     const cancelRequest = async () => {
       if (!confirm('Are you sure you want to cancel this adoption request? This action cannot be undone.')) {
@@ -870,21 +603,26 @@ export default {
         request.value.status = 'canceled';
       } catch (err) {
         console.error('Error canceling adoption request:', err);
-        alert('Failed to cancel the adoption request. Please try again.');
       }
     };
-    
+
+    const goBack = () => {
+      router.push('/my-adoption-requests');
+    };
 
 
     onMounted(fetchRequestDetails);
     
 
-    
     return {
       request,
       loading,
       error,
       shelter,
+      isExpanded,
+      currentIndex,
+      pet,
+      
       formatStatus,
       formatPetStatus,
       formatDate,
@@ -892,13 +630,8 @@ export default {
       goBack,
       cancelRequest,
       fetchRequestDetails,
-      isExpanded,
-      pet,
       openPetModal,
       formatShelterTime,
-      toggleExpandedView,
-      handleBackdropClick,
-      currentIndex,
       fetchShelterByPetId
     };
   }

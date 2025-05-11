@@ -251,6 +251,7 @@
 
 <script>
 import { ref, watch } from 'vue';
+import { updatePet, addPet } from '@/services/pet_service';
 
 export default {
   name: 'AddEditPetForm',
@@ -286,6 +287,118 @@ export default {
     const photoIdsToDelete = ref([]);
 
     const isSubmitting = ref(false);
+
+
+    const handlePhotoUpload = (event) => {
+      const files = Array.from(event.target.files);
+      files.forEach((file) => {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+              const newPhoto = {
+                  id: null, 
+                  url: e.target.result
+              };
+              photoPreview.value.push(newPhoto); 
+              photoFiles.value.push(file); 
+          };
+          reader.readAsDataURL(file);
+      });
+
+      console.log("After upload:", {
+          photoPreview: photoPreview.value,
+          photoFiles: photoFiles.value
+      });
+    };
+
+
+    const handleRemovePhoto = (index) => {
+      console.log("Removing photo at index:", index);
+
+      if (index < existingPhotos.value.length) {
+          const photoId = existingPhotos.value[index]?.id;
+          if (photoId) {
+              photoIdsToDelete.value.push(photoId);
+          }
+          existingPhotos.value.splice(index, 1);
+      } else {
+          const newPhotoIndex = index - existingPhotos.value.length;
+          photoFiles.value.splice(newPhotoIndex, 1);
+      }
+
+      photoPreview.value.splice(index, 1);
+
+      console.log("After removal:", {
+          photoPreview: photoPreview.value,
+          existingPhotos: existingPhotos.value,
+          photoIdsToDelete: photoIdsToDelete.value
+      });
+    };
+
+
+    const handleSubmit = async () => {
+      try {
+        isSubmitting.value = true;
+        const isUpdate = !!props.petToEdit;
+
+        const petDataToSend = { ...petData.value };
+        delete petDataToSend.Id;
+        delete petDataToSend.shelterUsername;
+        delete petDataToSend.photoUrls;
+
+        petDataToSend.age =
+          petDataToSend.ageUnit === "years"
+            ? petDataToSend.ageValue
+            : petDataToSend.ageValue / 12;
+
+        petDataToSend.timeSpentInShelter =
+          petDataToSend.shelterTimeUnit === "years"
+            ? petDataToSend.shelterTimeValue
+            : petDataToSend.shelterTimeValue / 12;
+
+        delete petDataToSend.ageValue;
+        delete petDataToSend.ageUnit;
+        delete petDataToSend.shelterTimeValue;
+        delete petDataToSend.shelterTimeUnit;
+        delete petDataToSend.shelterId;
+
+        console.log("Submitting form with:", {
+          petData: petDataToSend,
+          newPhotos: photoFiles.value.length,
+          photoIdsToDelete: photoIdsToDelete.value
+        });
+
+        let updatedPet;
+        if (isUpdate) {
+          updatedPet = await updatePet(
+            localStorage.getItem("Id"),
+            petData.value.id, 
+            petDataToSend, 
+            photoFiles.value, 
+            photoIdsToDelete.value
+          );
+        } else {
+          updatedPet = await addPet(
+            petDataToSend,
+            photoFiles.value,
+            photoIdsToDelete.value
+          );
+        }
+
+        console.log("Server response:", updatedPet);
+
+        emit(isUpdate ? "pet-updated" : "pet-added", updatedPet);
+        if (isUpdate) {
+          window.dispatchEvent(new Event('pet-updated'));
+        } else {
+          window.dispatchEvent(new Event('pet-added'));
+        }
+        emit("close");
+      } catch (error) {
+        console.error("Error saving pet:", error);
+      } finally {
+        isSubmitting.value = false;
+      }
+    };
 
 
     watch(() => props.petToEdit, (newPet) => {
@@ -328,141 +441,14 @@ export default {
     }, { immediate: true });
 
 
-
-    const handlePhotoUpload = (event) => {
-    const files = Array.from(event.target.files);
-    files.forEach((file) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const newPhoto = {
-                id: null, 
-                url: e.target.result
-            };
-            photoPreview.value.push(newPhoto); 
-            photoFiles.value.push(file); 
-        };
-        reader.readAsDataURL(file);
-    });
-
-    console.log("After upload:", {
-        photoPreview: photoPreview.value,
-        photoFiles: photoFiles.value
-    });
-};
-
-
-    const handleRemovePhoto = (index) => {
-      console.log("Removing photo at index:", index);
-
-      if (index < existingPhotos.value.length) {
-          const photoId = existingPhotos.value[index]?.id;
-          if (photoId) {
-              photoIdsToDelete.value.push(photoId);
-          }
-          existingPhotos.value.splice(index, 1);
-      } else {
-          const newPhotoIndex = index - existingPhotos.value.length;
-          photoFiles.value.splice(newPhotoIndex, 1);
-      }
-
-      photoPreview.value.splice(index, 1);
-
-      console.log("After removal:", {
-          photoPreview: photoPreview.value,
-          existingPhotos: existingPhotos.value,
-          photoIdsToDelete: photoIdsToDelete.value
-      });
-    };
-
-
-
-    const handleSubmit = async () => {
-      try {
-        // isSubmitting.value = true;
-
-        const formData = new FormData();
-        const isUpdate = !!props.petToEdit;
-
-        const petDataToSend = { ...petData.value };
-        delete petDataToSend.Id;
-        delete petDataToSend.shelterUsername;
-        delete petDataToSend.photoUrls;
-
-        petDataToSend.age =
-          petDataToSend.ageUnit === "years"
-            ? petDataToSend.ageValue
-            : petDataToSend.ageValue / 12;
-
-        petDataToSend.timeSpentInShelter =
-          petDataToSend.shelterTimeUnit === "years"
-            ? petDataToSend.shelterTimeValue
-            : petDataToSend.shelterTimeValue / 12;
-
-        delete petDataToSend.ageValue;
-        delete petDataToSend.ageUnit;
-        delete petDataToSend.shelterTimeValue;
-        delete petDataToSend.shelterTimeUnit;
-        delete petDataToSend.shelterId;
-
-
-        console.log("Submitting form with:", {
-          petData: petDataToSend,
-          newPhotos: photoFiles.value.length,
-          photoIdsToDelete: photoIdsToDelete.value
-        });
-
-        formData.append("petData", JSON.stringify(petDataToSend));
-
-        photoFiles.value.forEach((file) => {
-          formData.append("photos", file);
-        });
-
-        if (photoIdsToDelete.value.length > 0) {
-          formData.append("photoIdsToDelete", JSON.stringify(photoIdsToDelete.value));
-        }
-
-        const url = isUpdate
-          ? `http://localhost:8080/pets/update/${petData.value.id}`
-          : "http://localhost:8080/pets/add";
-
-        const response = await fetch(url, {
-          method: isUpdate ? "PATCH" : "POST",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-            "Id": localStorage.getItem("Id"),
-          },
-          body: formData,
-        });
-
-        if (!response.ok) {
-          throw new Error(`Failed to save pet: ${await response.text()}`);
-        }
-
-        const updatedPet = await response.json();
-        console.log("Server response:", updatedPet);
-
-        emit(isUpdate ? "pet-updated" : "pet-added", updatedPet);
-        if (isUpdate) {
-          window.dispatchEvent(new Event('pet-updated'));
-        }else{
-          window.dispatchEvent(new Event('pet-added'));
-        }
-        emit("close");
-      } catch (error) {
-        console.error("Error saving pet:", error);
-      // } finally {
-      //   isSubmitting.value = false;
-      }
-    };
-
-
     return {
       petData,
       photoPreview,
+      isSubmitting, 
+      
       handlePhotoUpload,
       handleRemovePhoto,
       handleSubmit,
-      isSubmitting, 
     };
   },
 };

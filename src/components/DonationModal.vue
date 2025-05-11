@@ -1,11 +1,7 @@
 <template>
     <div v-if="isOpen" class="fixed inset-0 flex items-center justify-center z-50">
-      <!-- Modal backdrop with improved opacity transition -->
       <div class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm transition-opacity duration-300" @click="close"></div>
-      
-      <!-- Modal content with smoother animations and improved shadow -->
       <div class="bg-white w-full max-w-lg mx-auto rounded-2xl shadow-2xl overflow-hidden z-10 transform transition-all duration-300 scale-100">
-        <!-- Modal header with more subtle gradient and better spacing -->
         <div class="bg-gradient-to-r from-red-600 to-red-700 px-8 py-5 text-white">
           <div class="flex justify-between items-center">
             <h3 class="text-2xl font-medium tracking-tight">Support {{ shelterName }}</h3>
@@ -17,13 +13,12 @@
           </div>
         </div>
         
-        <!-- Modal body with improved spacing and typography -->
         <div class="px-8 py-6">
           <!-- Donation steps -->
           <div v-if="step === 'amount'" class="space-y-5">
             <p class="text-gray-700 leading-relaxed">Your contribution will directly help provide essential care, shelter, and medical attention for animals in need.</p>
             
-            <!-- Donation amount selection with improved UI -->
+            <!-- Donation amount selection -->
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Select Donation Amount</label>
               <div class="grid grid-cols-2 gap-3 mb-4">
@@ -40,7 +35,7 @@
                 </button>
               </div>
                 
-              <!-- Custom amount with improved input styling -->
+              <!-- Custom amount -->
               <div class="mt-4">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Custom Amount</label>
                 <div class="relative rounded-2xl shadow-sm">
@@ -59,7 +54,7 @@
               </div>
             </div>
             
-            <!-- Donation message with improved textarea -->
+            <!-- Donation message -->
             <div class="mt-5">
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 Add a Personal Message (Optional)
@@ -72,20 +67,8 @@
               ></textarea>
             </div>
             
-            <!-- Anonymous option with improved checkbox -->
-            <div class="flex items-center mt-5 bg-gray-50 p-4 rounded-2xl border border-gray-200">
-              <input 
-                id="anonymous" 
-                v-model="isAnonymous" 
-                type="checkbox"
-                class="h-5 w-5 text-red-600 focus:ring-red-500 border-gray-300 rounded transition-all duration-200"
-              />
-              <label for="anonymous" class="ml-3 block text-sm text-gray-700">
-                Make my donation anonymous
-              </label>
-            </div>
             
-            <!-- Continue button with improved styling -->
+            <!-- Continue button -->
             <div class="mt-6">
               <button 
                 @click="goToPayment"
@@ -100,7 +83,7 @@
             </div>
           </div>
           
-          <!-- Payment step with improved layout -->
+          <!-- Payment step -->
           <div v-else-if="step === 'payment'" class="space-y-5">
             <div class="mb-6 text-center">
               <div class="inline-block bg-red-50 text-red-700 font-bold px-4 py-2 rounded-2xl mb-2">
@@ -113,11 +96,11 @@
               </div>
             </div>
             
-            <!-- Payment form with improved styling -->
+            <!-- Payment form -->
             <div class="border border-gray-300 rounded-2xl p-5 bg-white shadow-sm">
               <h4 class="text-sm font-medium text-gray-700 mb-3">Payment Information</h4>
               <div id="payment-element" class="mb-4">
-                <!-- Stripe Elements will be inserted here -->
+                <!-- Stripe Elements -->
               </div>
             </div>
             
@@ -148,7 +131,7 @@
             </div>
           </div>
           
-          <!-- Confirmation step with improved success display -->
+          <!-- Confirmation step -->
           <div v-else-if="step === 'confirmation'" class="py-8 text-center">
             <div class="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-green-100 mb-6">
               <svg class="h-12 w-12 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -169,15 +152,14 @@
                 Close
               </button>
               
-              <!-- Addition: Tax Receipt Info -->
               <p class="text-sm text-gray-500 mt-3">
-                A receipt for your donation will be emailed to you shortly.
+                You can view your donation in your donation history.
               </p>
             </div>
           </div>
         </div>
         
-        <!-- Added a footer with security badges -->
+        <!-- Footer with security badges -->
         <div class="px-8 py-4 bg-gray-50 border-t border-gray-200">
           <div class="flex items-center justify-center space-x-4">
             <div class="flex items-center text-gray-500 text-xs">
@@ -200,9 +182,12 @@
   
   <script>
   import { getStripePromise } from '@/utils/stripeClient';
+  import { createDonationIntent } from '@/services/donation_service';
   
   export default {
+
     name: 'DonationModal',
+
     props: {
       isOpen: {
         type: Boolean,
@@ -233,7 +218,6 @@
     watch: {
       isOpen(val) {
         if (val) {
-          // Reset form when opening
           this.step = 'amount';
           this.selectedAmount = 20;
           this.customAmount = '';
@@ -244,41 +228,27 @@
       }
     },
     methods: {
+
       close() {
         this.$emit('close');
       },
       
       async goToPayment() {
-        if (!this.selectedAmount || this.selectedAmount <= 0) {
-          return;
-        }
-        
+        if (!this.selectedAmount || this.selectedAmount <= 0) return;
+
         try {
-          // Create a donation intent on the server
-          const response = await fetch('http://localhost:8080/api/v1/donations/create-intent', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              shelterId: this.shelterId,
-              amount: this.selectedAmount,
-              message: this.message,
-              isAnonymous: this.isAnonymous,
-              userId: localStorage.getItem('Id') || null
-            }),
-          });
-          
-          if (!response.ok) {
-            throw new Error('Failed to create donation intent');
-          }
-          
-          const { clientSecret } = await response.json();
-          
-          // Move to payment step
+          const donationData = {
+            shelterId: this.shelterId,
+            amount: this.selectedAmount,
+            message: this.message,
+            isAnonymous: this.isAnonymous,
+            userId: localStorage.getItem('Id') || null
+          };
+
+          const { clientSecret } = await createDonationIntent(donationData);
+
           this.step = 'payment';
-          
-          // Initialize Stripe elements in the next tick to ensure the DOM is updated
+
           this.$nextTick(() => {
             this.initializeStripe(clientSecret);
           });
@@ -288,6 +258,7 @@
         }
       },
       
+
       async initializeStripe(clientSecret) {
         try {
           const stripe = await getStripePromise();
@@ -333,16 +304,13 @@
           
           if (error) {
             console.error('Payment error:', error);
-            // alert(`Payment error: ${error.message}`);
             this.isProcessing = false;
             return;
           }
           
-          // If we get here without redirect, payment is successful
           this.step = 'confirmation';
         } catch (error) {
           console.error('Payment processing error:', error);
-        //   alert('An error occurred while processing your payment. Please try again.');
         } finally {
           this.isProcessing = false;
         }

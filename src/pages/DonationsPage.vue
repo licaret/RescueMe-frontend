@@ -487,7 +487,6 @@
           
           const response = await fetch(`http://localhost:8080/api/v1/donations/user/${userId}`);
           if (response.ok) {
-            // Sort donations by date (newest first)
             const data = await response.json();
             donations.value = data.sort((a, b) => 
               new Date(b.donationDate) - new Date(a.donationDate)
@@ -582,6 +581,7 @@
         shelterPaginationStart,
         shelterPaginationEnd,
         shelterPaginationArray,
+        
         formatCurrency,
         formatDate,
         truncate,

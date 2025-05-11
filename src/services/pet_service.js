@@ -1,3 +1,106 @@
+async function addPet(petData, photos, photoIdsToDelete = []) {
+  try {
+    const formData = new FormData();
+    
+    formData.append("petData", JSON.stringify(petData));
+    
+    if (photos && photos.length > 0) {
+      photos.forEach((file) => {
+        formData.append("photos", file);
+      });
+    }
+    
+    if (photoIdsToDelete.length > 0) {
+      formData.append("photoIdsToDelete", JSON.stringify(photoIdsToDelete));
+    }
+    
+    const response = await fetch("http://localhost:8080/pets/add", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Id": localStorage.getItem("Id"),
+      },
+      body: formData,
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to add pet: ${await response.text()}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error("Error adding pet:", error);
+    throw error;
+  }
+}
+
+
+async function deletePet(Id, petId) {
+  try {
+    const response = await fetch(`http://localhost:8080/pets/${Id}/delete/${petId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to delete pet");
+    }
+
+    return true; 
+  } catch (error) {
+    console.error("Error deleting pet:", error);
+    return false; 
+  }
+}
+
+
+async function updatePet(Id, petId, petData, photos, photoIdsToDelete = []) {
+  try {
+    console.log(`Updating pet with ID ${petId} from shelter ID ${Id}...`);
+
+    const formData = new FormData();
+
+    formData.append("petData", JSON.stringify(petData));
+
+    if (photos && photos.length > 0) {
+      photos.forEach((photo) => {
+        formData.append("photos", photo);
+      });
+    }
+
+    if (photoIdsToDelete.length > 0) {
+      formData.append("photoIdsToDelete", JSON.stringify(photoIdsToDelete));
+    }
+
+    const response = await fetch(`http://localhost:8080/pets/update/${petId}`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Id": Id 
+      },
+      body: formData,
+    });
+
+    console.log("Response status:", response.status);
+
+    if (!response.ok) {
+      throw new Error(`Failed to update pet. Status: ${response.status}`);
+    }
+
+    const updatedPet = await response.json();
+    console.log("Updated pet data:", updatedPet);
+
+    return updatedPet; 
+  } catch (error) {
+    console.error("Error updating pet:", error);
+    throw error;
+  }
+}
+
+
 async function fetchAvailablePets() {
   try {
     const response = await fetch(`http://localhost:8080/pets/available`);
@@ -78,71 +181,6 @@ async function getUrgentPetsCount() {
     return 0;
   }
 }
-
-async function deletePet(Id, petId) {
-  try {
-    const response = await fetch(`http://localhost:8080/pets/${Id}/delete/${petId}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to delete pet");
-    }
-
-    return true; 
-  } catch (error) {
-    console.error("Error deleting pet:", error);
-    return false; 
-  }
-}
-
-
-async function updatePet(Id, petId, petData, photos, photoIdsToDelete = []) {
-  try {
-    console.log(`Updating pet with ID ${petId} from shelter ID ${Id}...`);
-
-    const formData = new FormData();
-
-    formData.append("petData", JSON.stringify(petData));
-
-    if (photos && photos.length > 0) {
-      photos.forEach((photo) => {
-        formData.append("photos", photo);
-      });
-    }
-
-    if (photoIdsToDelete.length > 0) {
-      formData.append("photoIdsToDelete", JSON.stringify(photoIdsToDelete));
-    }
-
-    const response = await fetch(`http://localhost:8080/pets/update/${petId}`, {
-      method: "PATCH",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-      body: formData,
-    });
-
-    console.log("Response status:", response.status);
-
-    if (!response.ok) {
-      throw new Error(`Failed to update pet. Status: ${response.status}`);
-    }
-
-    const updatedPet = await response.json();
-    console.log("Updated pet data:", updatedPet);
-
-    return updatedPet; 
-  } catch (error) {
-    console.error("Error updating pet:", error);
-    throw error;
-  }
-}
-
 
 
 const getPetCountByShelter = async (Id) => {
@@ -234,11 +272,9 @@ async function getBreedsBySpecies(species) {
       throw new Error(`Failed to fetch breeds: ${response.status}`);
     }
     
-    // Get the text response and parse it
     const textResponse = await response.text();
     const data = JSON.parse(textResponse);
     
-    // Clean the breed data
     return Array.isArray(data) ? data.map(b => b.trim()) : [];
     
   } catch (error) {
@@ -246,16 +282,51 @@ async function getBreedsBySpecies(species) {
     return [];
   }
 }
+async function getPetPhotoById(photoId) {
+  try {
+    const response = await fetch(`http://localhost:8080/pet-photos/${photoId}`);
+    
+    if (!response.ok) {
+      throw new Error(`Error fetching pet photo: ${response.statusText}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error(`Error fetching pet photo with ID ${photoId}:`, error);
+    throw error;
+  }
+}
+
+async function getPetPhotosFromIds(photoIds) {
+  if (!photoIds || !photoIds.length) {
+    return [];
+  }
+  
+  try {
+    return await Promise.all(
+      photoIds.map(async (id) => {
+        const data = await getPetPhotoById(id);
+        return { url: data.url };
+      })
+    );
+  } catch (error) {
+    console.error('Error fetching multiple pet photos:', error);
+    throw error;
+  }
+}
 
 
 export { 
+  addPet,
+  deletePet, 
+  updatePet, 
   fetchAvailablePets,
   fetchShelterPets, 
   getUrgentPetsCount,
-  deletePet, 
-  updatePet, 
   getPetCountByShelter, 
   fetchShelterPetStats, 
   getPetById,
-  getBreedsBySpecies
+  getBreedsBySpecies,
+  getPetPhotoById,
+  getPetPhotosFromIds
 };

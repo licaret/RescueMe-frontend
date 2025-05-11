@@ -51,7 +51,6 @@
           </div>
         </div>
       </div>
-      
       <div class="mt-12 pt-8 border-t border-gray-800 text-center text-gray-400">
         <p>&copy; 2025 RescueMe. All rights reserved.</p>
       </div>

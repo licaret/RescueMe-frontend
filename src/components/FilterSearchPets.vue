@@ -405,18 +405,6 @@
       };
       
 
-      onMounted(() => {
-        initializeFilters();
-        
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('urgent') === 'true') {
-          filters.urgentAdoptionNeeded = true;
-          showFilters.value = true;
-          updateFilters();
-        }
-      });
-      
-
       const updateFilters = () => {
         emit('update:filters', { ...filters });
       };
@@ -537,7 +525,19 @@
         updateFilters();
         emit('reset-filters');
       };
-  
+      
+
+      onMounted(() => {
+        initializeFilters();
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('urgent') === 'true') {
+          filters.urgentAdoptionNeeded = true;
+          showFilters.value = true;
+          updateFilters();
+        }
+      });
+      
 
       return {
         filters,

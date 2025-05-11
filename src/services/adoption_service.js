@@ -167,6 +167,20 @@ const completeAdoption = async (requestId) => {
 };
 
 
+async function checkExistingRequest(userId, petId) {
+  try {
+    const requests = await getUserAdoptionRequests(userId);
+    return requests.some(request => 
+      request.pet.id === petId && 
+      ['PENDING', 'APPROVED'].includes(request.status)
+    );
+  } catch (error) {
+    console.error('Error checking existing requests:', error);
+    return false;
+  }
+}
+
+
 export { 
   submitAdoptionRequest,
   getUserAdoptionRequests,
@@ -174,5 +188,6 @@ export {
   getAdoptionRequestById,
   updateAdoptionRequestStatus,
   cancelAdoptionRequest,
-  completeAdoption
+  completeAdoption,
+  checkExistingRequest
 };

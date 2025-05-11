@@ -118,7 +118,7 @@
 <script>
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { logout } from "@/services/user_service";
+import { logout, fetchProfilePicture  } from "@/services/user_service";
 import LogoutConfirmationModal from '@/components/LogoutConfirmationModal.vue';
 
 export default {
@@ -146,21 +146,9 @@ export default {
       
       const userId = localStorage.getItem('Id');
       if (userId) {
-        fetchProfilePicture(userId);
+        loadProfilePicture(userId);
       }
     });
-
-    const fetchProfilePicture = async (userId) => {
-      try {
-        const response = await fetch(`http://localhost:8080/users/${userId}/profilePicture`);
-        if (response.ok) {
-          const blob = await response.blob();
-          userProfilePicture.value = URL.createObjectURL(blob);
-        }
-      } catch (error) {
-        console.error('Error loading profile picture:', error);
-      }
-    };
 
     const navigateTo = (path) => {
       router.push(path);
@@ -177,6 +165,17 @@ export default {
 
     const hideLogoutConfirmation = () => {
       logoutConfirmationVisible.value = false;
+    };
+
+    const loadProfilePicture = async (userId) => {
+      try {
+        const profilePicUrl = await fetchProfilePicture(userId);
+        if (profilePicUrl) {
+          userProfilePicture.value = profilePicUrl;
+        }
+      } catch (error) {
+        console.error('Error loading profile picture:', error);
+      }
     };
 
     const confirmLogout = async () => {
