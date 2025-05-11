@@ -384,6 +384,23 @@ async function deleteProfilePicture(userId) {
 }
 
 
+async function getAllShelters() {
+  try {
+    const response = await fetch("http://localhost:8080/users/shelters");
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch shelters: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching shelters:", error);
+    throw error;
+  }
+}
+
+
 const getShelterByPetId = async (petId) => {
   try {
     const response = await fetch(`http://localhost:8080/users/shelter/by-pet/${petId}`, {
@@ -405,6 +422,7 @@ const getShelterByPetId = async (petId) => {
 };
 
 
+
 export { 
   registerAdopter, 
   registerShelter, 
@@ -422,5 +440,6 @@ export {
   resetPassword,
   changePassword,
   uploadShelterDocument,
+  getAllShelters,
   getShelterByPetId
  };

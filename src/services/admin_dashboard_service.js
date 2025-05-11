@@ -135,7 +135,70 @@ const getShelterDetails = async (Id) => {
     }
   };
 
+  
+  async function approveShelter(Id) {
+    try {
+      const response = await fetch(`${API_URL}/shelters/${Id}/approve`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Error approving shelter: ${response.status}`);
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Error approving shelter:', error);
+      throw error;
+    }
+  }
 
+
+  async function rejectShelter(Id) {
+    try {
+      const response = await fetch(`${API_URL}/shelters/${Id}/reject`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Error rejecting shelter: ${response.status}`);
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Error rejecting shelter:', error);
+      throw error;
+    }
+  }
+  
+  async function suspendShelter(Id) {
+    try {
+      const response = await fetch(`${API_URL}/shelters/${Id}/suspend`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Error suspending shelter: ${response.status}`);
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Error suspending shelter:', error);
+      throw error;
+    }
+  }
 
 
 const byteArrayToImageUrl = (byteArray, mimeType = 'image/jpeg') => {
@@ -167,5 +230,8 @@ export {
     getPendingShelters,
     getApprovedShelters,
     getShelterDetails,
-    byteArrayToImageUrl
+    approveShelter,
+    rejectShelter,
+    suspendShelter,
+    byteArrayToImageUrl,
 };

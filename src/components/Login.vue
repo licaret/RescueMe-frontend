@@ -76,21 +76,8 @@
                           <p v-if="passwordError" class="text-sm text-red-600 mt-2">{{ passwordError }}</p>
                         </div>
                         
-                        <!-- Remember me / Forgot password -->
+                        <!-- Forgot password -->
                         <div class="flex items-center justify-between">
-                          <div class="flex items-start">
-                            <div class="flex items-center h-5">
-                              <input 
-                                id="remember" 
-                                aria-describedby="remember" 
-                                type="checkbox" 
-                                class="w-4 h-4 border border-gray-300 rounded-full bg-gray-50 focus:outline-none dark:bg-gray-700 dark:border-gray-600"
-                              >
-                            </div>
-                            <div class="ml-3 text-sm">
-                              <label for="remember" class="text-gray-500 dark:text-gray-300">Remember me</label>
-                            </div>
-                          </div>
                           <a 
                             @click.prevent="navigateToRequestResetPassword" 
                             class="text-sm font-medium text-red-600 hover:text-red-700 transition-colors duration-200 hover:underline dark:text-red-500"
@@ -136,7 +123,6 @@
 <script>
 import {login} from '@/services/user_service.js';
 import {getShelterProfile, checkWelcomeStatus } from "@/services/shelter_profile_service";
-
 
 export default {
 
@@ -205,8 +191,9 @@ export default {
       try {
         const data = await login(this.email, this.password);
 
+        //pt shelter
         if (data.role === "SHELTER") {
-          // aici verific statusul unui shelter
+          //verific statusul unui shelter
           try {
             const profileData = await getShelterProfile(data.id);
             const profileStatus = profileData.status; 

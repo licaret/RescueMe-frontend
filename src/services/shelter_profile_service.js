@@ -220,6 +220,11 @@ function getDocumentUrl(Id, documentType) {
 }
 
 
+function getDocumentViewUrl(Id, documentType) {
+  return `${API_BASE_URL}/shelters/${Id}/documents/${documentType}`;
+}
+
+
 export {
   getShelterProfile,
   checkWelcomeStatus,
@@ -229,5 +234,6 @@ export {
   uploadDocument,
   deleteDocument,
   getDocumentStatus,
-  getDocumentUrl
+  getDocumentUrl,
+  getDocumentViewUrl
 };

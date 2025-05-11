@@ -1,3 +1,30 @@
+async function fetchAvailablePets() {
+  try {
+    const response = await fetch(`http://localhost:8080/pets/available`);
+    
+    if (!response.ok) {
+      console.error("Failed to fetch available pets. Response status:", response.status);
+      throw new Error("Failed to fetch available pets");
+    }
+    
+    const allPets = await response.json();
+    
+    const processedData = allPets.map(pet => ({
+      ...pet,
+      photos: pet.photos ? pet.photos.map(photo => ({
+        id: photo.id,
+        url: photo.url.startsWith("data:image") ? photo.url : `data:image/jpeg;base64,${photo.url}`
+      })) : []
+    }));
+    
+    return processedData;
+  } catch (error) {
+    console.error("Failed to fetch available pets:", error);
+    return [];
+  }
+}
+
+
 async function fetchShelterPets(Id) {
   try {
     console.log(`Fetching pets for shelter ID: ${Id}`);
@@ -33,7 +60,24 @@ async function fetchShelterPets(Id) {
   }
 }
 
-
+async function getUrgentPetsCount() {
+  try {
+    const response = await fetch('http://localhost:8080/pets/available');
+    
+    if (!response.ok) {
+      console.error("Failed to fetch pets for emergency banner");
+      return 0;
+    }
+    
+    const pets = await response.json();
+    const urgentCount = pets.filter(pet => pet.urgentAdoptionNeeded).length;
+    
+    return urgentCount;
+  } catch (error) {
+    console.error("Error fetching urgent pets count:", error);
+    return 0;
+  }
+}
 
 async function deletePet(Id, petId) {
   try {
@@ -175,12 +219,43 @@ async function getPetById(petId) {
   }
 }
 
+async function getBreedsBySpecies(species) {
+  try {
+    if (!species) {
+      return [];
+    }
+    
+    console.log(`Fetching breeds for species: ${species}`);
+    
+    const response = await fetch(`http://localhost:8080/pets/breedsBySpecies?species=${species}`);
+    
+    if (!response.ok) {
+      console.error("Failed to fetch breeds. Response status:", response.status);
+      throw new Error(`Failed to fetch breeds: ${response.status}`);
+    }
+    
+    // Get the text response and parse it
+    const textResponse = await response.text();
+    const data = JSON.parse(textResponse);
+    
+    // Clean the breed data
+    return Array.isArray(data) ? data.map(b => b.trim()) : [];
+    
+  } catch (error) {
+    console.error("Error fetching breeds by species:", error);
+    return [];
+  }
+}
+
 
 export { 
+  fetchAvailablePets,
   fetchShelterPets, 
+  getUrgentPetsCount,
   deletePet, 
   updatePet, 
   getPetCountByShelter, 
   fetchShelterPetStats, 
-  getPetById 
+  getPetById,
+  getBreedsBySpecies
 };

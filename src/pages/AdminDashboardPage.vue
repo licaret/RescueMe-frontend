@@ -1,6 +1,7 @@
 <template>
     <div class="min-h-screen bg-gray-100">
-      <!-- Admin Header -->
+
+      <!-- Header -->
       <header class="bg-white shadow">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="flex justify-between items-center py-6">
@@ -21,6 +22,7 @@
   
       <!-- Main Content -->
       <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
         <!-- Dashboard Stats -->
         <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
           <div class="bg-white overflow-hidden shadow rounded-2xl">
@@ -42,7 +44,7 @@
           <div class="bg-white overflow-hidden shadow rounded-2xl">
             <div class="px-4 py-5 sm:p-6">
               <dl>
-                <dt class="text-sm font-medium text-gray-500 truncate">Total Users</dt>
+                <dt class="text-sm font-medium text-gray-500 truncate">Total Users / Adopters</dt>
                 <dd class="mt-1 text-3xl font-semibold text-gray-900">{{ stats.totalUsers }}</dd>
               </dl>
             </div>
@@ -93,17 +95,6 @@
             >
               User Management
             </button>
-            <button 
-              @click="activeTab = 'reports'" 
-              :class="[
-                activeTab === 'reports' 
-                  ? 'border-red-500 text-red-600' 
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
-                'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm'
-              ]"
-            >
-              Reports
-            </button>
           </nav>
         </div>
         
@@ -131,8 +122,8 @@
           </div>
         </div>
         
-<!-- Pending Shelters Tab -->
-<div v-if="activeTab === 'pending'">
+        <!-- Pending Shelters Tab -->
+        <div v-if="activeTab === 'pending'">
         <div class="bg-white shadow overflow-hidden sm:rounded-2xl">
           <div class="px-4 py-5 border-b border-gray-200 sm:px-6 flex justify-between items-center">
             <div>
@@ -653,340 +644,20 @@
         </div>
       </div>
       
-      <!-- Reports Tab -->
-      <div v-if="activeTab === 'reports'">
-        <div class="bg-white shadow overflow-hidden sm:rounded-2xl">
-          <div class="px-4 py-5 border-b border-gray-200 sm:px-6">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">
-              Reports and Analytics
-            </h3>
-            <p class="mt-1 max-w-2xl text-sm text-gray-500">
-              View platform statistics and generate reports.
-            </p>
-          </div>
-          
-          <!-- Date Range Selector -->
-          <div class="px-4 py-4 sm:px-6 flex flex-col md:flex-row justify-between space-y-4 md:space-y-0">
-            <div class="flex space-x-4">
-              <div>
-                <label for="start-date" class="block text-sm font-medium text-gray-700">Start Date</label>
-                <input 
-                  type="date" 
-                  id="start-date" 
-                  v-model="reportStartDate"
-                  class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm" 
-                />
-              </div>
-              <div>
-                <label for="end-date" class="block text-sm font-medium text-gray-700">End Date</label>
-                <input 
-                  type="date" 
-                  id="end-date" 
-                  v-model="reportEndDate"
-                  class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm" 
-                />
-              </div>
-            </div>
-            <div class="flex items-end">
-              <button 
-                @click="generateReport" 
-                class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-2xl text-white bg-red-600 hover:bg-red-700"
-              >
-                Generate Report
-              </button>
-            </div>
-          </div>
-          
-          <!-- Stats Cards -->
-          <div class="px-4 py-5 sm:p-6">
-            <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="px-4 py-5 sm:p-6">
-                  <dl>
-                    <dt class="text-sm font-medium text-gray-500 truncate">New Users</dt>
-                    <dd class="mt-1 text-3xl font-semibold text-gray-900">{{ reportStats.newUsers }}</dd>
-                    <dd class="mt-1 text-sm text-green-600">+{{ reportStats.userGrowthRate }}% from previous period</dd>
-                  </dl>
-                </div>
-              </div>
-              
-              <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="px-4 py-5 sm:p-6">
-                  <dl>
-                    <dt class="text-sm font-medium text-gray-500 truncate">New Shelters</dt>
-                    <dd class="mt-1 text-3xl font-semibold text-gray-900">{{ reportStats.newShelters }}</dd>
-                    <dd class="mt-1 text-sm text-green-600">+{{ reportStats.shelterGrowthRate }}% from previous period</dd>
-                  </dl>
-                </div>
-              </div>
-              
-              <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="px-4 py-5 sm:p-6">
-                  <dl>
-                    <dt class="text-sm font-medium text-gray-500 truncate">Animals Added</dt>
-                    <dd class="mt-1 text-3xl font-semibold text-gray-900">{{ reportStats.newAnimals }}</dd>
-                    <dd class="mt-1 text-sm text-green-600">+{{ reportStats.animalGrowthRate }}% from previous period</dd>
-                  </dl>
-                </div>
-              </div>
-              
-              <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="px-4 py-5 sm:p-6">
-                  <dl>
-                    <dt class="text-sm font-medium text-gray-500 truncate">Adoptions</dt>
-                    <dd class="mt-1 text-3xl font-semibold text-gray-900">{{ reportStats.adoptions }}</dd>
-                    <dd class="mt-1 text-sm text-green-600">+{{ reportStats.adoptionGrowthRate }}% from previous period</dd>
-                  </dl>
-                </div>
-              </div>
-              
-              <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="px-4 py-5 sm:p-6">
-                  <dl>
-                    <dt class="text-sm font-medium text-gray-500 truncate">Platform Visits</dt>
-                    <dd class="mt-1 text-3xl font-semibold text-gray-900">{{ reportStats.visits }}</dd>
-                    <dd class="mt-1 text-sm text-green-600">+{{ reportStats.visitGrowthRate }}% from previous period</dd>
-                  </dl>
-                </div>
-              </div>
-              
-              <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="px-4 py-5 sm:p-6">
-                  <dl>
-                    <dt class="text-sm font-medium text-gray-500 truncate">Average Session Duration</dt>
-                    <dd class="mt-1 text-3xl font-semibold text-gray-900">{{ reportStats.avgSessionDuration }} min</dd>
-                    <dd class="mt-1 text-sm text-red-600">{{ reportStats.sessionDurationChange }}% from previous period</dd>
-                  </dl>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Charts -->
-          <div class="px-4 py-5 sm:p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="bg-white p-6 rounded-lg shadow">
-              <h3 class="text-lg font-medium text-gray-900 mb-4">User Growth</h3>
-              <div class="h-64">
-                <!-- Insert Chart Component Here -->
-                <div class="w-full h-full flex items-center justify-center text-gray-400">
-                  [User Growth Chart Placeholder]
-                </div>
-              </div>
-            </div>
-            
-            <div class="bg-white p-6 rounded-lg shadow">
-              <h3 class="text-lg font-medium text-gray-900 mb-4">Adoptions by Animal Type</h3>
-              <div class="h-64">
-                <!-- Insert Chart Component Here -->
-                <div class="w-full h-full flex items-center justify-center text-gray-400">
-                  [Adoptions by Animal Type Chart Placeholder]
-                </div>
-              </div>
-            </div>
-            
-            <div class="bg-white p-6 rounded-lg shadow">
-              <h3 class="text-lg font-medium text-gray-900 mb-4">Shelter Distribution by Region</h3>
-              <div class="h-64">
-                <!-- Insert Chart Component Here -->
-                <div class="w-full h-full flex items-center justify-center text-gray-400">
-                  [Shelter Distribution Map Placeholder]
-                </div>
-              </div>
-            </div>
-            
-            <div class="bg-white p-6 rounded-lg shadow">
-              <h3 class="text-lg font-medium text-gray-900 mb-4">Platform Activity</h3>
-              <div class="h-64">
-                <!-- Insert Chart Component Here -->
-                <div class="w-full h-full flex items-center justify-center text-gray-400">
-                  [Platform Activity Chart Placeholder]
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Export Options -->
-          <div class="px-4 py-5 sm:p-6 border-t border-gray-200">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">Export Data</h3>
-            <div class="flex flex-wrap gap-4">
-              <button 
-                @click="exportReport('pdf')" 
-                class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-              >
-                <svg class="mr-2 h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                </svg>
-                Export as PDF
-              </button>
-              <button 
-                @click="exportReport('excel')" 
-                class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-              >
-                <svg class="mr-2 h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                Export as Excel
-              </button>
-              <button 
-                @click="exportReport('csv')" 
-                class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-              >
-                <svg class="mr-2 h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-                Export as CSV
-              </button>
-              <button 
-                @click="scheduleReport" 
-                class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-              >
-                <svg class="mr-2 h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                Schedule Regular Reports
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      
     </main>
     
     <!-- Shelter Details Modal -->
-    <div v-if="showShelterModal" class="fixed z-10 inset-0 overflow-y-auto">
-      <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 transition-opacity" aria-hidden="true" @click="showShelterModal = false">
-          <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
-        </div>
-        
-        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-        
-        <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full">
-          <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-            <div class="sm:flex sm:items-start">
-              <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-              </div>
-              <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                <h3 class="text-lg leading-6 font-medium text-gray-900">
-                  Shelter Details
-                </h3>
-                <div class="mt-2">
-                  <p class="text-sm text-gray-500">
-                    Review details for {{ selectedShelter?.username || 'this shelter' }} before making a decision.
-                  </p>
-                </div>
-              </div>
-            </div>
-            
-            <div v-if="isLoadingShelterDetails" class="flex justify-center items-center py-10">
-              <svg class="animate-spin -ml-1 mr-3 h-8 w-8 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              <span class="text-gray-700">Loading shelter details...</span>
-            </div>
-            
-            <div v-else-if="selectedShelter" class="mt-5 divide-y divide-gray-200">
-              <!-- Basic Info Section -->
-              <div class="py-4">
-                <div class="flex items-center mb-4">
-                  <img :src="selectedShelter.profilePicture || defaultShelterImage" alt="Shelter profile" class="h-20 w-20 rounded-full object-cover mr-4">
-                  <div>
-                    <h4 class="text-lg font-bold text-gray-900">{{ selectedShelter.username }}</h4>
-                    <p class="text-sm text-gray-500">{{ selectedShelter.email }}</p>
-                    <p class="text-sm text-gray-500">{{ selectedShelter.phoneNumber }}</p>
-                  </div>
-                </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                  <div>
-                    <p class="text-sm font-medium text-gray-500">Shelter Type</p>
-                    <p class="mt-1">{{ selectedShelter.shelterType }}</p>
-                  </div>
-                  <div>
-                    <p class="text-sm font-medium text-gray-500">Location</p>
-                    <p class="mt-1">{{ selectedShelter.fullAddress }}, {{ selectedShelter.city }}, {{ selectedShelter.county }}</p>
-                  </div>
-                  <div>
-                    <p class="text-sm font-medium text-gray-500">Year Founded</p>
-                    <p class="mt-1">{{ selectedShelter.yearFounded }}</p>
-                  </div>
-                  <div>
-                    <p class="text-sm font-medium text-gray-500">Hours of Operation</p>
-                    <p class="mt-1">{{ selectedShelter.hoursOfOperation }}</p>
-                  </div>
-                </div>
-              </div>
-              
-              <!-- Mission Section -->
-              <div class="py-4">
-                <h4 class="text-lg font-medium text-gray-900 mb-2">Mission Statement</h4>
-                <p class="text-gray-700 whitespace-normal overflow-auto max-h-60 p-4 bg-gray-50 rounded-md">
-                    {{ selectedShelter.mission }}
-                </p>
-            </div>
-              
-              <!-- Documents Section -->
-            <div class="py-4">
-            <h4 class="text-lg font-medium text-gray-900 mb-2">Verification Documents</h4>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div v-for="(value, key) in selectedShelter.documents" :key="key" class="bg-gray-50 p-3 rounded-md">
-                <div class="flex justify-between items-center">
-                    <div>
-                    <p class="font-medium text-gray-700">{{ getDocumentTypeName(key) }}</p>
-                    <p class="text-sm text-gray-500">
-                        {{ value ? 'Document uploaded' : 'No document' }}
-                    </p>
-                    </div>
-                    <div v-if="value">
-                    <button 
-                        @click="viewShelterDocument(selectedShelter.id, key)" 
-                        class="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                    >
-                        View
-                    </button>
-                    </div>
-                </div>
-                </div>
-            </div>
-            </div>
-
-            </div>
-          </div>
-          <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-            <button 
-              v-if="selectedShelter && selectedShelter.status === 'PENDING_APPROVAL'"
-              @click="approveShelter(selectedShelter.id, true)" 
-              class="w-full inline-flex justify-center rounded-3xl border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm"
-            >
-              Approve
-            </button>
-            <button 
-              v-if="selectedShelter && selectedShelter.status === 'PENDING_APPROVAL'"
-              @click="rejectShelter(selectedShelter.id, true)" 
-              class="w-full inline-flex justify-center rounded-3xl border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
-            >
-              Reject
-            </button>
-            <button 
-              v-if="selectedShelter && selectedShelter.status === 'APPROVED'"
-              @click="suspendShelter(selectedShelter.id, true)" 
-              class="w-full inline-flex justify-center rounded-3xl border border-transparent shadow-sm px-4 py-2 bg-yellow-600 text-base font-medium text-white hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 sm:ml-3 sm:w-auto sm:text-sm"
-            >
-              Suspend
-            </button>
-            <button 
-              @click="showShelterModal = false" 
-              class="mt-3 w-full inline-flex justify-center rounded-3xl border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <ShelterDetailsModal
+      :show="showShelterModal"
+      :shelter="selectedShelter"
+      :isLoading="isLoadingShelterDetails"
+      @close="showShelterModal = false"
+      @approve="approveShelter($event, true)"
+      @reject="rejectShelter($event, true)"
+      @suspend="suspendShelter($event, true)"
+      @view-document="viewShelterDocument"
+    />
     
     <!-- User Details Modal -->
     <div v-if="showUserModal" class="fixed z-10 inset-0 overflow-y-auto">
@@ -1248,45 +919,11 @@
       </div>
     </div>
 
-    <!-- Logout Confirmation Modal -->
-    <div v-if="showLogoutConfirmation" class="fixed inset-0 flex items-center justify-center z-50">
-      <!-- Modal backdrop with blur effect -->
-      <div class="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm" @click="showLogoutConfirmation = false"></div>
-      
-      <!-- Modal content -->
-      <div class="bg-white rounded-2xl shadow-2xl w-96 p-8 z-10 relative transform transition-all duration-300 ease-in-out scale-100">
-        <button @click="showLogoutConfirmation = false" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-        
-        <div class="text-center mb-6">
-          <div class="mx-auto h-16 w-16 flex items-center justify-center rounded-full bg-red-50 mb-6">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
-          </div>
-          <h3 class="text-xl font-semibold text-gray-900">Are you sure you want to logout?</h3>
-          <p class="text-gray-500 mt-3">You will be redirected to the login page.</p>
-        </div>
-        
-        <div class="flex justify-center space-x-4 mt-8">
-          <button 
-            @click="showLogoutConfirmation = false"
-            class="px-5 py-2.5 bg-gray-100 text-gray-700 rounded-3xl font-medium hover:bg-gray-200 transition-colors duration-200 border border-gray-200 shadow-sm"
-          >
-            Cancel
-          </button>
-          <button 
-            @click="performLogout"
-            class="px-5 py-2.5 bg-red-600 text-white rounded-3xl font-medium hover:bg-red-700 transition-colors duration-200 shadow-sm"
-          >
-            Logout
-          </button>
-        </div>
-      </div>
-    </div>
+    <LogoutConfirmationModal
+      :show="showLogoutConfirmation"
+      @close="showLogoutConfirmation = false"
+      @confirm="performLogout"
+    />
 
   </div>
 </template>
@@ -1294,13 +931,31 @@
 <script>
 import { ref, computed, onMounted, watch} from 'vue';
 import { useRouter } from 'vue-router';
-import {getTotalShelterCount, getPendingShelterCount, getTotalUserCount, getTotalAnimalCount, getPendingShelters, getApprovedShelters, getShelterDetails} from '@/services/admin_dashboard_service.js';
-
+import {
+  getTotalShelterCount, 
+  getPendingShelterCount, 
+  getTotalUserCount, 
+  getTotalAnimalCount, 
+  getPendingShelters, 
+  getApprovedShelters, 
+  approveShelter,
+  rejectShelter,
+  suspendShelter,
+  getShelterDetails
+} from '@/services/admin_dashboard_service.js';
+import { getDocumentViewUrl } from '@/services/shelter_profile_service.js';
+import { getPetCountByShelter } from '@/services/pet_service.js';
 import blankProfilePicture from '@/assets/blank_profile_picture.jpg';
+import ShelterDetailsModal from '@/components/ShelterDetailsModal.vue';
+import LogoutConfirmationModal from '@/components/LogoutConfirmationModal.vue';
+
 
 export default {
   name: 'AdminDashboard',
-  
+  components: {
+    ShelterDetailsModal,
+    LogoutConfirmationModal
+  },
   setup() {
     const router = useRouter()
     const activeTab = ref('pending');
@@ -1317,7 +972,6 @@ export default {
     const defaultUserImage = ref(blankProfilePicture);
     const showLogoutConfirmation = ref(false);
     
-    // Dashboard Statistics
     const stats = ref({
       totalShelters: 0,
       pendingApprovals: 0,
@@ -1325,14 +979,12 @@ export default {
       totalAnimals: 0
     });
     
-    // Shelters Data
     const pendingShelters = ref([]);
     const approvedShelters = ref([]);
     const searchQuery = ref('');
     const currentPage = ref(1);
     const itemsPerPage = 10;
     
-    // User Management Data
     const users = ref([]);
     const userSearchQuery = ref('');
     const userRole = ref('');
@@ -1340,7 +992,6 @@ export default {
     const userPage = ref(1);
     const userItemsPerPage = 10;
     
-    // Modal States
     const showShelterModal = ref(false);
     const showUserModal = ref(false);
     const showConfirmationModal = ref(false);
@@ -1348,18 +999,15 @@ export default {
     const selectedUser = ref(null);
     const userNotes = ref('');
 
-    // Pagination for Pending Shelters
     const pendingCurrentPage = ref(1);
     const pendingItemsPerPage = 10; 
     
-    // Confirmation Modal Data
     const confirmationTitle = ref('');
     const confirmationMessage = ref('');
     const confirmationActionType = ref('');
     const confirmationActionText = ref('');
     const confirmationCallback = ref(null);
     
-    // Report Data
     const reportStartDate = ref('');
     const reportEndDate = ref('');
     const reportStats = ref({
@@ -1381,28 +1029,20 @@ export default {
       showLogoutConfirmation.value = true;
     };
     
-    // Perform the actual logout when confirmed
     const performLogout = () => {
-      // Close the confirmation modal
       showLogoutConfirmation.value = false;
-      
-      // In a real implementation, call API to logout
-      // Then redirect to login page
-      localStorage.clear();
       router.push("/");
     };
-
     
     const sortPendingShelters = (ascending = false) => {
       pendingShelters.value.sort((a, b) => {
         const dateA = new Date(a.createdAt);
         const dateB = new Date(b.createdAt);
         return ascending 
-          ? dateA - dateB  // crescător
-          : dateB - dateA; // descrescător
+          ? dateA - dateB  
+          : dateB - dateA; 
       });
     };
-
 
     const formatRelativeTime = (dateString) => {
       const date = new Date(dateString);
@@ -1432,7 +1072,6 @@ export default {
     };
 
     
-
     const filteredApprovedShelters = computed(() => {
       if (!searchQuery.value) return approvedShelters.value;
       
@@ -1446,7 +1085,6 @@ export default {
       );
     });
 
-
     
     const paginatedShelters = computed(() => {
       const start = (currentPage.value - 1) * itemsPerPage;
@@ -1455,7 +1093,6 @@ export default {
     });
 
 
-    // Pagination for Pending Shelters
     const paginatedPendingShelters = computed(() => {
       const start = (pendingCurrentPage.value - 1) * pendingItemsPerPage;
       const end = start + pendingItemsPerPage;
@@ -1463,13 +1100,11 @@ export default {
     });
 
 
-
     const pendingTotalPages = computed(() => {
       return Math.ceil(pendingShelters.value.length / pendingItemsPerPage);
     });
 
 
-    
     const pendingPaginationPages = computed(() => {
       const pages = [];
       const maxPages = 5;
@@ -1489,14 +1124,12 @@ export default {
       return pages;
     });
 
-
     
     const totalPages = computed(() => {
       return Math.ceil(filteredApprovedShelters.value.length / itemsPerPage);
     });
 
 
-    
     const paginationPages = computed(() => {
       const pages = [];
       const maxPages = 5;
@@ -1516,8 +1149,7 @@ export default {
       return pages;
     });
 
-
-    
+  
     const filteredUsers = computed(() => {
       let result = users.value;
       
@@ -1543,7 +1175,6 @@ export default {
     });
 
 
-    
     const paginatedUsers = computed(() => {
       const start = (userPage.value - 1) * userItemsPerPage;
       const end = start + userItemsPerPage;
@@ -1551,13 +1182,11 @@ export default {
     });
 
 
-    
     const userTotalPages = computed(() => {
       return Math.ceil(filteredUsers.value.length / userItemsPerPage);
     });
 
 
-    
     const userPaginationPages = computed(() => {
       const pages = [];
       const maxPages = 5;
@@ -1578,35 +1207,26 @@ export default {
     });
 
 
-    
     const viewShelterDocument = (Id, documentType) => {
-        // Create the document URL
-        const documentUrl = `http://localhost:8080/api/v1/shelters/${Id}/documents/${documentType}`;
-        
-        // Open document in a new tab
-        window.open(documentUrl, '_blank');
+      const documentUrl = getDocumentViewUrl(Id, documentType);
+      window.open(documentUrl, '_blank');
     };
 
 
-
-    // Functions
     const fetchDashboardData = async () => {
         try {
             isLoading.value = true;
             
-            // Obține date reale din API
             const totalShelters = await getTotalShelterCount();
             const pendingApprovals = await getPendingShelterCount();
             const totalUsers = await getTotalUserCount();
             const totalAnimals = await getTotalAnimalCount();
             
-            // Actualizează statisticile cu valorile reale
             stats.value.totalShelters = totalShelters;
             stats.value.pendingApprovals = pendingApprovals;
             stats.value.totalUsers = totalUsers;
             stats.value.totalAnimals = totalAnimals;
             
-            // Fetch actual pending shelters
             const pendingSheltersData = await getPendingShelters();
               pendingShelters.value = pendingSheltersData.map(shelter => ({
               id: shelter.id,
@@ -1626,12 +1246,9 @@ export default {
                 approvedSheltersData.map(async (shelter) => {
                     let animalCount = 0;
                     try {
-                        const response = await fetch(`http://localhost:8080/pets/count/${shelter.id}`);
-                        if (response.ok) {
-                            animalCount = await response.json();
-                        }
+                      animalCount = await getPetCountByShelter(shelter.id);
                     } catch (error) {
-                        console.error(`Failed to fetch animal count for shelter ${shelter.id}:`, error);
+                      console.error(`Failed to fetch animal count for shelter ${shelter.id}:`, error);
                     }
 
                     return {
@@ -1652,8 +1269,7 @@ export default {
                     };
                 })
             );
-            
-            isLoading.value = false;
+          isLoading.value = false;
         } catch (error) {
             console.error('Error fetching dashboard data:', error);
             isLoading.value = false;
@@ -1661,7 +1277,6 @@ export default {
         }
     };
     
-
 
 
     const fetchUsers = async () => {
@@ -1679,14 +1294,12 @@ export default {
       }
     };
 
-
     
     const viewShelterDetails = (Id) => {
         fetchShelterDetails(Id);
     };
 
 
-    
     const viewUserDetails = async (userId) => {
       try {
         showUserModal.value = true;
@@ -1753,76 +1366,48 @@ export default {
     };
 
 
-    
     const performShelterAction = async (Id, action) => {
       try {
-          let response;
+        let responseData;
+        
+        if (action === 'approve') {
+          responseData = await approveShelter(Id);
+        } else if (action === 'reject') {
+          responseData = await rejectShelter(Id);
+        } else if (action === 'suspend') {
+          responseData = await suspendShelter(Id);
+        } else {
+          throw new Error(`Unknown action: ${action}`);
+        }
+        
+        if (showShelterModal.value) {
+          showShelterModal.value = false;
+        }
+        
+        if (showConfirmationModal.value) {
+          showConfirmationModal.value = false;
+        }
+        
+        if (action === 'approve' || action === 'reject') {
+          pendingShelters.value = pendingShelters.value.filter(s => s.id !== Id);
+          stats.value.pendingApprovals = pendingShelters.value.length;
           
           if (action === 'approve') {
-              response = await fetch(`http://localhost:8080/api/v1/admin/shelters/${Id}/approve`, {
-                  method: 'POST',
-                  headers: {
-                      'Content-Type': 'application/json'
-                  },
-                  body: JSON.stringify({})
-              });
-          } else if (action === 'reject') {
-              response = await fetch(`http://localhost:8080/api/v1/admin/shelters/${Id}/reject`, {
-                  method: 'POST',
-                  headers: {
-                      'Content-Type': 'application/json'
-                  },
-                  body: JSON.stringify({})
-              });
-          } else if (action === 'suspend') {
-              response = await fetch(`http://localhost:8080/api/v1/admin/shelters/${Id}/suspend`, {
-                  method: 'POST',
-                  headers: {
-                      'Content-Type': 'application/json'
-                  },
-                  body: JSON.stringify({})
-              });
+            successMessage.value = 'Shelter has been approved successfully.';
+            fetchDashboardData();
+          } else {
+            successMessage.value = 'Shelter application has been rejected.';
           }
-          
-          if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          
-          const responseData = await response.json();
-          
-          // Close modals
-          if (showShelterModal.value) {
-              showShelterModal.value = false;
-          }
-          
-          if (showConfirmationModal.value) {
-              showConfirmationModal.value = false;
-          }
-          
-          // Update local data and UI
-          if (action === 'approve' || action === 'reject') {
-              pendingShelters.value = pendingShelters.value.filter(s => s.id !== Id);
-              stats.value.pendingApprovals = pendingShelters.value.length;
-              
-              if (action === 'approve') {
-                  successMessage.value = 'Shelter has been approved successfully.';
-                  
-                  // Refresh the dashboard data to show the newly approved shelter
-                  fetchDashboardData();
-              } else {
-                  successMessage.value = 'Shelter application has been rejected.';
-              }
-          } else if (action === 'suspend') {
-              successMessage.value = 'Shelter has been suspended successfully.';
-          }
-          
-          isSubmitted.value = true;
+        } else if (action === 'suspend') {
+          successMessage.value = 'Shelter has been suspended successfully.';
+        }
+        
+        isSubmitted.value = true;
       } catch (error) {
-          console.error(`Error ${action}ing shelter:`, error);
-          showToastMessage(`Failed to ${action} shelter. Please try again.`);
+        console.error(`Error ${action}ing shelter:`, error);
+        showToastMessage(`Failed to ${action} shelter. Please try again.`);
       }
-  };
-
+    };
 
     
     const suspendUser = (userId, fromModal = false) => {
@@ -1838,7 +1423,6 @@ export default {
       confirmationCallback.value = () => performUserAction(userId, 'suspend');
       showConfirmationModal.value = true;
     };
-    
 
 
     const activateUser = (userId, fromModal = false) => {
@@ -1855,7 +1439,6 @@ export default {
       showConfirmationModal.value = true;
     };
 
-
     
     const deleteUser = (userId, fromModal = false) => {
       if (fromModal) {
@@ -1871,7 +1454,6 @@ export default {
       showConfirmationModal.value = true;
     };
 
-
     
     const performUserAction = async (userId, action) => {
       try {
@@ -1885,7 +1467,6 @@ export default {
           showConfirmationModal.value = false;
         }
         
-        // Update local data based on action
         if (action === 'suspend') {
           const userIndex = users.value.findIndex(user => user.id === userId);
           if (userIndex !== -1) {
@@ -1911,11 +1492,9 @@ export default {
       }
     };
 
-
     
     const saveUserNotes = async () => {
       try {
-        // In a real implementation, call API to save notes
         await mockSaveUserNotes(selectedUser.value.id, userNotes.value);
         
         showToastMessage('User notes saved successfully.');
@@ -1926,49 +1505,6 @@ export default {
     };
     
 
-
-    const generateReport = async () => {
-      try {
-        // Validate dates
-        if (!reportStartDate.value || !reportEndDate.value) {
-          showToastMessage('Please select both start and end dates.');
-          return;
-        }
-        
-        const start = new Date(reportStartDate.value);
-        const end = new Date(reportEndDate.value);
-        
-        if (start > end) {
-          showToastMessage('Start date must be before end date.');
-          return;
-        }
-        
-        const reportData = await mockGenerateReport(reportStartDate.value, reportEndDate.value);
-        reportStats.value = reportData;
-        
-        showToastMessage('Report generated successfully.');
-      } catch (error) {
-        console.error('Error generating report:', error);
-        showToastMessage('Failed to generate report. Please try again.');
-      }
-    };
-
-
-    
-    const exportReport = (format) => {
-      // In a real implementation, call API to export data
-      showToastMessage(`Report exported in ${format.toUpperCase()} format.`);
-    };
-    
-
-
-    const scheduleReport = () => {
-      // This would show a form or modal for scheduling reports
-      showToastMessage('Report scheduling feature is not implemented in this demo.');
-    };
-    
-
-
     const confirmAction = () => {
       if (confirmationCallback.value) {
         confirmationCallback.value();
@@ -1977,7 +1513,6 @@ export default {
     };
 
 
-    
     const showToastMessage = (message) => {
       toastMessage.value = message;
       showToast.value = true;
@@ -1985,7 +1520,6 @@ export default {
         showToast.value = false;
       }, 3000);
     };
-
 
     
     const formatDate = (dateString) => {
@@ -1998,8 +1532,6 @@ export default {
         day: 'numeric'
       });
     };
-
-
     
     const getDocumentTypeName = (documentType) => {
       const names = {
@@ -2012,73 +1544,22 @@ export default {
       return names[documentType] || documentType;
     };
 
-
-    
-    const getDocumentUrl = (Id, documentType) => {
-        // Generate the actual API URL for the document
-        return `/api/v1/shelters/${Id}/documents/${documentType}`;
-    };
-
-
     
     const logout = () => {
-      // In a real implementation, call API to logout
-      // Then redirect to login page
       localStorage.clear();
       router.push("/");
     };
 
 
-    
-    // Reset pagination when filters change
-    watch(searchQuery, () => {
-      currentPage.value = 1;
-    });
-
-
-    
-    watch([userSearchQuery, userRole, userStatus], () => {
-      userPage.value = 1;
-    });
-    
-
-
-    // Watch tab changes to load data when needed
-    watch(activeTab, (newTab) => {
-      if (newTab === 'users' && users.value.length === 0) {
-        fetchUsers();
-      }
-    });
-    
-
-
-    // Initialize data on mount
-    onMounted(() => {
-      fetchDashboardData();
-      
-      // Set default dates for report
-      const today = new Date();
-      const lastMonth = new Date(today);
-      lastMonth.setMonth(lastMonth.getMonth() - 1);
-      
-      reportEndDate.value = today.toISOString().split('T')[0];
-      reportStartDate.value = lastMonth.toISOString().split('T')[0];
-    });
-    
-
-
-    // Function to format long text with line breaks
     const formatLongText = (text, charsPerLine = 10) => {
         if (!text || text.length <= charsPerLine) {
             return text;
         }
         
-        // Split the text into words
         const words = text.split(' ');
         let formattedText = '';
         let currentLine = '';
         
-        // Build the text with line breaks
         words.forEach(word => {
             if ((currentLine + word).length > charsPerLine) {
             formattedText += currentLine.trim() + '\n';
@@ -2088,7 +1569,6 @@ export default {
             }
         });
         
-        // Add the last line
         if (currentLine.trim()) {
             formattedText += currentLine.trim();
         }
@@ -2098,33 +1578,26 @@ export default {
     
 
 
-    // In the fetchShelterDetails function, add this code:
     const fetchShelterDetails = async (Id) => {
       try {
           showShelterModal.value = true;
           isLoadingShelterDetails.value = true;
-          
-          // Check in both pending and approved shelters lists
+        
           const existingPendingShelter = pendingShelters.value.find(s => s.id === Id);
           const existingApprovedShelter = approvedShelters.value.find(s => s.id === Id);
           
-          // Prioritize checking approved shelters if not found in pending
           const existingShelter = existingPendingShelter || existingApprovedShelter;
           
-          // If it exists and already has a correctly processed profile image, use it
           if (existingShelter && existingShelter.profilePicture) {
               console.log("Using image from existing shelters list");
               
-              // Get the rest of the data from the API
               const shelterData = await getShelterDetails(Id);
               
-              // Format the mission text
               const formattedMission = formatLongText(
                   shelterData.mission ? shelterData.mission.trim() : '', 
-                  80 // Characters per line - adjust as needed
+                  80 
               );
               
-              // But use the already processed image
               selectedShelter.value = {
                   ...shelterData,
                   profilePicture: existingShelter.profilePicture,
@@ -2135,10 +1608,8 @@ export default {
               return;
           }
           
-          // If it doesn't exist in either list, continue with full processing
           const shelterData = await getShelterDetails(Id);
           
-          // Process the image in the same way it's processed in the initial list
           let profilePictureUrl = null;
           if (shelterData.profilePicture) {
               if (typeof shelterData.profilePicture === 'string') {
@@ -2155,10 +1626,9 @@ export default {
               }
           }
           
-          // Format the mission text
           const formattedMission = formatLongText(
               shelterData.mission ? shelterData.mission.trim() : '', 
-              40 // Characters per line - adjust as needed
+              40 
           );
           
           selectedShelter.value = {
@@ -2231,11 +1701,9 @@ export default {
     };
     
 
-
     const mockPerformUserAction = (userId, action) => {
       return new Promise((resolve) => {
         setTimeout(() => {
-          // Find the user
           const user = users.value.find(u => u.id === userId);
           
           if (user) {
@@ -2247,16 +1715,13 @@ export default {
       });
     };
 
-
     
     const mockSaveUserNotes = (userId, notes) => {
       return new Promise((resolve) => {
         setTimeout(() => {
-          // Find the user
           const userIndex = users.value.findIndex(u => u.id === userId);
           
           if (userIndex !== -1) {
-            // In a real app, this would update the database
             resolve(true);
           } else {
             throw new Error('User not found');
@@ -2265,33 +1730,35 @@ export default {
       });
     };
     
+    watch(searchQuery, () => {
+      currentPage.value = 1;
+    });
 
 
-    const mockGenerateReport = (startDate, endDate) => {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({
-            newUsers: Math.floor(Math.random() * 100) + 20,
-            userGrowthRate: Math.floor(Math.random() * 30) + 5,
-            newShelters: Math.floor(Math.random() * 10) + 2,
-            shelterGrowthRate: Math.floor(Math.random() * 20) + 10,
-            newAnimals: Math.floor(Math.random() * 200) + 50,
-            animalGrowthRate: Math.floor(Math.random() * 25) + 8,
-            adoptions: Math.floor(Math.random() * 80) + 10,
-            adoptionGrowthRate: Math.floor(Math.random() * 35) + 5,
-            visits: Math.floor(Math.random() * 5000) + 1000,
-            visitGrowthRate: Math.floor(Math.random() * 15) + 3,
-            avgSessionDuration: Math.floor(Math.random() * 10) + 3,
-            sessionDurationChange: Math.floor(Math.random() * 10) - 5
-          });
-        }, 1000);
-      });
-    };
-
+    watch([userSearchQuery, userRole, userStatus], () => {
+      userPage.value = 1;
+    });
     
+
+    watch(activeTab, (newTab) => {
+      if (newTab === 'users' && users.value.length === 0) {
+        fetchUsers();
+      }
+    });
+    
+
+    onMounted(() => {
+      fetchDashboardData();
+      
+      const today = new Date();
+      const lastMonth = new Date(today);
+      lastMonth.setMonth(lastMonth.getMonth() - 1);
+      
+      reportEndDate.value = today.toISOString().split('T')[0];
+      reportStartDate.value = lastMonth.toISOString().split('T')[0];
+    });
     
     return {
-      // Data and State
       activeTab,
       isLoading,
       isLoadingUsers,
@@ -2330,7 +1797,6 @@ export default {
       defaultShelterImage,
       defaultUserImage,
       
-      // Computed Properties
       filteredApprovedShelters,
       paginatedShelters,
       totalPages,
@@ -2340,7 +1806,6 @@ export default {
       userTotalPages,
       userPaginationPages,
 
-      // Methods
       sortPendingShelters,
       formatRelativeTime,
       viewShelterDetails,
@@ -2352,18 +1817,15 @@ export default {
       activateUser,
       deleteUser,
       saveUserNotes,
-      generateReport,
-      exportReport,
-      scheduleReport,
       confirmAction,
       formatDate,
       getDocumentTypeName,
-      getDocumentUrl,
       viewShelterDocument,
       logout,
-      showLogoutConfirmation,
       confirmLogout,
       performLogout,
+
+      showLogoutConfirmation,
       pendingCurrentPage,
       pendingItemsPerPage,
       paginatedPendingShelters,

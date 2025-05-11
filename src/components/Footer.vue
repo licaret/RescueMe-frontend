@@ -2,6 +2,7 @@
   <footer class="text-black py-12" style="background-color: #f5f5f5;">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        
         <!-- About -->
         <div>
           <h3 class="text-xl  mb-4">About Us</h3>
@@ -16,7 +17,6 @@
           <ul class="space-y-2">
             <li><router-link to="/about-us" class="text-gray-400 hover:text-black transition-colors">About us</router-link></li>
             <li><router-link to="/contact" class="text-gray-400 hover:text-black transition-colors">Contact us</router-link></li>
-            <!-- <li><router-link to="/volunteer" class="text-gray-400 hover:text-black transition-colors">Volunteer</router-link></li> -->
           </ul>
         </div>
         
@@ -24,8 +24,6 @@
         <div>
           <h3 class="text-xl  mb-4">Contact</h3>
           <ul class="space-y-2 text-gray-400">
-            <!-- <li>Str. Romanilor, Nr. 1A</li>
-            <li>Timisoara, Romania</li> -->
             <li>rescueme.care@gmail.com</li>
             <li>+40 743 060 122</li>
           </ul>

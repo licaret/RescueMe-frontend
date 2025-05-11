@@ -6,7 +6,7 @@
         
         <!-- Modal content -->
         <div class="relative w-full max-w-3xl mx-auto my-6 z-50">
-          <div class="relative flex flex-col w-full bg-white border-0 rounded-lg shadow-lg outline-none focus:outline-none dark:bg-gray-800">
+          <div class="relative flex flex-col w-full bg-white border-0 rounded-2xl shadow-lg outline-none focus:outline-none dark:bg-gray-800">
             <!-- Header -->
             <div class="flex items-start justify-between p-5 border-b border-gray-200 rounded-t dark:border-gray-700">
               <h3 class="text-2xl font-bold text-gray-900 dark:text-white">
@@ -109,7 +109,7 @@
             <!-- Footer -->
             <div class="flex items-center justify-end p-6 border-t border-gray-200 rounded-b dark:border-gray-700">
               <button
-                class="px-6 py-2 text-white bg-red-600 rounded hover:bg-red-700 focus:outline-none"
+                class="px-6 py-2 text-white bg-red-600 rounded-3xl hover:bg-red-700 focus:outline-none"
                 @click="$emit('update:modelValue', false)"
               >
                 Close

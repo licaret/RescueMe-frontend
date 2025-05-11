@@ -152,7 +152,7 @@
                 <p v-if="passwordError" class="text-sm text-red-600 mt-2">{{ passwordError }}</p>
               </div>
               
-              <!-- Phone numbe -->
+              <!-- Phone number -->
               <div>
                 <label for="phone-number" class="block mb-2 text-sm font-medium text-gray-700 dark:text-white">Phone Number</label>
                 <div class="relative">
