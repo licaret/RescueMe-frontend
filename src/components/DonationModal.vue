@@ -271,6 +271,7 @@
                 colorPrimary: '#ef4444',
               },
             },
+            locale: 'en'
           };
           
           this.stripeElements = stripe.elements(options);

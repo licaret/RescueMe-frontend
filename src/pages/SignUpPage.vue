@@ -1,24 +1,27 @@
+<template>
+  <div class="signup-page">
+    <IntroNavbar />
+    <div class="pt-16"> 
+      <SignUp />
+    </div>
+  </div>
+</template>
+
 <script>
 import IntroNavbar from "@/components/IntroNavbar.vue";
-
 import SignUp from "@/components/SignUp.vue";
-import IntroFooter from "@/components/IntroFooter.vue";
 
 export default {
   name: "SignUpPage",
   components: {
     IntroNavbar,
     SignUp,
-    // IntroFooter,
   },
 };
 </script>
 
-<template>
-  <div class="signup-page">
-    <IntroNavbar />
-    <SignUp />
-    <!-- <IntroFooter /> -->
-  </div>
-</template>
-
+<style>
+.signup-page {
+  min-height: 100vh;
+}
+</style>

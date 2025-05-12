@@ -1,10 +1,11 @@
 <template>
   <div class="login-page">
     <IntroNavbar />
-    <Login />
+    <div class="pt-32 sm:pt-40"> 
+      <Login />
+    </div>
   </div>
 </template>
-
 
 <script>
 import IntroNavbar from "@/components/IntroNavbar.vue";
@@ -19,4 +20,8 @@ export default {
 };
 </script>
 
-
+<style>
+.login-page {
+  min-height: 100vh;
+}
+</style>

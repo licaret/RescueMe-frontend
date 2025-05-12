@@ -119,15 +119,17 @@
       <div v-else class="flex justify-end relative">
         <div class="relative inline-block text-left">
           <button 
-            @click="toggleDropdown" 
+            @click="isLoggedIn ? toggleDropdown() : null" 
             :class="[
               'inline-flex justify-center items-center px-3 py-1.5 text-sm font-medium border rounded-2xl shadow-sm transition',
+              !isLoggedIn ? 'opacity-50 cursor-not-allowed bg-gray-100 text-gray-400 border-gray-300' :
               userAttendanceStatus === 'GOING' 
                 ? 'bg-green-50 text-green-700 border-green-300 hover:bg-green-100'
                 : userAttendanceStatus === 'INTERESTED' 
                   ? 'bg-red-50 text-red-700 border-red-300 hover:bg-red-100'
                   : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
             ]"
+            :title="isLoggedIn ? '' : 'Please login to set attendance'"
           >
             {{ userAttendanceStatus ? formatStatusLabel(userAttendanceStatus) : 'Attendance' }}
             <svg 
@@ -135,7 +137,7 @@
               :class="{
                 'text-green-500': userAttendanceStatus === 'GOING',
                 'text-red-500': userAttendanceStatus === 'INTERESTED',
-                'text-gray-500': !userAttendanceStatus
+                'text-gray-500': !userAttendanceStatus || !isLoggedIn
               }"
               viewBox="0 0 20 20" fill="currentColor"
             >
@@ -264,8 +266,8 @@ export default defineComponent({
 
     const userAttendanceStatus = ref(props.event.userAttendanceStatus || null);
     
-
     const toggleDropdown = () => {
+      if (!isLoggedIn.value) return;
       dropdownOpen.value = !dropdownOpen.value;
     };
 
@@ -277,6 +279,9 @@ export default defineComponent({
       }
     };
 
+    const isLoggedIn = computed(() => {
+      return !!localStorage.getItem('Id');
+    });
     
     const isShelter = computed(() => {
       return localStorage.getItem('Role') === 'SHELTER';
@@ -467,6 +472,7 @@ export default defineComponent({
       handleAttendanceUpdated,
       handleAttendanceRemoved,
 
+      isLoggedIn,
       detailsModalOpen,
       showAdminElements,
       deleteConfirmModalOpen,
