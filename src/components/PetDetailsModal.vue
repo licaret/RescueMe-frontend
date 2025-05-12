@@ -301,6 +301,7 @@ import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 
 export default {
   name: 'PetDetailsModal',
+
   props: {
     pet: {
       type: Object,
@@ -315,7 +316,9 @@ export default {
       default: false
     }
   },
+
   emits: ['close', 'edit', 'delete', 'toggleFavorite', 'adopt'],
+
   setup(props, { emit }) {
     const currentIndex = ref(0);
     
@@ -324,45 +327,51 @@ export default {
       return userRole === 'SHELTER';
     });
     
-    // Reset image index when pet changes
+
     watch(() => props.pet, () => {
       currentIndex.value = 0;
     });
     
-    // Disable body scrolling when modal is open
+
     onMounted(() => {
       document.body.style.overflow = 'hidden';
     });
     
-    // Re-enable body scrolling when modal is closed
+
     onUnmounted(() => {
       document.body.style.overflow = '';
     });
     
+
     const close = () => {
       emit('close');
     };
     
+
     const handleBackdropClick = (event) => {
       if (event.target === event.currentTarget) {
         close();
       }
     };
+
     
     const prevImage = () => {
       if (!props.pet.photos || props.pet.photos.length <= 1) return;
       currentIndex.value = (currentIndex.value - 1 + props.pet.photos.length) % props.pet.photos.length;
     };
+
     
     const nextImage = () => {
       if (!props.pet.photos || props.pet.photos.length <= 1) return;
       currentIndex.value = (currentIndex.value + 1) % props.pet.photos.length;
     };
     
+
     const goToImage = (index) => {
       currentIndex.value = index;
     };
     
+
     const formatAge = (age) => {
       if (!age && age !== 0) return 'Unknown';
       
@@ -374,6 +383,7 @@ export default {
       }
     };
     
+
     const formatShelterTime = (time) => {
       if (!time) return 'New arrival';
       
@@ -386,9 +396,11 @@ export default {
       }
     };
     
+    
     return {
       currentIndex,
       isShelter,
+
       close,
       handleBackdropClick,
       prevImage,

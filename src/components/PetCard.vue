@@ -173,7 +173,7 @@
     />
   </Teleport>
 
-  <!-- Confirmation Modal -->
+  <!-- Delete Pet Confirmation Modal -->
   <Teleport to="body" v-if="showModal">
     <div class="fixed inset-0 z-[10000] bg-black/30 backdrop-blur-sm flex items-center justify-center p-4">
       <div class="bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:max-w-lg w-full">
@@ -210,7 +210,6 @@
     </div>
   </Teleport>
 
-
   <!-- Edit Form Modal -->
   <Teleport to="body" v-if="showEditForm">
     <div class="fixed inset-0 z-[10001] bg-black/10 backdrop-blur-sm flex items-center justify-center p-4">
@@ -236,10 +235,12 @@ import PetDetailsModal from './PetDetailsModal.vue';
 
 export default {
   name: "PetCard",
+
   components: {
     AddEditPetForm,
     PetDetailsModal
   },
+
   props: {
     pet: {
       type: Object,
@@ -274,19 +275,16 @@ export default {
     });
 
 
-    // Reset current index when pet changes
     watch(() => props.pet, () => {
       currentIndex.value = 0;
     });
 
 
-    // Watch the favorited prop for external changes
     watch(() => props.favorited, (newValue) => {
       isFavorite.value = newValue;
     });
 
 
-    // Check if pet is in user's favorites when component is mounted
     onMounted(async () => {
       if (!isShelter.value && !props.favorited) {
         const userId = localStorage.getItem('Id');
@@ -323,7 +321,6 @@ export default {
     };
 
 
-
     const toggleFavorite = async (event) => {
       if (event) event.stopPropagation();
       
@@ -350,7 +347,6 @@ export default {
         console.error("Error toggling favorite:", error);
       }
     };
-
 
 
     const adoptPet = (event) => {
@@ -440,7 +436,6 @@ export default {
     };
 
 
-    // Clean up when component is unmounted
     onMounted(() => {
       return () => {
         if (isExpanded.value) {
@@ -448,8 +443,8 @@ export default {
         }
       };
     });
+  
 
-    // Check if user has existing request for this pet
     onMounted(async () => {
       if (!isShelter.value) {
         const userId = localStorage.getItem('Id');
@@ -465,25 +460,26 @@ export default {
 
     return {
       currentIndex,
+      showModal,
+      showEditForm,
+      isShelter,
+      isFavorite,
+      isExpanded,
+      modalMounted,
+      hasExistingRequest,
+
       prevImage,
       nextImage,
       goToImage,
-      showModal,
-      showEditForm,
       openEditForm,
       updatePet,
       toggleFavorite,
       adoptPet,
-      isShelter,
-      isFavorite,
       formatAge,
       formatShelterTime,
-      isExpanded,
       toggleExpandedView,
       handleBackdropClick,
-      showDeleteModal,
-      modalMounted,
-      hasExistingRequest,
+      showDeleteModal
     };
   },
 

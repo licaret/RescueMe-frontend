@@ -7,25 +7,5 @@ import { RouterLink, RouterView } from 'vue-router'
 </template>
 
 <style>
-body {
-  /* margin: 0; */
-  /* font-family: 'Inter', sans-serif; */
-  /* background-color: white; */
-}
-
-/* html, body {
-  margin: 0;
-  padding: 0; 
-  overflow-x: hidden;
-  height: 100%;
-  width: 100%;
-}
-
-#app {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-} */
-
-
+  body {}
 </style>

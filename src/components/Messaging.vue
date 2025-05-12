@@ -10,15 +10,6 @@
       <!-- Sidebar header -->
       <div class="p-4 border-b border-gray-200 flex justify-between items-center bg-white shadow-sm">
         <h2 class="text-xl font-semibold text-gray-800">Messages</h2>
-        <button 
-          v-if="isMobileView"
-          @click="showSidebar = false"
-          class="md:hidden text-gray-500 hover:text-gray-700"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
       </div>
       
       <!-- Search conversations -->
@@ -49,7 +40,6 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8s-9-3.582-9-8 4.03-8 9-8 9 3.582 9 8z" />
           </svg>
           <p>No conversations yet</p>
-          <!-- <p class="text-sm mt-1">Start by messaging a shelter</p> -->
         </div>
         
         <div v-else>
@@ -108,36 +98,10 @@
       </div>
     </div>
     
-    <!-- Chat area - takes full height of the screen -->
+    <!-- Chat area -->
     <div class="flex-1 flex flex-col bg-white ">
-      <!-- Mobile toggle button for sidebar -->
-      <!-- <div 
-        v-if="isMobileView && !showSidebar && selectedConversation" 
-        class="md:hidden p-2 bg-gray-50 border-b border-gray-200"
-      >
-        <button 
-          @click="showSidebar = true"
-          class="flex items-center text-gray-600 hover:text-gray-800"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
-          All conversations
-        </button>
-      </div> -->
-      
       <!-- Header -->
-      <div v-if="selectedConversation" class="p-4 border-b border-gray-200 flex items-center bg-white shadow-sm">
-        <button 
-          v-if="isMobileView && !showSidebar"
-          @click="showSidebar = true"
-          class="md:hidden mr-3 text-gray-500"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
-        </button>
-        
+      <div v-if="selectedConversation" class="p-4 border-b border-gray-200 flex items-center bg-white shadow-sm">        
         <div class="h-10 w-10 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
           <img 
             v-if="selectedConversation.participantProfilePicture" 
@@ -172,7 +136,7 @@
         </p>
       </div>
       
-      <!-- Chat messages - takes all available space, only scrolls within message area -->
+      <!-- Chat messages -->
       <div 
         v-else
         ref="messagesContainer"
@@ -230,7 +194,7 @@
               
               <!-- Attachments -->
               <div v-if="message.attachments && message.attachments.length > 0" class="mt-2 space-y-2">
-                <!-- Images - clickable for full-screen view -->
+                <!-- Images -->
                 <div v-for="attachment in message.attachments.filter(a => a.contentType && a.contentType.startsWith('image/'))" 
                      :key="attachment.id" 
                      class="relative">
@@ -356,13 +320,13 @@
       </div>
     </div>
     
-    <!-- Image preview modal with consistent dimensions -->
+    <!-- Image preview modal -->
     <div v-if="previewAttachment && previewAttachment.contentType && previewAttachment.contentType.startsWith('image/')" 
         class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90" 
         @click="previewAttachment = null">
       <div class="max-w-6xl max-h-full p-4" @click.stop>
         <div class="bg-white rounded-2xl overflow-hidden shadow-2xl">
-          <!-- Image preview container with fixed height and width -->
+          <!-- Image preview container -->
           <div class="relative flex items-center justify-center" style="height: 70vh;">
             <img :src="getAttachmentDownloadUrl(previewAttachment.id)" 
               class="h-full w-full object-contain" 
@@ -422,6 +386,7 @@ import {
 
 export default {
   name: 'Messaging',
+
   props: {
     initialRecipientId: {
       type: [Number, String],
@@ -432,10 +397,10 @@ export default {
       default: null
     }
   },
+
   setup(props) {
     const route = useRoute();
     
-    // State
     const currentUserId = ref(null);
     const conversations = ref([]);
     const messages = ref([]);
@@ -454,62 +419,52 @@ export default {
     const selectedFiles = ref([]);
     const previewAttachment = ref(null);
 
+
     const initialRecipient = ref({
       id: props.initialRecipientId,
       username: props.initialRecipientUsername
     });
     
-    // Get current user from localStorage
+
     const initUser = () => {
       const userId = localStorage.getItem('Id');
       if (userId) {
         currentUserId.value = parseInt(userId);
       } else {
-        // Redirect to login if not logged in
         window.location.href = '/login';
       }
     };
     
-    // Handle window resize for responsive layout
-    const handleResize = () => {
-      isMobileView.value = window.innerWidth < 768;
-      if (!isMobileView.value) {
-        showSidebar.value = true;
-      }
-    };
     
-    // Set up WebSocket connection and listeners
     const setupChatConnection = () => {
-  if (!currentUserId.value) return;
-  
-  console.log("Setting up chat connection for user:", currentUserId.value);
-  
-  return new Promise((resolve) => {
-    connectToChat(
-      currentUserId.value,
-      async () => {
-        console.log('✅ Chat WebSocket connected successfully');
-        
-        messageCallback.value = onMessageReceived(handleNewMessage);
-        readReceiptCallback.value = onReadReceipt(handleReadReceipt);
-        
-        await fetchConversations();  // Așteaptă să se încarce conversațiile
-        resolve(); // Rezolvăm promisiunea când conexiunea este stabilită
-      },
-      (err) => {
-        console.error('❌ WebSocket error', err);
-        resolve(); // Rezolvăm promisiunea chiar și în caz de eroare
-      }
-    );
-  });
-};
+      if (!currentUserId.value) return;
+      
+      console.log("Setting up chat connection for user:", currentUserId.value);
+      
+      return new Promise((resolve) => {
+        connectToChat(
+          currentUserId.value,
+          async () => {
+            console.log('Chat WebSocket connected successfully');
+            
+            messageCallback.value = onMessageReceived(handleNewMessage);
+            readReceiptCallback.value = onReadReceipt(handleReadReceipt);
+            
+            await fetchConversations();
+            resolve(); 
+          },
+          (err) => {
+            console.error('WebSocket error', err);
+            resolve(); 
+          }
+        );
+      });
+    };
 
     
-    // Cleanup WebSocket connection and listeners
     const cleanupChatConnection = () => {
       console.log("Cleaning up chat connection");
       
-      // Remove callbacks
       if (messageCallback.value) {
         messageCallback.value();
         messageCallback.value = null;
@@ -521,11 +476,9 @@ export default {
       }
     };
     
+
     onMounted(() => {
       initUser();
-      window.addEventListener('resize', handleResize);
-      
-      // Adăugăm event listener pentru actualizarea conversațiilor
       window.addEventListener('refresh-conversations', handleRefreshConversations);
       
       setupChatConnection().then(() => {
@@ -535,21 +488,20 @@ export default {
       });
     });
 
-    // Funcția pentru actualizarea conversațiilor
+
     const handleRefreshConversations = () => {
-      console.log("🔄 Refresh conversations event received");
+      console.log("Refresh conversations event received");
       fetchConversations();
     };
     
-    // Clean up on unmount
+    
     onBeforeUnmount(() => {
-      window.removeEventListener('resize', handleResize);
       window.removeEventListener('refresh-conversations', handleRefreshConversations);
       cleanupChatConnection();
       disconnectFromChat();
     });
     
-    // Watch for changes in selected conversation
+
     watch(selectedConversationId, (newId) => {
       if (newId) {
         const conversation = conversations.value.find(c => c.conversationId === newId);
@@ -561,7 +513,7 @@ export default {
       }
     });
     
-    // Watch for route query parameter changes
+
     watch(() => route.query.shelterId, (newShelterId) => {
       if (newShelterId && currentUserId.value) {
         initialRecipient.value.id = newShelterId;
@@ -570,7 +522,7 @@ export default {
       }
     });
 
-    // Save selected conversation on change
+
     watch(selectedConversationId, (newId) => {
       if (newId) {
         localStorage.setItem('lastConversationId', newId);
@@ -583,7 +535,7 @@ export default {
       }
     });
 
-    // Filter conversations based on search
+
     const filteredConversations = computed(() => {
       if (!searchQuery.value) return conversations.value;
       
@@ -593,20 +545,19 @@ export default {
         conv.lastMessage.toLowerCase().includes(query)
       );
     });
+
     
-    // Check if can send message (text or files)
     const canSendMessage = computed(() => {
       return newMessage.value.trim() !== '' || selectedFiles.value.length > 0;
     });
     
+
     const handleNewMessage = (message) => {
-      console.log("📩 New message received in handleNewMessage:", message);
+      console.log("New message received in handleNewMessage:", message);
       
-      // If the message is for the current conversation
       if (selectedConversationId.value === message.conversationId) {
         console.log("Adding message to current conversation");
         
-        // Check for duplicates
         const messageExists = messages.value.some(m => 
           m.id === message.id || 
           (m.content === message.content && 
@@ -615,27 +566,23 @@ export default {
         );
         
         if (!messageExists) {
-          // Use assign to force reactivity
           messages.value = [...messages.value, message];
-          // Use nextTick directly, not Vue.nextTick
           nextTick(scrollToBottom);
           
-          // Mark as read if we are the recipient
           if (message.recipientId === currentUserId.value) {
             markConversationAsRead(message.conversationId, currentUserId.value);
           }
         }
       }
       
-      // Update the conversation list
       updateConversationWithMessage(message);
     };
     
-    // Handle read receipts
+    
+
     const handleReadReceipt = (receipt) => {
-      console.log("📬 Read receipt received:", receipt);
+      console.log("Read receipt received:", receipt);
       
-      // Update read status of messages in current conversation
       if (selectedConversationId.value === receipt.conversationId) {
         messages.value = messages.value.map(msg => {
           if (msg.senderId === currentUserId.value && !msg.read) {
@@ -645,128 +592,115 @@ export default {
         });
       }
       
-      // Update conversation list to remove unread flags
       fetchConversations();
     };
     
-    // Update or add a conversation with a new message
+
+
     const updateConversationWithMessage = (message) => {
-  console.log("Updating conversation with message:", message);
-  
-  // Check if this is a new conversation that doesn't exist yet
-  const existingConversationIndex = conversations.value.findIndex(
-    conv => conv.conversationId === message.conversationId
-  );
-  
-  // If it's a completely new conversation, fetch all conversations
-  if (existingConversationIndex === -1) {
-    console.log("New conversation detected, refreshing conversation list");
-    fetchConversations();
-    return;
-  }
-  
-  // Find the conversation index
-  const updatedConversations = [...conversations.value];
-  const existing = {...updatedConversations[existingConversationIndex]};
-  
-  // Format message preview based on type
-  let lastMessagePreview = message.content;
-  if (message.type !== 'TEXT' && message.attachments && message.attachments.length > 0) {
-    const attachmentCount = message.attachments.length;
-    
-    switch (message.type) {
-      case 'IMAGE':
-        lastMessagePreview = attachmentCount > 1 
-          ? `📷 ${attachmentCount} images` 
-          : '📷 Image';
-        break;
-      case 'DOCUMENT':
-        lastMessagePreview = attachmentCount > 1 
-          ? `📄 ${attachmentCount} documents` 
-          : '📄 Document';
-        break;
-      case 'MIXED':
-        lastMessagePreview = `📎 ${attachmentCount} attachments`;
-        break;
-    }
-    
-    if (message.content && message.content.trim() !== '') {
-      lastMessagePreview = `${message.content} [${lastMessagePreview}]`;
-    }
-  }
-  
-  existing.lastMessage = lastMessagePreview;
-  existing.lastMessageTime = message.timestamp;
-  
-  // Update unread count if current user is the recipient
-  if (message.recipientId === currentUserId.value) {
-    // Only increment if not currently viewing this conversation
-    if (selectedConversationId.value !== message.conversationId) {
-      existing.unreadCount = (existing.unreadCount || 0) + 1;
-      existing.hasUnreadMessages = true;
-    }
-  }
-  
-  // Remove existing and add to the beginning for proper sorting
-  updatedConversations.splice(existingConversationIndex, 1);
-  updatedConversations.unshift(existing);
-  conversations.value = updatedConversations;
-  
-  // If this is the selected conversation, update that reference too
-  if (selectedConversationId.value === message.conversationId) {
-    selectedConversation.value = existing;
-  }
-};
-    
-const fetchConversations = async () => {
-  try {
-    loading.value = true;
-    
-    // Check if there are conversations in cache
-    const cachedConversations = localStorage.getItem('cachedConversations');
-    if (cachedConversations && conversations.value.length === 0) {
-      try {
-        // Display conversations from cache while loading new data
-        conversations.value = JSON.parse(cachedConversations);
-        loading.value = false;
-      } catch (e) {
-        console.error('Error parsing conversation cache:', e);
+      console.log("Updating conversation with message:", message);
+      
+      const existingConversationIndex = conversations.value.findIndex(
+        conv => conv.conversationId === message.conversationId
+      );
+      
+      if (existingConversationIndex === -1) {
+        console.log("New conversation detected, refreshing conversation list");
+        fetchConversations();
+        return;
       }
-    }
-    
-    // Load fresh data from server
-    const data = await getUserConversations(currentUserId.value);
-    
-    // Păstrăm selecția conversației curente
-    const currentSelectedId = selectedConversationId.value;
-    
-    conversations.value = data;
-    
-    // Save to cache
-    localStorage.setItem('cachedConversations', JSON.stringify(data));
-    
-    // Dacă aveam o conversație selectată, dar acum nu mai este în listă (e.g. după refresh)
-    // și conversația temporară nu mai există, trebuie să găsim și să selectăm din nou
-    if (currentSelectedId && !conversations.value.find(c => c.conversationId === currentSelectedId)) {
-      const tempConversation = selectedConversation.value;
-      if (tempConversation) {
-        const newMatchingConversation = conversations.value.find(
-          c => c.participantId === tempConversation.participantId
-        );
+      
+      const updatedConversations = [...conversations.value];
+      const existing = {...updatedConversations[existingConversationIndex]};
+      
+      let lastMessagePreview = message.content;
+      if (message.type !== 'TEXT' && message.attachments && message.attachments.length > 0) {
+        const attachmentCount = message.attachments.length;
         
-        if (newMatchingConversation) {
-          selectConversation(newMatchingConversation);
+        switch (message.type) {
+          case 'IMAGE':
+            lastMessagePreview = attachmentCount > 1 
+              ? `📷 ${attachmentCount} images` 
+              : '📷 Image';
+            break;
+          case 'DOCUMENT':
+            lastMessagePreview = attachmentCount > 1 
+              ? `📄 ${attachmentCount} documents` 
+              : '📄 Document';
+            break;
+          case 'MIXED':
+            lastMessagePreview = `📎 ${attachmentCount} attachments`;
+            break;
+        }
+        
+        if (message.content && message.content.trim() !== '') {
+          lastMessagePreview = `${message.content} [${lastMessagePreview}]`;
         }
       }
-    }
-  } catch (error) {
-    console.error('Error fetching conversations:', error);
-  } finally {
-    loading.value = false;
-  }
-};
+      
+      existing.lastMessage = lastMessagePreview;
+      existing.lastMessageTime = message.timestamp;
+      
+      if (message.recipientId === currentUserId.value) {
+        if (selectedConversationId.value !== message.conversationId) {
+          existing.unreadCount = (existing.unreadCount || 0) + 1;
+          existing.hasUnreadMessages = true;
+        }
+      }
+      
+      updatedConversations.splice(existingConversationIndex, 1);
+      updatedConversations.unshift(existing);
+      conversations.value = updatedConversations;
+      
+      if (selectedConversationId.value === message.conversationId) {
+        selectedConversation.value = existing;
+      }
+    };
+
+
     
-    // Scroll to bottom of messages
+    const fetchConversations = async () => {
+      try {
+        loading.value = true;
+        
+        const cachedConversations = localStorage.getItem('cachedConversations');
+        if (cachedConversations && conversations.value.length === 0) {
+          try {
+            conversations.value = JSON.parse(cachedConversations);
+            loading.value = false;
+          } catch (e) {
+            console.error('Error parsing conversation cache:', e);
+          }
+        }
+        
+        const data = await getUserConversations(currentUserId.value);
+        
+        const currentSelectedId = selectedConversationId.value;
+        
+        conversations.value = data;
+        
+        localStorage.setItem('cachedConversations', JSON.stringify(data));
+        
+        if (currentSelectedId && !conversations.value.find(c => c.conversationId === currentSelectedId)) {
+          const tempConversation = selectedConversation.value;
+          if (tempConversation) {
+            const newMatchingConversation = conversations.value.find(
+              c => c.participantId === tempConversation.participantId
+            );
+            
+            if (newMatchingConversation) {
+              selectConversation(newMatchingConversation);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching conversations:', error);
+      } finally {
+        loading.value = false;
+      }
+    };
+    
+
     const scrollToBottom = () => {
       nextTick(() => {
         if (messagesContainer.value) {
@@ -775,7 +709,7 @@ const fetchConversations = async () => {
       });
     };
     
-    // Format timestamp to a human-readable time
+    
     const formatTime = (timestamp) => {
       if (!timestamp) return '';
       
@@ -796,7 +730,7 @@ const fetchConversations = async () => {
       }
     };
     
-    // Format file size to human-readable format
+
     const formatFileSize = (sizeInBytes) => {
       if (!sizeInBytes) return '0 B';
       
@@ -812,22 +746,20 @@ const fetchConversations = async () => {
       return `${size.toFixed(1)} ${units[unitIndex]}`;
     };
     
-    // Fetch messages for the selected conversation
+
+
     const fetchMessages = async (conversationId) => {
       try {
         loadingMessages.value = true;
         const data = await getConversationMessages(conversationId, currentUserId.value);
         messages.value = data;
         
-        // Mark conversation as read
         if (data.length > 0) {
           markConversationAsRead(conversationId, currentUserId.value);
           
-          // Update conversation list to reflect read status
           fetchConversations();
         }
         
-        // Scroll to bottom
         scrollToBottom();
       } catch (error) {
         console.error('Error fetching messages:', error);
@@ -836,7 +768,8 @@ const fetchConversations = async () => {
       }
     };
     
-    // Select a conversation
+
+    
     const selectConversation = async (conversation) => {
       selectedConversationId.value = conversation.conversationId;
       selectedConversation.value = conversation;
@@ -845,36 +778,31 @@ const fetchConversations = async () => {
         showSidebar.value = false;
       }
       
-      // Check cache
       const cacheKey = `messages_${conversation.conversationId}`;
       const cachedMessages = localStorage.getItem(cacheKey);
       
-      // Display cached messages immediately if they exist
       if (cachedMessages) {
         try {
           messages.value = JSON.parse(cachedMessages);
-          // Continue loading fresh data in the background
           fetchMessagesInBackground(conversation.conversationId);
         } catch (e) {
           console.error('Error parsing message cache:', e);
           await fetchMessages(conversation.conversationId);
         }
       } else {
-        // No cache, load normally
         await fetchMessages(conversation.conversationId);
       }
     };
 
-    // New function for loading messages in background
+
+
     const fetchMessagesInBackground = async (conversationId) => {
       try {
         const data = await getConversationMessages(conversationId, currentUserId.value);
         messages.value = data;
         
-        // Update cache
         localStorage.setItem(`messages_${conversationId}`, JSON.stringify(data));
         
-        // Mark as read
         if (data.length > 0) {
           markConversationAsRead(conversationId, currentUserId.value);
           fetchConversations();
@@ -886,150 +814,133 @@ const fetchConversations = async () => {
       }
     };
     
-    // Handle file selection
+
     const handleFileSelect = (event) => {
       const files = Array.from(event.target.files);
       
       if (files.length === 0) return;
       
-      // Check total size (max 10MB)
       const totalSize = files.reduce((total, file) => total + file.size, 0);
-      const MAX_TOTAL_SIZE = 10 * 1024 * 1024; // 10MB
+      const MAX_TOTAL_SIZE = 10 * 1024 * 1024;
       
       if (totalSize > MAX_TOTAL_SIZE) {
         alert('Total file size cannot exceed 10MB');
-        event.target.value = null; // Reset input
+        event.target.value = null; 
         return;
       }
       
-      // Add selected files
       selectedFiles.value = [...selectedFiles.value, ...files];
       
-      // Reset input to allow selecting the same files again
       event.target.value = null;
     };
     
-    // Remove a selected file
+
+
     const removeSelectedFile = (index) => {
       const newFiles = [...selectedFiles.value];
       newFiles.splice(index, 1);
       selectedFiles.value = newFiles;
     };
     
-    // Open attachment
+
     const openAttachment = (attachment) => {
       console.log('Opening attachment:', attachment);
       
-      // Add defensive checks
       if (!attachment || !attachment.id) {
         console.error('Invalid attachment data:', attachment);
         return;
       }
       
-      // For images, display in modal
       if (attachment.contentType && attachment.contentType.startsWith('image/')) {
-        previewAttachment.value = {...attachment}; // Create a copy to avoid reference issues
+        previewAttachment.value = {...attachment};
       } else {
-        // For documents, download directly
         const url = getAttachmentDownloadUrl(attachment.id);
         window.open(url, '_blank');
       }
     };
     
-    // Send a new message
+
+
     const sendMessage = async () => {
-  if (!canSendMessage.value || !selectedConversationId.value) return;
-  
-  try {
-    // Build message data
-    const messageData = {
-      senderId: currentUserId.value,
-      recipientId: selectedConversation.value.participantId,
-      content: newMessage.value.trim(),
-      conversationId: selectedConversationId.value,
-      type: 'TEXT'
+      if (!canSendMessage.value || !selectedConversationId.value) return;
+      
+      try {
+        const messageData = {
+          senderId: currentUserId.value,
+          recipientId: selectedConversation.value.participantId,
+          content: newMessage.value.trim(),
+          conversationId: selectedConversationId.value,
+          type: 'TEXT'
+        };
+        
+        if (selectedFiles.value.length > 0) {
+          const optimisticMessage = {
+            ...messageData,
+            id: `temp-${Date.now()}`,
+            timestamp: new Date().toISOString(),
+            read: false,
+            senderUsername: localStorage.getItem('username') || 'You',
+            attachments: selectedFiles.value.map((file, index) => ({
+              id: `temp-attachment-${index}`,
+              fileName: file.name,
+              contentType: file.type,
+              fileSize: file.size,
+              hasThumbnail: file.type.startsWith('image/')
+            })),
+            type: determineMessageType(selectedFiles.value)
+          };
+          
+          messages.value = [...messages.value, optimisticMessage];
+          scrollToBottom();
+          
+          const response = await apiSendMessageWithAttachments(messageData, selectedFiles.value);
+          
+          const index = messages.value.findIndex(m => m.id === optimisticMessage.id);
+          if (index !== -1) {
+            const updatedMessages = [...messages.value];
+            updatedMessages[index] = response;
+            messages.value = updatedMessages;
+          }
+          
+          updateConversationWithMessage(response);
+          
+          await fetchConversations();
+          
+          selectedFiles.value = [];
+        } else {
+          const optimisticMessage = {
+            ...messageData,
+            id: `temp-${Date.now()}`,
+            timestamp: new Date().toISOString(),
+            read: false,
+            senderUsername: localStorage.getItem('username') || 'You',
+          };
+          
+          messages.value = [...messages.value, optimisticMessage];
+          scrollToBottom();
+          
+          const response = await apiSendMessage(messageData);
+          
+          const index = messages.value.findIndex(m => m.id === optimisticMessage.id);
+          if (index !== -1) {
+            const updatedMessages = [...messages.value];
+            updatedMessages[index] = response;
+            messages.value = updatedMessages;
+          }
+          
+          updateConversationWithMessage(response);
+          
+          await fetchConversations();
+        }
+        
+        newMessage.value = '';
+      } catch (error) {
+        console.error('Error sending message:', error);
+      }
     };
     
-    // Determine if we're sending a simple message or with attachments
-    if (selectedFiles.value.length > 0) {
-      // Display an optimistic message
-      const optimisticMessage = {
-        ...messageData,
-        id: `temp-${Date.now()}`,
-        timestamp: new Date().toISOString(),
-        read: false,
-        senderUsername: localStorage.getItem('username') || 'You',
-        attachments: selectedFiles.value.map((file, index) => ({
-          id: `temp-attachment-${index}`,
-          fileName: file.name,
-          contentType: file.type,
-          fileSize: file.size,
-          hasThumbnail: file.type.startsWith('image/')
-        })),
-        type: determineMessageType(selectedFiles.value)
-      };
-      
-      messages.value = [...messages.value, optimisticMessage];
-      scrollToBottom();
-      
-      // Send message with attachments
-      const response = await apiSendMessageWithAttachments(messageData, selectedFiles.value);
-      
-      // Replace optimistic message with real response
-      const index = messages.value.findIndex(m => m.id === optimisticMessage.id);
-      if (index !== -1) {
-        const updatedMessages = [...messages.value];
-        updatedMessages[index] = response;
-        messages.value = updatedMessages;
-      }
-      
-      // Update conversation list
-      updateConversationWithMessage(response);
-      
-      // Refresh conversations to ensure the new one appears
-      await fetchConversations();
-      
-      // Reset selected files
-      selectedFiles.value = [];
-    } else {
-      // Send a simple text message
-      const optimisticMessage = {
-        ...messageData,
-        id: `temp-${Date.now()}`,
-        timestamp: new Date().toISOString(),
-        read: false,
-        senderUsername: localStorage.getItem('username') || 'You',
-      };
-      
-      messages.value = [...messages.value, optimisticMessage];
-      scrollToBottom();
-      
-      const response = await apiSendMessage(messageData);
-      
-      // Replace optimistic message with real response
-      const index = messages.value.findIndex(m => m.id === optimisticMessage.id);
-      if (index !== -1) {
-        const updatedMessages = [...messages.value];
-        updatedMessages[index] = response;
-        messages.value = updatedMessages;
-      }
-      
-      // Update conversation list
-      updateConversationWithMessage(response);
-      
-      // Refresh conversations to ensure the new one appears
-      await fetchConversations();
-    }
+
     
-    // Clear message input
-    newMessage.value = '';
-  } catch (error) {
-    console.error('Error sending message:', error);
-    // Here we can add error handling, for example, marking failed messages
-  }
-};
-    
-    // Determine message type based on attachments
     const determineMessageType = (files) => {
       if (files.length === 0) return 'TEXT';
       
@@ -1041,90 +952,81 @@ const fetchConversations = async () => {
       return 'DOCUMENT';
     };
     
-    // Initialize chat with specific user if provided
     const initChat = async () => {
-  // Asigură-te că userID-ul și ID-ul recipientului sunt disponibile
-  if (!currentUserId.value) {
-    console.error("Current user ID is not available");
-    return;
-  }
-  
-  const recipientId = initialRecipient.value.id || route.query.shelterId;
-  if (!recipientId) {
-    console.error("No recipient ID provided");
-    return;
-  }
-
-  try {
-    console.log("Initializing chat with recipient:", recipientId);
-    
-    // Încercăm să găsim o conversație existentă
-    const existingConversation = conversations.value.find(
-      c => c.participantId === parseInt(recipientId)
-    );
-
-    if (existingConversation) {
-      console.log("Found existing conversation:", existingConversation);
-      selectConversation(existingConversation);
-      return;
-    }
-
-    // Dacă nu există, obținem/creăm un ID de conversație
-    console.log("Creating new conversation with:", recipientId);
-    const conversationId = await getConversationId(
-      currentUserId.value, 
-      parseInt(recipientId)
-    );
-
-    // Verificăm din nou conversațiile (ar putea fi actualizate între timp)
-    const existingById = conversations.value.find(
-      c => c.conversationId === conversationId
-    );
-
-    if (existingById) {
-      console.log("Found conversation by ID:", existingById);
-      selectConversation(existingById);
-    } else {
-      // Obținem profilul shelterului pentru poza de profil
-      let shelterData = null;
-      try {
-        const response = await fetch(`http://localhost:8080/users/${recipientId}`);
-        if (response.ok) {
-          shelterData = await response.json();
-        }
-      } catch (err) {
-        console.warn("Could not fetch shelter profile data:", err);
+      if (!currentUserId.value) {
+        console.error("Current user ID is not available");
+        return;
       }
       
-      // Creăm o nouă conversație temporară
-      console.log("Creating temporary conversation with ID:", conversationId);
-      const recipientUsername = initialRecipient.value.username || 
-                               route.query.shelterName || 
-                               'User';
-                               
-      const tempConversation = {
-        conversationId,
-        participantId: parseInt(recipientId),
-        participantUsername: recipientUsername,
-        participantRole: 2, // Presupunem că e shelter
-        lastMessage: '',
-        lastMessageTime: new Date().toISOString(),
-        hasUnreadMessages: false,
-        unreadCount: 0,
-        participantProfilePicture: shelterData?.profilePicture || null
-      };
-      
-      // Adăugăm conversația temporară la lista
-      conversations.value = [tempConversation, ...conversations.value];
-      selectConversation(tempConversation);
-      
-      // Actualizăm lista de conversații după ce am creat una nouă
-      fetchConversations();
-    }
-  } catch (error) {
-    console.error('Error initializing chat:', error);
-  }
-};
+      const recipientId = initialRecipient.value.id || route.query.shelterId;
+      if (!recipientId) {
+        console.error("No recipient ID provided");
+        return;
+      }
+
+      try {
+        console.log("Initializing chat with recipient:", recipientId);
+        
+        const existingConversation = conversations.value.find(
+          c => c.participantId === parseInt(recipientId)
+        );
+
+        if (existingConversation) {
+          console.log("Found existing conversation:", existingConversation);
+          selectConversation(existingConversation);
+          return;
+        }
+
+        console.log("Creating new conversation with:", recipientId);
+        const conversationId = await getConversationId(
+          currentUserId.value, 
+          parseInt(recipientId)
+        );
+
+        const existingById = conversations.value.find(
+          c => c.conversationId === conversationId
+        );
+
+        if (existingById) {
+          console.log("Found conversation by ID:", existingById);
+          selectConversation(existingById);
+        } else {
+          let shelterData = null;
+          try {
+            const response = await fetch(`http://localhost:8080/users/${recipientId}`);
+            if (response.ok) {
+              shelterData = await response.json();
+            }
+          } catch (err) {
+            console.warn("Could not fetch shelter profile data:", err);
+          }
+          
+          console.log("Creating temporary conversation with ID:", conversationId);
+          const recipientUsername = initialRecipient.value.username || 
+                                  route.query.shelterName || 
+                                  'User';
+                                  
+          const tempConversation = {
+            conversationId,
+            participantId: parseInt(recipientId),
+            participantUsername: recipientUsername,
+            participantRole: 2, 
+            lastMessage: '',
+            lastMessageTime: new Date().toISOString(),
+            hasUnreadMessages: false,
+            unreadCount: 0,
+            participantProfilePicture: shelterData?.profilePicture || null
+          };
+          
+          conversations.value = [tempConversation, ...conversations.value];
+          selectConversation(tempConversation);
+          
+          fetchConversations();
+        }
+      } catch (error) {
+        console.error('Error initializing chat:', error);
+      }
+    };
 
     
     return {
@@ -1145,6 +1047,7 @@ const fetchConversations = async () => {
       selectedFiles,
       previewAttachment,
       canSendMessage,
+      
       selectConversation,
       sendMessage,
       formatTime,

@@ -1805,6 +1805,12 @@ export default {
       paginatedUsers,
       userTotalPages,
       userPaginationPages,
+      
+      showLogoutConfirmation,
+      pendingCurrentPage,
+      pendingItemsPerPage,
+      paginatedPendingShelters,
+      pendingPaginationPages,
 
       sortPendingShelters,
       formatRelativeTime,
@@ -1823,13 +1829,7 @@ export default {
       viewShelterDocument,
       logout,
       confirmLogout,
-      performLogout,
-
-      showLogoutConfirmation,
-      pendingCurrentPage,
-      pendingItemsPerPage,
-      paginatedPendingShelters,
-      pendingPaginationPages
+      performLogout
     };
   }
 };

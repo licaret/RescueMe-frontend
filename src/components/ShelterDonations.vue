@@ -85,7 +85,10 @@
                   Status
                 </th>
                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Message
+                  Message from donator
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Action
                 </th>
               </tr>
             </thead>
@@ -125,6 +128,19 @@
                   <div class="text-sm text-gray-900 truncate max-w-xs">
                     {{ donation.message || 'No message' }}
                   </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <button 
+                    v-if="!donation.anonymous && donation.donorName"
+                    @click="messageUser(donation.id, donation.donorName)" 
+                    class="text-blue-600 hover:text-blue-900 text-sm font-medium flex items-center"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8s-9-3.582-9-8 4.03-8 9-8 9 3.582 9 8z" />
+                    </svg>
+                    Message
+                  </button>
+                  <span v-else class="text-gray-400 text-sm">Anonymous</span>
                 </td>
               </tr>
             </tbody>
@@ -206,6 +222,8 @@
   
   <script>
   import { ref, computed, onMounted, watch } from 'vue';
+  import { getDonationStatistics, getDonationsForShelter } from '@/services/donation_service';
+
   
   export default {
     name: 'ShelterDonations',
@@ -226,7 +244,7 @@
         period: 'all',
       });
       
-      // Compute filtered donations based on selected period
+
       const filteredDonations = computed(() => {
         if (filters.value.period === 'all') {
           return donations.value;
@@ -249,25 +267,29 @@
         });
       });
       
-      // Pagination logic
+
       const totalPages = computed(() => {
         return Math.ceil(filteredDonations.value.length / itemsPerPage);
       });
       
+
       const paginatedDonations = computed(() => {
         const start = (currentPage.value - 1) * itemsPerPage;
         const end = start + itemsPerPage;
         return filteredDonations.value.slice(start, end);
       });
       
+
       const paginationStart = computed(() => {
         return filteredDonations.value.length === 0 ? 0 : (currentPage.value - 1) * itemsPerPage + 1;
       });
+      
       
       const paginationEnd = computed(() => {
         return Math.min(currentPage.value * itemsPerPage, filteredDonations.value.length);
       });
       
+
       const paginationArray = computed(() => {
         const pages = [];
         const maxVisiblePages = 5;
@@ -293,12 +315,12 @@
         return pages;
       });
       
-      // Reset to page 1 when filters change
+      
       watch(filters, () => {
         currentPage.value = 1;
       });
       
-      // Functions
+
       const changePage = (direction) => {
         const newPage = currentPage.value + direction;
         if (newPage >= 1 && newPage <= totalPages.value) {
@@ -306,46 +328,37 @@
         }
       };
       
+
       const loadDonations = async () => {
         loading.value = true;
         try {
           const shelterId = localStorage.getItem('Id');
-          
+
           if (!shelterId) {
             console.error('Shelter ID not found in localStorage');
             return;
           }
-          
-          // Load donation statistics
-          const statsResponse = await fetch(`http://localhost:8080/api/v1/donations/statistics/${shelterId}`);
-          if (statsResponse.ok) {
-            stats.value = await statsResponse.json();
-          } else {
-            console.error('Failed to load donation statistics:', statsResponse.statusText);
-          }
-          
-          // Load donations list
-          const donationsResponse = await fetch(`http://localhost:8080/api/v1/donations/shelter/${shelterId}`);
-          if (donationsResponse.ok) {
-            const data = await donationsResponse.json();
-            // Sort by donation date descending (most recent first)
-            donations.value = data.sort((a, b) => 
-              new Date(b.donationDate) - new Date(a.donationDate)
-            );
-          } else {
-            console.error('Failed to load donations:', donationsResponse.statusText);
-          }
+
+          stats.value = await getDonationStatistics(shelterId);
+
+          const data = await getDonationsForShelter(shelterId);
+          donations.value = data.sort((a, b) => 
+            new Date(b.donationDate) - new Date(a.donationDate)
+          );
         } catch (error) {
           console.error('Error loading donations:', error);
         } finally {
           loading.value = false;
         }
       };
+
       
+
       const refreshDonations = () => {
         loadDonations();
       };
       
+
       const formatCurrency = (amount) => {
         return new Intl.NumberFormat('ro-RO', {
           style: 'currency',
@@ -354,18 +367,20 @@
         }).format(amount || 0);
       };
       
+
       const formatDate = (dateString) => {
         const date = new Date(dateString);
-        return new Intl.DateTimeFormat('ro-RO', {
+        return new Intl.DateTimeFormat('en-US', {
           year: 'numeric',
           month: 'short',
           day: 'numeric'
         }).format(date);
       };
       
+
       const formatTime = (dateString) => {
         const date = new Date(dateString);
-        return new Intl.DateTimeFormat('ro-RO', {
+        return new Intl.DateTimeFormat('en-US', {
           hour: '2-digit',
           minute: '2-digit'
         }).format(date);
@@ -374,6 +389,16 @@
       onMounted(() => {
         loadDonations();
       });
+
+
+      const messageUser = (donationId, donorName) => {
+        if (!donationId) {
+          console.error('No donation ID provided');
+          return;
+        }
+        
+        window.location.href = `/messages?shelterId=${donationId}&shelterName=${encodeURIComponent(donorName || 'Donor')}`;
+      };
       
       return {
         donations,
@@ -387,11 +412,13 @@
         paginationArray,
         paginationStart,
         paginationEnd,
+
         changePage,
         refreshDonations,
         formatCurrency,
         formatDate,
-        formatTime
+        formatTime,
+        messageUser
       };
     }
   }

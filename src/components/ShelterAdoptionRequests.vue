@@ -47,7 +47,7 @@
               </select>
             </div>
             
-            <!-- Buton de resetare -->
+            <!-- Reset Filters Button -->
             <button 
               @click="resetFilters"
               class="p-2 text-gray-500 hover:text-gray-700 focus:outline-none"
@@ -65,8 +65,9 @@
       <div v-if="isLoading" class="flex justify-center items-center py-12">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
-
-      <div v-else-if="groupedPetRequests.length === 0" class="text-center py-12 bg-gray-50">
+      
+      <!-- Empty State: No Requests At All -->
+      <div v-else-if="requests.length === 0" class="text-center py-12 bg-gray-50">
         <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
         </svg>
@@ -74,6 +75,31 @@
         <p class="mt-1 text-gray-500">You currently have no adoption requests.</p>
       </div>
 
+      <!-- Empty State: No Search Results -->
+      <div v-else-if="searchQuery && groupedPetRequests.length === 0" class="text-center py-12 bg-gray-50">
+        <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <h3 class="mt-2 text-xl font-semibold text-gray-600">No Matching Pets</h3>
+        <p class="mt-1 text-gray-500">
+          No pets found matching "<span class="font-medium">{{ searchQuery }}</span>".
+          <button @click="searchQuery = ''" class="text-blue-500 hover:underline">Clear search</button>
+        </p>
+      </div>
+
+      <!-- Empty State: No Status Filter Results -->
+      <div v-else-if="statusFilter && groupedPetRequests.length === 0" class="text-center py-12 bg-gray-50">
+        <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+        </svg>
+        <h3 class="mt-2 text-xl font-semibold text-gray-600">No {{ statusFilter.toLowerCase() }} requests</h3>
+        <p class="mt-1 text-gray-500">
+          There are no adoption requests with status "{{ statusFilter }}".
+          <button @click="statusFilter = ''" class="text-blue-500 hover:underline">Show all statuses</button>
+        </p>
+      </div>
+
+      <!-- Results List -->
       <div v-else class="grid grid-cols-1 gap-6 p-6">
         <div 
           v-for="petGroup in paginatedPetGroups" 
@@ -214,229 +240,17 @@
         </div>
       </div>
 
-      
-
-
-      <Teleport to="body">
-        <div 
-          v-if="selectedRequest" 
-          class="fixed inset-0 z-[9999] overflow-y-auto bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
-          @click.self="selectedRequest = null"
-        >
-          <div 
-            class="bg-white max-w-4xl w-full max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl transform transition-all"
-            @click.stop
-          >
-            <div class="p-6">
-              <!-- Modal Header -->
-              <div class="flex justify-between items-center border-b pb-4 mb-6">
-                <h2 class="text-2xl font-bold text-gray-800">Adoption Request Details</h2>
-                <button 
-                  @click="selectedRequest = null" 
-                  class="text-gray-500 hover:text-gray-700 transition"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-
-              <!-- Request Overview -->
-              <div class="grid md:grid-cols-2 gap-6 mb-6">
-                <!-- Pet Information -->
-                <div>
-                  <h3 class="text-lg font-semibold text-gray-700 mb-4">Pet Information</h3>
-                  <div class="flex items-center space-x-4">
-                    <img 
-                      v-if="selectedRequest.pet?.photoUrl" 
-                      :src="selectedRequest.pet.photoUrl" 
-                      :alt="selectedRequest.pet.name" 
-                      class="w-24 h-24 object-cover rounded-2xl border"
-                    />
-                    <div>
-                      <div class="text-xl font-bold text-gray-800">{{ selectedRequest.pet?.name }}</div>
-                      <div class="text-sm text-gray-600">
-                        {{ selectedRequest.pet?.species }} • {{ selectedRequest.pet?.breed }}
-                      </div>
-                      <div class="text-sm text-gray-600">{{ formatAge(selectedRequest.pet?.age) }}</div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Applicant Information -->
-                <div>
-                  <h3 class="text-lg font-semibold text-gray-700 mb-4">Applicant Information</h3>
-                  <div class="space-y-2">
-                    <div>
-                      <span class="text-sm text-gray-500">Name</span>
-                      <div class="text-gray-800">{{ selectedRequest.requestDetails?.contactInfo?.name || 'Not provided' }}</div>
-                    </div>
-                    <div>
-                      <span class="text-sm text-gray-500">Email</span>
-                      <div class="text-gray-800">{{ selectedRequest.requestDetails?.contactInfo?.email || 'Not provided' }}</div>
-                    </div>
-                    <div>
-                      <span class="text-sm text-gray-500">Phone</span>
-                      <div class="text-gray-800">{{ selectedRequest.requestDetails?.contactInfo?.phone || 'Not provided' }}</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Adoption Questionnaire -->
-              <div class="space-y-6">
-                <!-- Housing Information -->
-                <div>
-                  <h3 class="text-lg font-semibold text-gray-700 mb-4">Housing Information</h3>
-                  <div class="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <span class="text-sm text-gray-500">Housing Type</span>
-                      <div class="text-gray-800 capitalize">{{ selectedRequest.requestDetails?.housing?.type || 'Not provided' }}</div>
-                    </div>
-                    <div>
-                      <span class="text-sm text-gray-500">Ownership</span>
-                      <div class="text-gray-800 capitalize">{{ selectedRequest.requestDetails?.housing?.ownership || 'Not provided' }}</div>
-                    </div>
-                    <div v-if="selectedRequest.requestDetails?.housing?.ownership === 'rent'">
-                      <span class="text-sm text-gray-500">Landlord Permission</span>
-                      <div class="text-gray-800 capitalize">{{ selectedRequest.requestDetails?.housing?.landlordPermission || 'Not provided' }}</div>
-                    </div>
-                    <div>
-                      <span class="text-sm text-gray-500">Has Yard</span>
-                      <div class="text-gray-800 capitalize">{{ selectedRequest.requestDetails?.housing?.hasYard || 'Not provided' }}</div>
-                    </div>
-                    <div v-if="selectedRequest.requestDetails?.housing?.hasYard === 'yes'">
-                      <span class="text-sm text-gray-500">Fenced Yard</span>
-                      <div class="text-gray-800 capitalize">{{ selectedRequest.requestDetails?.housing?.fencedYard || 'Not provided' }}</div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Household Information -->
-                <div>
-                  <h3 class="text-lg font-semibold text-gray-700 mb-4">Household Information</h3>
-                  <div class="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <span class="text-sm text-gray-500">Household Members</span>
-                      <div class="text-gray-800">{{ selectedRequest.requestDetails?.household?.members || 'Not provided' }} person(s)</div>
-                    </div>
-                    <div>
-                      <span class="text-sm text-gray-500">Children in Home</span>
-                      <div class="text-gray-800 capitalize">{{ selectedRequest.requestDetails?.household?.children?.has || 'Not provided' }}</div>
-                    </div>
-                    <div v-if="selectedRequest.requestDetails?.household?.children?.has === 'yes'">
-                      <span class="text-sm text-gray-500">Children's Ages</span>
-                      <div class="text-gray-800">{{ selectedRequest.requestDetails?.household?.children?.ages || 'Not provided' }}</div>
-                    </div>
-                    <div>
-                      <span class="text-sm text-gray-500">Other Pets</span>
-                      <div class="text-gray-800 capitalize">{{ selectedRequest.requestDetails?.household?.otherPets?.has || 'Not provided' }}</div>
-                    </div>
-                    <div v-if="selectedRequest.requestDetails?.household?.otherPets?.has === 'yes'" class="md:col-span-2">
-                      <span class="text-sm text-gray-500">Current Pets</span>
-                      <div class="text-gray-800">{{ selectedRequest.requestDetails?.household?.otherPets?.description || 'Not provided' }}</div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Experience & Expectations -->
-                <div>
-                  <h3 class="text-lg font-semibold text-gray-700 mb-4">Experience & Expectations</h3>
-                  <div class="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <span class="text-sm text-gray-500">Pet Experience</span>
-                      <div class="text-gray-800">
-                        {{ 
-                          selectedRequest.requestDetails?.experience?.level === 'first' ? 'First-time pet owner' : 
-                          selectedRequest.requestDetails?.experience?.level === 'some' ? 'Some experience' :
-                          selectedRequest.requestDetails?.experience?.level === 'experienced' ? 'Experienced owner' :
-                          'Not provided'
-                        }}
-                      </div>
-                    </div>
-                    <div>
-                      <span class="text-sm text-gray-500">Activity Level</span>
-                      <div class="text-gray-800 capitalize">{{ selectedRequest.requestDetails?.experience?.activityLevel || 'Not provided' }}</div>
-                    </div>
-                    <div>
-                      <span class="text-sm text-gray-500">Time Alone</span>
-                      <div class="text-gray-800">{{ selectedRequest.requestDetails?.experience?.timeAlone || 'Not provided' }}</div>
-                    </div>
-                  </div>
-                  <div v-if="selectedRequest.requestDetails?.experience?.reason" class="mt-4">
-                    <span class="text-sm text-gray-500">Reason for Adoption</span>
-                    <div class="text-gray-800 bg-gray-50 p-3 rounded-lg mt-2">{{ selectedRequest.requestDetails.experience.reason }}</div>
-                  </div>
-                </div>
-
-                <!-- Additional Information -->
-                <div v-if="selectedRequest.requestDetails?.additionalInfo">
-                  <h3 class="text-lg font-semibold text-gray-700 mb-4">Additional Information</h3>
-                  <div class="bg-gray-50 p-3 rounded-lg text-gray-800">{{ selectedRequest.requestDetails.additionalInfo }}</div>
-                </div>
-              </div>
-
-              <!-- Response Section -->
-              <div v-if="selectedRequest.status === 'PENDING'" class="mt-6">
-                <label for="response-note" class="block text-sm font-medium text-gray-700 mb-1">Response Note (optional)</label>
-                <textarea
-                  id="response-note"
-                  v-model="responseNote"
-                  rows="3"
-                  class="w-full border border-gray-300 rounded-md p-2 focus:ring-indigo-500 focus:border-indigo-500"
-                  placeholder="Write a message for the applicant..."
-                ></textarea>
-              </div>
-
-              <div v-else-if="selectedRequest.notes" class="mt-6">
-                <h3 class="text-sm font-medium text-gray-700 mb-2">Your Response</h3>
-                <div class="bg-gray-50 p-3 rounded-md text-gray-800">{{ selectedRequest.notes }}</div>
-              </div>
-
-              <!-- Modal Actions -->
-              <div class="mt-6 flex justify-end space-x-3">
-                <!-- For pending requests - option to approve -->
-                <button 
-                  v-if="selectedRequest.status === 'PENDING'"
-                  @click="showApproveConfirmation = true"
-                  class="px-4 py-2 bg-green-600 text-white rounded-3xl hover:bg-green-700 transition"
-                  title="This will mark the pet status as PENDING"
-                >
-                  Approve Request
-                </button>
-                
-                <!-- For approved requests with pet in PENDING status - option to complete -->
-                <button 
-                  v-if="selectedRequest.status === 'APPROVED' && selectedRequest.pet?.status === 'PENDING'"
-                  @click="showCompleteConfirmation = true"
-                  class="px-4 py-2 bg-blue-600 text-white rounded-3xl hover:bg-blue-700 transition"
-                  title="This will mark the pet as ADOPTED"
-                >
-                  Complete Adoption
-                </button>
-                
-                <!-- For pending requests - option to reject -->
-                <button 
-                  v-if="selectedRequest.status === 'PENDING'"
-                  @click="showRejectConfirmation = true"
-                  class="px-4 py-2 bg-red-600 text-white rounded-3xl hover:bg-red-700 transition"
-                >
-                  Reject
-                </button>
-                
-                <!-- Close button -->
-                <button 
-                  @click="selectedRequest = null"
-                  class="px-4 py-2 bg-gray-200 text-gray-700 rounded-3xl hover:bg-gray-300 transition"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </Teleport>
+      <AdoptionRequestDetailsForShelter
+        :request="selectedRequest"
+        :responseNote="responseNote"
+        @update:responseNote="responseNote = $event"
+        @close="selectedRequest = null"
+        @approve="showApproveConfirmation = true"
+        @reject="showRejectConfirmation = true"
+        @complete="showCompleteConfirmation = true"
+      />
     </div>
+
     <!-- Approval Confirmation Modal -->
     <Teleport to="body">
       <div v-if="showApproveConfirmation" class="fixed inset-0 z-[10000] overflow-y-auto bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
@@ -549,15 +363,25 @@
 import { ref, computed, onMounted, watch, reactive } from 'vue';
 import { getShelterAdoptionRequests, updateAdoptionRequestStatus } from '@/services/adoption_service';
 import { completeAdoption } from '@/services/adoption_service';
+import { getPetPhotoById } from '@/services/pet_service';
+import { fetchProfilePicture } from '@/services/user_service';
+import AdoptionRequestDetailsForShelter from '@/components/AdoptionRequestDetailsForShelter.vue';
 
 export default {
+
   name: 'ShelterAdoptionRequests',
+
+  components: {
+    AdoptionRequestDetailsForShelter
+  },
+
   props: {
     shelterId: {
       type: [String, Number],
       required: true
     }
   },
+
   setup(props) {
     const requests = ref([]);
     const isLoading = ref(true);
@@ -567,9 +391,8 @@ export default {
     const error = ref(null);
     const dateSort = ref('newest');
     
-    // Pagination
-    const itemsPerPage = 5; // Show 5 requests per page
-    const currentPages = reactive({}); // Track current page for each pet group
+    const itemsPerPage = 5;
+    const currentPages = reactive({});
     const petGroupsPerPage = 5;
     const currentPetGroupPage = ref(1);
 
@@ -579,9 +402,11 @@ export default {
     const showRejectConfirmation = ref(false);
     const showCompleteConfirmation = ref(false);
 
+
     watch(dateSort, () => {
       sortRequests();
     });
+
 
     const paginatedPetGroups = computed(() => {
       const start = (currentPetGroupPage.value - 1) * petGroupsPerPage;
@@ -589,9 +414,11 @@ export default {
       return groupedPetRequests.value.slice(start, end);
     });
 
+
     const totalPetGroupPages = computed(() => {
       return Math.ceil(groupedPetRequests.value.length / petGroupsPerPage);
     });
+
 
     watch(statusFilter, () => {
       currentPetGroupPage.value = 1;
@@ -603,6 +430,7 @@ export default {
       dateSort.value = 'newest';
     };
 
+
     const sortRequests = () => {
       if (dateSort.value === 'newest') {
         requests.value.sort((a, b) => new Date(b.requestDate) - new Date(a.requestDate));
@@ -611,16 +439,18 @@ export default {
       }
     };
 
+
     const getPageCount = (totalItems) => {
       return Math.ceil(totalItems / itemsPerPage);
     };
+
 
     const changePage = (petId, pageNumber) => {
       currentPages[petId] = pageNumber;
     };
 
+
     const paginatedRequests = (requestsList, petId) => {
-      // Initialize the current page for this pet if it doesn't exist
       if (!currentPages[petId]) {
         currentPages[petId] = 1;
       }
@@ -630,6 +460,7 @@ export default {
       
       return requestsList.slice(startIndex, endIndex);
     };
+
 
     const sortedGroupedPetRequests = computed(() => {
       let filteredRequests = statusFilter.value 
@@ -663,29 +494,26 @@ export default {
       });
     });
 
+
     const completeAdoptionProcess = async () => {
       if (!selectedRequest.value) return;
 
       try {
         isLoading.value = true;
 
-        // Trimite către backend
         await completeAdoption(selectedRequest.value.id);
 
-        // Update local statusuri
         const index = requests.value.findIndex(r => r.id === selectedRequest.value.id);
         if (index !== -1) {
-          // ✅ Marchează cererea ca FINALIZATĂ
           requests.value[index].status = 'COMPLETED';
           requests.value[index].pet.status = 'ADOPTED';
 
           if (selectedRequest.value) {
-            selectedRequest.value.status = 'COMPLETED'; // ✅ aici e cheia
+            selectedRequest.value.status = 'COMPLETED'; 
             selectedRequest.value.pet.status = 'ADOPTED';
           }
         }
 
-        // Emit event (dacă ai componente care ascultă)
         window.dispatchEvent(new Event('adoption-completed'));
 
       } catch (error) {
@@ -708,8 +536,7 @@ export default {
           let photoUrl = null;
           if (request.pet && request.pet.photoIds && request.pet.photoIds.length > 0) {
             try {
-              const response = await fetch(`http://localhost:8080/pet-photos/${request.pet.photoIds[0]}`);
-              const photoData = await response.json();
+              const photoData = await getPetPhotoById(request.pet.photoIds[0]);
               photoUrl = photoData.url;
             } catch (err) {
               console.warn('Could not fetch pet photo:', err);
@@ -717,16 +544,8 @@ export default {
           }
 
           let adopterPhotoUrl = null;
-          if (request.userId) { // Make sure this is the correct property for the adopter's ID
-            try {
-              const response = await fetch(`http://localhost:8080/users/${request.userId}/profilePicture`);
-              if (response.ok) {
-                // For binary data like images
-                adopterPhotoUrl = URL.createObjectURL(await response.blob());
-              }
-            } catch (err) {
-              console.warn('Could not fetch adopter photo:', err);
-            }
+          if (request.userId) { 
+            adopterPhotoUrl = await fetchProfilePicture(request.userId);
           }
           
           return {
@@ -747,6 +566,7 @@ export default {
         isLoading.value = false;
       }
     };
+
 
     const groupedPetRequests = computed(() => {
       const filteredRequests = statusFilter.value 
@@ -775,87 +595,40 @@ export default {
         return bPending - aPending;
       });
     });
+
+
     
     const viewRequestDetails = (request) => {
       selectedRequest.value = { ...request };
       responseNote.value = request.notes || '';
     };
 
-    // const processApproval = async () => {
-    //   if (!selectedRequest.value) return;
-
-    //   try {
-    //     isLoading.value = true;
-
-    //     // Aprobă requestul în backend
-    //     await updateAdoptionRequestStatus(
-    //       selectedRequest.value.id,
-    //       'APPROVED',
-    //       responseNote.value
-    //     );
-
-    //     // Trigger pentru alte componente (dacă e nevoie)
-    //     window.dispatchEvent(new Event('adoption-status-updated'));
-
-    //     // Update local pentru lista de requesturi
-    //     const index = requests.value.findIndex(r => r.id === selectedRequest.value.id);
-    //     if (index !== -1) {
-    //       requests.value[index].status = 'APPROVED';
-    //       requests.value[index].notes = responseNote.value;
-
-    //       // Update și statusul pet-ului în lista de requesturi
-    //       if (requests.value[index].pet) {
-    //         requests.value[index].pet.status = 'PENDING';
-    //       }
-    //     }
-
-    //     // Update și în selectedRequest ca să se afișeze "Complete Adoption" fără refresh
-    //     if (selectedRequest.value.pet) {
-    //       selectedRequest.value.pet.status = 'PENDING';
-    //     }
-
-    //     // Închide modalul
-    //     selectedRequest.value = null;
-
-    //   } catch (error) {
-    //     console.error('Error approving adoption request:', error);
-    //     alert('Failed to approve adoption request. Please try again.');
-    //   } finally {
-    //     isLoading.value = false;
-    //   }
-    // };
+   
 
     const processApproval = async () => {
-  if (!selectedRequest.value) return;
+      if (!selectedRequest.value) return;
 
-  try {
-    isLoading.value = true;
+      try {
+        isLoading.value = true;
+        await updateAdoptionRequestStatus(
+          selectedRequest.value.id,
+          'APPROVED',
+          responseNote.value
+        );
 
-    // Approve the request in backend
-    // The backend should already be handling:
-    // 1. Setting this request to APPROVED
-    // 2. Auto-rejecting other pending requests for this pet
-    // 3. Creating notifications for rejected users
-    // 4. Setting pet status to PENDING
-    await updateAdoptionRequestStatus(
-      selectedRequest.value.id,
-      'APPROVED',
-      responseNote.value
-    );
+        await fetchRequests();
+        
+        selectedRequest.value = null;
 
-    // Reload all adoption requests from the server to see the updates including auto-rejected requests
-    await fetchRequests();
+      } catch (error) {
+        console.error('Error approving adoption request:', error);
+        alert('Failed to approve adoption request. Please try again.');
+      } finally {
+        isLoading.value = false;
+      }
+    };
+
     
-    // Close the modal after refresh is complete
-    selectedRequest.value = null;
-
-  } catch (error) {
-    console.error('Error approving adoption request:', error);
-    alert('Failed to approve adoption request. Please try again.');
-  } finally {
-    isLoading.value = false;
-  }
-};
 
     const processRejection = async () => {
       if (!selectedRequest.value) return;
@@ -886,6 +659,8 @@ export default {
       }
     };
     
+
+
     const formatDate = (dateString) => {
       if (!dateString) return 'Unknown date';
       
@@ -897,12 +672,14 @@ export default {
           hour: '2-digit',
           minute: '2-digit'
         };
-        return new Date(dateString).toLocaleDateString(undefined, options);
+        return new Date(dateString).toLocaleDateString('en-US', options);
       } catch (e) {
         console.error('Error formatting date:', e);
         return dateString;
       }
     };
+
+
 
     const formatAge = (age) => {
       if (age === undefined || age === null) return 'Unknown';
@@ -920,34 +697,34 @@ export default {
       }
     };
 
+
     onMounted(() => {
       fetchRequests();
     });
 
+
     const messageUser = (adopterId) => {
-  if (!adopterId) {
-    console.error('No adopter ID provided');
-    return;
-  }
-  
-  // Găsim requestul care conține acest ID
-  const relevantRequest = requests.value.find(req => req.userId === adopterId || req.adopterId === adopterId);
-  
-  if (!relevantRequest) {
-    console.error('Could not find request information for this adopter');
-    
-    // Dacă nu găsim cererea, navigăm oricum folosind doar ID-ul
-    window.location.href = `/messages?shelterId=${adopterId}`;
-    return;
-  }
-  
-  // Obține numele utilizatorului dacă este disponibil
-  const adopterName = relevantRequest.requestDetails?.contactInfo?.name || 
-                      'Adopter';
-  
-  // Navighează către pagina de mesaje, transmițând ID-ul și numele utilizatorului
-  window.location.href = `/messages?shelterId=${adopterId}&shelterName=${encodeURIComponent(adopterName)}`;
-};
+      if (!adopterId) {
+        console.error('No adopter ID provided');
+        return;
+      }
+      
+      const relevantRequest = requests.value.find(req => req.userId === adopterId || req.adopterId === adopterId);
+      
+      if (!relevantRequest) {
+        console.error('Could not find request information for this adopter');
+        
+        window.location.href = `/messages?shelterId=${adopterId}`;
+        return;
+      }
+      
+      const adopterName = relevantRequest.requestDetails?.contactInfo?.name || 
+                          'Adopter';
+      
+      window.location.href = `/messages?shelterId=${adopterId}&shelterName=${encodeURIComponent(adopterName)}`;
+    };
+
+
 
     return {
       requests,
@@ -961,6 +738,15 @@ export default {
       currentPages,
       groupedPetRequests,
       sortedGroupedPetRequests,
+      showApproveConfirmation,
+      showRejectConfirmation, 
+      showCompleteConfirmation,
+      petGroupsPerPage,
+      currentPetGroupPage,
+      paginatedPetGroups,
+      totalPetGroupPages,
+      searchQuery,
+
       getPageCount,
       changePage,
       paginatedRequests,
@@ -972,14 +758,6 @@ export default {
       processRejection,
       formatDate,
       formatAge,
-      showApproveConfirmation,
-      showRejectConfirmation, 
-      showCompleteConfirmation,
-      petGroupsPerPage,
-      currentPetGroupPage,
-      paginatedPetGroups,
-      totalPetGroupPages,
-      searchQuery,
       messageUser
     };
   }

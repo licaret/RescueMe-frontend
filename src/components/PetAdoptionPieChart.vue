@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white rounded-lg shadow-sm">
+  <div class="bg-white rounded-lg shadow-sm mt-6">
     <div class="p-5 flex justify-between items-center border-b">
       <h2 class="text-gray-800 text-lg font-medium">Adoption Dashboard</h2>
       <div class="bg-blue-50 text-blue-800 text-sm py-1 px-3 rounded-full font-medium">
@@ -26,15 +26,15 @@
     
     <!-- Stats with chart -->
     <div v-else class="p-5">
-      <div class="flex mb-8">
-        <div class="w-1/2 relative">
-          <canvas ref="chartCanvas" height="180"></canvas>
+      <div class="flex flex-col md:flex-row mb-8">
+        <div class="w-full md:w-1/2 relative" style="height: 220px;">
+          <canvas ref="chartCanvas"></canvas>
           <div class="absolute inset-0 flex flex-col items-center justify-center">
             <div class="text-2xl font-semibold text-gray-800">{{ totalPets }}</div>
             <div class="text-xs text-gray-500">TOTAL</div>
           </div>
         </div>
-        <div class="w-1/2 pl-6 flex flex-col justify-center">
+        <div class="w-full md:w-1/2 md:pl-6 flex flex-col justify-center mt-6 md:mt-0">
           <div class="grid gap-4">
             <!-- Available -->
             <div class="flex items-center">
@@ -85,25 +85,19 @@
 </template>
 
 <script>
-import { ref, onMounted, onUnmounted, watch, computed } from 'vue';
+import { ref, onMounted, onBeforeUnmount, watch, computed, nextTick } from 'vue';
+import Chart from 'chart.js/auto';
 
 export default {
-  name: 'AdoptionDashboard',
+  name: 'PetAdoptionPieChart',
   props: {
     stats: {
       type: Object,
+      required: true,
       default: () => ({
         adopted: 0,
         pending: 0,
         available: 0
-      })
-    },
-    monthlyStats: {
-      type: Object,
-      default: () => ({
-        new: 12,
-        adoptions: 8,
-        avgDays: 14
       })
     },
     showAddButton: {
@@ -125,96 +119,124 @@ export default {
       return Math.round((props.stats[type] / totalPets.value) * 100);
     };
 
-    const createChart = () => {
+    const initializeChart = async () => {
+      if (chart) {
+        chart.destroy();
+        chart = null;
+      }
+
+      await nextTick();
+      
       if (!chartCanvas.value || totalPets.value === 0) return;
       
       const ctx = chartCanvas.value.getContext('2d');
       
-      import('chart.js/auto').then((ChartModule) => {
-        const Chart = ChartModule.default;
-        
-        if (chart) chart.destroy();
-        
-        const colors = {
-          available: {
-            background: 'rgba(59, 130, 246, 0.9)', // blue-500
-            border: '#fff'
-          },
-          pending: {
-            background: 'rgba(245, 158, 11, 0.9)', // amber-500
-            border: '#fff'
-          },
-          adopted: {
-            background: 'rgba(16, 185, 129, 0.9)', // green-500
-            border: '#fff'
-          }
-        };
-        
-        chart = new Chart(ctx, {
-          type: 'doughnut',
-          data: {
-            labels: ['Available', 'Pending', 'Adopted'],
-            datasets: [{
-              data: [props.stats.available, props.stats.pending, props.stats.adopted],
-              backgroundColor: [
-                colors.available.background, 
-                colors.pending.background, 
-                colors.adopted.background
-              ],
-              borderColor: colors.available.border,
-              borderWidth: 2
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '75%',
-            plugins: {
-              legend: {
-                display: false
-              },
-              tooltip: {
-                enabled: true,
-                backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                titleColor: '#111827',
-                bodyColor: '#374151',
-                borderColor: '#e5e7eb',
-                borderWidth: 1,
-                cornerRadius: 4,
-                displayColors: true,
-                boxPadding: 4,
-                callbacks: {
-                  label: function(context) {
-                    const label = context.label || '';
-                    const value = context.raw || 0;
-                    return `${label}: ${value} (${getPercentage(label.toLowerCase())}%)`;
-                  }
+      const colors = {
+        available: {
+          background: 'rgba(59, 130, 246, 0.9)',
+          border: '#fff'
+        },
+        pending: {
+          background: 'rgba(245, 158, 11, 0.9)',
+          border: '#fff'
+        },
+        adopted: {
+          background: 'rgba(16, 185, 129, 0.9)',
+          border: '#fff'
+        }
+      };
+      
+      chart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Available', 'Pending', 'Adopted'],
+          datasets: [{
+            data: [props.stats.available, props.stats.pending, props.stats.adopted],
+            backgroundColor: [
+              colors.available.background, 
+              colors.pending.background, 
+              colors.adopted.background
+            ],
+            borderColor: [colors.available.border, colors.pending.border, colors.adopted.border],
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '75%',
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              enabled: true,
+              backgroundColor: 'rgba(255, 255, 255, 0.9)',
+              titleColor: '#111827',
+              bodyColor: '#374151',
+              borderColor: '#e5e7eb',
+              borderWidth: 1,
+              cornerRadius: 4,
+              displayColors: true,
+              boxPadding: 4,
+              callbacks: {
+                label: function(context) {
+                  const label = context.label || '';
+                  const value = context.raw || 0;
+                  const percentage = getPercentage(label.toLowerCase());
+                  return `${label}: ${value} (${percentage}%)`;
                 }
               }
-            },
-            animation: {
-              animateScale: true,
-              animateRotate: true
             }
+          },
+          animation: {
+            animateScale: true,
+            animateRotate: true
           }
-        });
+        }
       });
     };
 
+
     watch(() => props.stats, () => {
-      createChart();
+      setTimeout(() => {
+        initializeChart();
+      }, 100);
     }, { deep: true });
 
+
+    const observer = ref(null);
+    
     onMounted(() => {
-      createChart();
-      window.addEventListener('resize', createChart);
+      initializeChart();
+      
+      window.addEventListener('resize', initializeChart);
+      
+      observer.value = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
+          initializeChart();
+        }
+      });
+      
+      if (chartCanvas.value) {
+        observer.value.observe(chartCanvas.value);
+      }
     });
 
-    onUnmounted(() => {
-      if (chart) chart.destroy();
-      window.removeEventListener('resize', createChart);
+
+    onBeforeUnmount(() => {
+      if (chart) {
+        chart.destroy();
+      }
+      
+      window.removeEventListener('resize', initializeChart);
+      
+      if (observer.value && chartCanvas.value) {
+        observer.value.unobserve(chartCanvas.value);
+      }
     });
 
+    
     return {
       chartCanvas,
       totalPets,

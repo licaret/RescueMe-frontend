@@ -97,7 +97,7 @@
         :key="request.id" 
         class="request-card bg-white rounded-2xl border border-gray-200 shadow-md hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 overflow-hidden relative"
       >
-        <!-- Status indicator in top-right corner -->
+        <!-- Status indicator -->
         <span 
           class="absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-medium uppercase z-10"
           :class="{
@@ -112,7 +112,7 @@
         </span>
         
         <div class="p-6 grid grid-cols-1 md:grid-cols-12 gap-6">
-          <!-- Pet Image - Consistent sizing with aspect ratio -->
+          <!-- Pet Image -->
           <div class="md:col-span-3 flex items-center justify-center">
             <div class="w-full h-48 md:h-48 relative overflow-hidden rounded-2xl">
               <img 
@@ -160,10 +160,9 @@
 
           <!-- Shelter Information -->
           <div class="md:col-span-4 flex flex-col">
-            <!-- Empty space to push the shelter info lower -->
             <div class="flex-grow mb-4"></div>
             
-            <!-- Shelter Information Card - now positioned lower -->
+            <!-- Shelter Information Card -->
             <div class="bg-gray-50 rounded-2xl p-4 border border-gray-200">
               <h4 class="text-sm font-bold text-gray-700 mb-3 flex items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -203,7 +202,7 @@
           </div>
         </div>
         
-        <!-- Action Buttons - Separated from the shelter details -->
+        <!-- Action Buttons -->
         <div class="px-6 pb-6 grid grid-cols-3 gap-4">
           <router-link 
             :to="`/my-adoption-requests/${request.id}`" 
@@ -261,9 +260,8 @@
         </button>
       </nav>
     </div>
-
-    
   </div>
+
   <!-- Cancel Request Confirmation Popup -->
   <div v-if="showCancelPopup" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-hidden" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0;">
       <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden transform transition-all">
@@ -314,20 +312,23 @@ import { ref, onMounted, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { getUserAdoptionRequests, cancelAdoptionRequest } from '../services/adoption_service';
 import { getShelterByPetId } from '../services/user_service';
+import { getPetPhotoById } from '../services/pet_service';
 import Navbar from '@/components/Navbar.vue';
 
 export default {
+
   name: 'AdoptionRequestsView',
+
   components: {
     Navbar,
   },
+
   setup() {
     const router = useRouter();
     const requests = ref([]);
     const loading = ref(true);
     const error = ref(null);
     
-    // Filtering and Sorting
     const statusFilter = ref('');
     const sortBy = ref('newest');
     const currentPage = ref(1);
@@ -336,10 +337,12 @@ export default {
     const showCancelPopup = ref(false);
     const requestToCancel = ref(null);
 
+
     const cancelRequest = (requestId) => {
       requestToCancel.value = requestId;
       showCancelPopup.value = true;
     };
+
 
     const confirmCancelRequest = async () => {
       try {
@@ -356,10 +359,12 @@ export default {
       }
     };
 
+
     const closeCancelPopup = () => {
       showCancelPopup.value = false;
       requestToCancel.value = null;
     };
+
     
     const fetchRequests = async () => {
       loading.value = true;
@@ -420,16 +425,12 @@ export default {
     });
 
 
-
-    // Pagination
     const totalPages = computed(() => Math.ceil(filteredRequests.value.length / itemsPerPage.value));
     
-
 
     watch([statusFilter, sortBy], () => {
       currentPage.value = 1;
     });
-
 
 
     const paginatedRequests = computed(() => {
@@ -438,7 +439,6 @@ export default {
       return filteredRequests.value.slice(start, end);
     });
     
-
 
     const formatStatus = (status) => {
       if (!status) return 'Unknown';
@@ -455,7 +455,6 @@ export default {
     };
     
 
-    
     const formatDate = (dateString) => {
       if (!dateString) return 'Unknown date';
       
@@ -467,7 +466,7 @@ export default {
           hour: '2-digit',
           minute: '2-digit'
         };
-        return new Date(dateString).toLocaleDateString(undefined, options);
+        return new Date(dateString).toLocaleDateString('en-US', options);
       } catch (e) {
         console.error('Error formatting date:', e);
         return dateString;
@@ -475,24 +474,20 @@ export default {
     };
     
 
-
     onMounted(() => {
       fetchRequests();
     });
     
 
-
-
     const getPetPhotoUrl = async (request) => {
       if (request.pet && request.pet.photoIds && request.pet.photoIds.length > 0) {
         try {
           const photoId = request.pet.photoIds[0];
-          const response = await fetch(`http://localhost:8080/pet-photos/${photoId}`);
-          const photoData = await response.json();
+          const photoData = await getPetPhotoById(photoId);
           
           return photoData.url;
         } catch (error) {
-          console.error('Eroare la preluarea pozei:', error);
+          console.error('Error fetching pet photo:', error);
         }
       }
       
@@ -501,7 +496,6 @@ export default {
 
 
     const messageShelter = (shelterId) => {
-      // Get the shelter ID from the request
       const relevantRequest = requests.value.find(req => 
         (req.shelter && req.shelter.id === shelterId) || req.shelterId === shelterId
       );
@@ -511,10 +505,8 @@ export default {
         return;
       }
       
-      // Get the actual shelter ID
       const actualShelterId = relevantRequest.shelter?.id || relevantRequest.shelterId;
       
-      // Navigate to messages page with shelter ID
       router.push({
         path: '/messages',
         query: { 
@@ -527,31 +519,26 @@ export default {
 
 
     return {
-      // Data
       requests,
       loading,
       error,
       statusFilter,
       sortBy,
       currentPage,
-      
-      // Computed
       filteredRequests,
       totalPages,
       paginatedRequests,
+      showCancelPopup,
+      requestToCancel,
       
-      // Methods
       fetchRequests,
       cancelRequest,
       formatStatus,
       formatDate,
       getPetPhotoUrl,
-      messageShelter, 
-
+      messageShelter,
       confirmCancelRequest,
       closeCancelPopup, 
-      showCancelPopup ,
-      requestToCancel 
     };
   }
 };

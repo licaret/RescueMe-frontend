@@ -122,18 +122,24 @@ import { logout, fetchProfilePicture  } from "@/services/user_service";
 import LogoutConfirmationModal from '@/components/LogoutConfirmationModal.vue';
 
 export default {
+
   name: 'SidebarMenu',
+
   components: {
     LogoutConfirmationModal 
   },
+
   props: {
     isOpen: {
       type: Boolean,
       required: true
     }
   },
+
   emits: ['close'],
+
   setup(props, { emit }) {
+
     const router = useRouter();
     const userProfilePicture = ref(null);
     const username = ref('');
@@ -150,22 +156,27 @@ export default {
       }
     });
 
+
     const navigateTo = (path) => {
       router.push(path);
       emit('close');
     };
 
+
     const close = () => {
       emit('close');
     };
+
 
     const showLogoutConfirmation = () => {
       logoutConfirmationVisible.value = true;
     };
 
+
     const hideLogoutConfirmation = () => {
       logoutConfirmationVisible.value = false;
     };
+
 
     const loadProfilePicture = async (userId) => {
       try {
@@ -178,10 +189,10 @@ export default {
       }
     };
 
+
     const confirmLogout = async () => {
       try {
         await logout();
-        // router.push("/login");
         emit('close');
         hideLogoutConfirmation();
       } catch (e) {
@@ -194,6 +205,7 @@ export default {
       username,
       userRole,
       logoutConfirmationVisible,
+      
       navigateTo,
       close,
       showLogoutConfirmation,

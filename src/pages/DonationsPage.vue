@@ -13,7 +13,6 @@
         </p>
       </div>
   
-      <!-- Container for content -->
       <div class="max-w-6xl mx-auto bg-white rounded-2xl shadow-md overflow-hidden">
         <!-- Tabs -->
         <div class="border-b border-gray-200">
@@ -325,22 +324,26 @@
       :shelter-name="selectedShelterName"
       @close="closeDonationModal"
     />
+
   </template>
   
   <script>
   import { ref, computed, onMounted, watch } from 'vue';
-  import { useRouter } from 'vue-router';
+  import { getDonationsForUser } from '@/services/donation_service.js'
+  import { getAllShelters } from '@/services/user_service.js'
   import Navbar from '@/components/Navbar.vue';
   import DonationModal from '@/components/DonationModal.vue';
   
   export default {
+
     name: 'DonationsPage',
+
     components: {
       Navbar,
       DonationModal
     },
+
     setup() {
-      const router = useRouter();
       const activeTab = ref('history');
       const loading = ref(true);
       const loadingShelters = ref(true);
@@ -351,21 +354,20 @@
       const selectedShelterId = ref(null);
       const selectedShelterName = ref('');
       
-      // Pagination for donations
       const currentPage = ref(1);
       const itemsPerPage = 5;
       
-      // Pagination for shelters
       const shelterCurrentPage = ref(1);
       const shelterItemsPerPage = 6;
   
+
       const totalDonated = computed(() => {
         return donations.value
           .filter(d => d.paymentStatus === 'COMPLETED')
           .reduce((sum, donation) => sum + donation.amount, 0);
       });
   
-      // Changed to filter only by username (shelter name)
+
       const filteredShelters = computed(() => {
         if (!searchQuery.value) return shelters.value;
         
@@ -375,25 +377,29 @@
         );
       });
       
-      // Paginated donations
+
       const paginatedDonations = computed(() => {
         const start = (currentPage.value - 1) * itemsPerPage;
         const end = start + itemsPerPage;
         return donations.value.slice(start, end);
       });
       
+
       const totalPages = computed(() => {
         return Math.ceil(donations.value.length / itemsPerPage);
       });
       
+
       const paginationStart = computed(() => {
         return donations.value.length === 0 ? 0 : (currentPage.value - 1) * itemsPerPage + 1;
       });
       
+
       const paginationEnd = computed(() => {
         return Math.min(currentPage.value * itemsPerPage, donations.value.length);
       });
       
+
       const paginationArray = computed(() => {
         const pages = [];
         const maxVisiblePages = 5;
@@ -419,25 +425,29 @@
         return pages;
       });
       
-      // Paginated shelters
+      
       const paginatedShelters = computed(() => {
         const start = (shelterCurrentPage.value - 1) * shelterItemsPerPage;
         const end = start + shelterItemsPerPage;
         return filteredShelters.value.slice(start, end);
       });
       
+
       const shelterTotalPages = computed(() => {
         return Math.ceil(filteredShelters.value.length / shelterItemsPerPage);
       });
       
+
       const shelterPaginationStart = computed(() => {
         return filteredShelters.value.length === 0 ? 0 : (shelterCurrentPage.value - 1) * shelterItemsPerPage + 1;
       });
       
+
       const shelterPaginationEnd = computed(() => {
         return Math.min(shelterCurrentPage.value * shelterItemsPerPage, filteredShelters.value.length);
       });
       
+
       const shelterPaginationArray = computed(() => {
         const pages = [];
         const maxVisiblePages = 5;
@@ -463,35 +473,35 @@
         return pages;
       });
   
-      // Reset pagination when filters change
+      
       watch(searchQuery, () => {
         shelterCurrentPage.value = 1;
       });
       
+
       watch(activeTab, () => {
-        // Reset current page when switching tabs
         currentPage.value = 1;
         shelterCurrentPage.value = 1;
       });
   
+
       onMounted(async () => {
         await loadDonations();
         await loadShelters();
       });
   
+
       const loadDonations = async () => {
         loading.value = true;
         try {
           const userId = localStorage.getItem('Id');
           if (!userId) return;
           
-          const response = await fetch(`http://localhost:8080/api/v1/donations/user/${userId}`);
-          if (response.ok) {
-            const data = await response.json();
-            donations.value = data.sort((a, b) => 
-              new Date(b.donationDate) - new Date(a.donationDate)
-            );
-          }
+          const data = await getDonationsForUser(userId);
+          donations.value = data.sort((a, b) => 
+            new Date(b.donationDate) - new Date(a.donationDate)
+          );
+
         } catch (error) {
           console.error('Error loading donations:', error);
         } finally {
@@ -499,13 +509,11 @@
         }
       };
   
+
       const loadShelters = async () => {
         loadingShelters.value = true;
         try {
-          const response = await fetch('http://localhost:8080/users/shelters');
-          if (response.ok) {
-            shelters.value = await response.json();
-          }
+          shelters.value = await getAllShelters;
         } catch (error) {
           console.error('Error loading shelters:', error);
         } finally {
@@ -513,6 +521,7 @@
         }
       };
   
+
       const formatCurrency = (amount) => {
         return new Intl.NumberFormat('ro-RO', {
           style: 'currency',
@@ -521,6 +530,7 @@
         }).format(amount || 0);
       };
   
+
       const formatDate = (dateString, shortFormat = false) => {
         const date = new Date(dateString);
         
@@ -540,20 +550,22 @@
         }).format(date);
       };
   
+
       const truncate = (text, length) => {
         if (!text) return '';
         return text.length > length ? text.substring(0, length) + '...' : text;
       };
   
+
       const openDonationModal = (shelterId, shelterName) => {
         selectedShelterId.value = shelterId;
         selectedShelterName.value = shelterName;
         showDonationModal.value = true;
       };
   
+
       const closeDonationModal = () => {
         showDonationModal.value = false;
-        // Reload donations after a successful donation
         loadDonations();
       };
   

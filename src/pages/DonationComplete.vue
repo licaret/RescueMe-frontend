@@ -69,21 +69,23 @@
   
   <script>
   import { ref, onMounted } from 'vue';
-  import { useRoute, useRouter } from 'vue-router';
+  import {  useRouter } from 'vue-router';
   import { getStripePromise } from '@/utils/stripeClient';
   
   export default {
+
     name: 'DonationComplete',
+
     setup() {
-      const route = useRoute();
+
       const router = useRouter();
-      
+  
       const status = ref('loading');
       const returnPath = ref('/');
       
+
       const checkPaymentStatus = async () => {
         try {
-          // Get the payment intent client secret from the URL query parameters
           const clientSecret = new URLSearchParams(window.location.search).get(
             'payment_intent_client_secret'
           );
@@ -93,7 +95,6 @@
             return;
           }
           
-          // Retrieve the payment intent using the client secret
           const stripe = await getStripePromise();
           const { paymentIntent } = await stripe.retrievePaymentIntent(clientSecret);
           
@@ -108,12 +109,13 @@
         }
       };
       
+
       const tryAgain = () => {
-        router.go(-1); // Go back to previous page
+        router.go(-1); 
       };
       
+
       onMounted(() => {
-        // Try to extract shelter ID from previous route or from local storage
         const previousPath = document.referrer;
         if (previousPath && previousPath.includes('/shelter/')) {
           const match = previousPath.match(/\/shelter\/(\d+)/);
@@ -124,6 +126,7 @@
         
         checkPaymentStatus();
       });
+      
       
       return {
         status,

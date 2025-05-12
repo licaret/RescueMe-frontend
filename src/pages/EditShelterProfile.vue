@@ -951,10 +951,8 @@
 
 <script>
 import { ref, reactive, computed, onMounted } from 'vue';
-import { getShelterProfile } from '@/services/shelter_profile_service';
-import { getUserById, updateUser, changePassword } from '@/services/user_service';
-import { fetchProfilePicture, uploadProfilePicture, deleteProfilePicture } from '@/services/user_service';
-import { uploadDocument, deleteDocument, getDocumentStatus } from '@/services/shelter_profile_service';
+import { updateUser, changePassword, fetchProfilePicture, uploadProfilePicture, deleteProfilePicture } from '@/services/user_service';
+import { getShelterProfile, uploadDocument, deleteDocument, getDocumentStatus } from '@/services/shelter_profile_service';
 import judete from '@/assets/judete.json';
 import blankPicture from '@/assets/blank_profile_picture.jpg';
 
@@ -962,7 +960,6 @@ export default {
   name: 'EditShelterProfile',
 
   setup() {
-    // Basic state
     const activeTab = ref('account');
     const isSaving = ref(false);
     const isChangingPassword = ref(false);
@@ -977,7 +974,6 @@ export default {
     const phoneError = ref("");  
     const isValidPhone = ref(false); 
     
-    // Shelter data
     const shelter = reactive({
       id: localStorage.getItem('Id') || null,
       username: '',
@@ -995,22 +991,24 @@ export default {
       profilePictureUrl: null
     });
     
-    // Store initial data for comparison
+    
     const initialShelterData = reactive({});
     
-    // Password data
+    
     const passwordData = reactive({
       currentPassword: '',
       newPassword: '',
       confirmPassword: ''
     });
     
+
     const passwordVisibility = reactive({
       current: false,
       new: false,
       confirm: false
     });
     
+
     const passwordRequirements = reactive({
       length: false,
       lowercase: false,
@@ -1018,12 +1016,14 @@ export default {
       different: true 
     });
 
+
     const errors = reactive({
       currentPassword: '',
       newPassword: '',
       confirmPassword: '',
     });
     
+
     const documentStatus = reactive({
       taxCertificate: false,
       vetAuthorization: false,
@@ -1031,6 +1031,7 @@ export default {
       idCard: false
     });
     
+
     const isUploading = reactive({
       taxCertificate: false,
       vetAuthorization: false,
@@ -1038,6 +1039,7 @@ export default {
       idCard: false
     });
     
+
     const isDeleting = reactive({
       taxCertificate: false,
       vetAuthorization: false,
@@ -1045,21 +1047,17 @@ export default {
       idCard: false
     });
     
-    // Document viewer
     const showDocumentModal = ref(false);
     const currentDocumentType = ref('');
     const documentUrl = ref('');
     
-    // Profile picture states
     const isUploadingProfilePicture = ref(false);
     const isDeletingProfilePicture = ref(false);
     
-    // Location data
     const counties = ref([]);
     const cities = ref([]);
     const citiesLoading = ref(false);
     
-
     const shelterTypes = [
       'Municipal Shelter',
       'Private Shelter',
@@ -1073,7 +1071,6 @@ export default {
     
 
 
-    // Computed properties
     const accountHasChanges = computed(() => {
       const accountFields = ['username', 'email', 'phoneNumber', 'shelterType'];
       return accountFields.some(field => 
@@ -1783,7 +1780,6 @@ export default {
     
 
     return {
-      // State
       activeTab,
       shelter,
       passwordData,
@@ -1809,20 +1805,13 @@ export default {
       citiesLoading,
       errors,
       validationAttempted,
-      
-      // Computed
       accountHasChanges,
       detailsHasChanges,
-      
       phoneInput, 
       phoneError,
       isValidPhone,
-      validatePhoneOnInput,
-      
-      // Fixed data
       shelterTypes,
       
-      // Methods
       savePassword,
       limitMissionLength,
       saveChanges,
@@ -1838,7 +1827,8 @@ export default {
       viewDocument,
       getDocumentUrl,
       getDocumentTypeName,
-      goBack
+      goBack,
+      validatePhoneOnInput,
     };
   }
 };
