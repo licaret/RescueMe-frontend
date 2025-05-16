@@ -47,7 +47,7 @@
   </section>
 
     <!-- Emergency Banner-->
-    <section class="py-4 bg-red-600 text-white">
+    <section v-if="urgentPetsCount > 0" class="py-4 bg-red-600 text-white">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex flex-col md:flex-row items-center justify-between">
         <div class="flex items-center mb-4 md:mb-0">
@@ -259,6 +259,7 @@
   </section>
 
   <Footer></Footer>
+  
 </template>
 
 <script>

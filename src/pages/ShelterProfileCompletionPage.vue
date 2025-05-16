@@ -42,7 +42,7 @@
         </button>
       </div>
 
-      <!-- Success view (displayed after successful submission or approval) -->
+      <!-- Success view (displayed after successful submission, when in PENDING_APPROVAL) -->
       <div v-if="profileSubmitted" class="text-center mt-10">
         <div class="p-10 bg-white rounded-lg shadow-md">
           <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-6">
@@ -50,7 +50,6 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          
           
           <!-- When status is PENDING_APPROVAL -->
           <div v-if="shelterData.status === 'PENDING_APPROVAL'" class="max-w-4xl mx-auto text-center">
@@ -118,9 +117,7 @@
             <p class="text-gray-500 text-sm">
               Have questions? Contact our support team at <a href="mailto:rescueme.care@gmail.com" class="text-blue-600 hover:underline">rescueme.care@gmail.com</a>
             </p>
-
           </div>
-          
         </div>
       </div>
 
@@ -357,7 +354,6 @@
               
               <div class="mb-4">
                 <div class="flex flex-col space-y-4">
-                  <!-- Weekdays selection -->
                   <div class="bg-gray-50 rounded-lg border border-gray-200 p-3">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Weekdays (Mon-Fri)</label>
                     <div class="flex items-center">
@@ -383,7 +379,6 @@
                     </div>
                   </div>
                   
-                  <!-- Weekend selection -->
                   <div class="bg-gray-50 rounded-lg border border-gray-200 p-3">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Weekend (Sat-Sun)</label>
                     <div class="flex items-center">
@@ -438,7 +433,6 @@
                   </div>
                 </div>
               </div>
-              
               <p v-if="errors.hoursOfOperation" class="text-red-500 text-sm mt-1">{{ errors.hoursOfOperation }}</p>
             </div>
           </div>
@@ -715,7 +709,6 @@
                   </div>
                 </div>
               </div>
-              
               <p v-if="errors.idCard" class="text-red-500 text-sm mt-1">{{ errors.idCard }}</p>
             </div>
           </div>
@@ -797,7 +790,6 @@ export default {
         profilePicture: null 
       },
       
-      // Document status
       documentStatus: {
         taxCertificate: false,
         vetAuthorization: false,
@@ -805,7 +797,6 @@ export default {
         idCard: false
       },
       
-      // Loading states for document operations
       isUploading: {
         taxCertificate: false,
         vetAuthorization: false,
@@ -819,10 +810,8 @@ export default {
         idCard: false
       },
       
-      // Form validation
       errors: {},
       
-      // Dropdown options
       shelterTypes: [
         'Municipal Shelter',
         'Private Shelter',
@@ -837,7 +826,6 @@ export default {
       cities: [] 
     }
   },
-  
   
 
   async mounted() {
@@ -1357,7 +1345,6 @@ export default {
       
       return isValid;
     },
-    
 
 
 
@@ -1456,13 +1443,11 @@ export default {
         }, 3000);
       }
     },
-    
 
 
     getCurrentId() {
       return localStorage.getItem('Id') || localStorage.getItem('Id');
     },
-    
 
 
     getDocumentTypeName(documentType) {
@@ -1478,6 +1463,7 @@ export default {
     
 
     getDocumentUrl,
+    
     
     goToDashboard() {
       if (this.$router) {

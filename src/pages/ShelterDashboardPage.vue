@@ -502,7 +502,6 @@ export default {
       }
     };
 
-    
 
     const loadPendingAdoptionCount = async () => {
       const shelterId = localStorage.getItem("Id");
@@ -535,12 +534,6 @@ export default {
       switch (notification.type) {
         case 'ADOPTION_REQUEST':
           return 'bg-blue-600';
-        // case 'DONATION':
-        //   return 'bg-green-600';
-        // case 'APPROVAL':
-        //   return 'bg-green-500';
-        // case 'SYSTEM':
-        //   return 'bg-purple-600';
         default:
           return 'bg-gray-500';
       }
@@ -554,12 +547,6 @@ export default {
       switch (notification.type) {
         case 'ADOPTION_REQUEST':
           return 'M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9';
-        // case 'DONATION':
-        //   return 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z';
-        // case 'APPROVAL':
-        //   return 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z';
-        // case 'SYSTEM':
-        //   return 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z';
         default:
           return 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z';
       }
@@ -573,12 +560,6 @@ export default {
             fill: "none",
             path: "M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
           };
-        // case 'DONATION':
-        //   return {
-        //     bg: "bg-green-600",
-        //     fill: "none",
-        //     path: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-        //   };
         default:
           return {
             bg: "bg-gray-500",
@@ -632,18 +613,6 @@ export default {
         case 'NEW_ADOPTION_REQUEST':
           router.push('/shelter-dashboard/adoption-requests');
           break;
-        // case 'DONATION':
-        //   router.push('/shelter-dashboard/donations');
-        //   break;
-        // case 'APPROVAL':
-        //   router.push('/shelter-dashboard/edit-profile');
-        //   break;
-        // case 'PET_UPDATE':
-        //   router.push('/shelter-dashboard/manage-pets');
-        //   break;
-        // case 'EVENT':
-        //   router.push('/shelter-dashboard/manage-events');
-        //   break;
         default:
           router.push('/shelter-dashboard/');
           break;
@@ -655,14 +624,6 @@ export default {
       switch (type) {
         case 'NEW_ADOPTION_REQUEST':
           return 'Pending';
-        // case 'APPROVAL':
-        //   return 'Completed';
-        // case 'DONATION':
-        //   return 'Donation';
-        // case 'EVENT':
-        //   return 'Event';
-        // case 'PET_FAVORITE':
-        //   return 'Favorite';
         default:
           return 'Update';
       }
@@ -696,9 +657,11 @@ export default {
       logoutModalVisible.value = true;
     };
 
+
     const hideLogoutConfirmation = () => {
       logoutModalVisible.value = false;
     };
+
 
     const confirmLogout = async () => {
       try {
@@ -708,15 +671,18 @@ export default {
       }
     };
 
+
     const handleLogout = () => {
       showLogoutConfirmation();
     };
+
 
     const handleClickOutside = (event) => {
       if (showNotifications.value && !event.target.closest('.notifications-container')) {
         showNotifications.value = false;
       }
     };
+
 
     const handleResize = () => {
       if (window.innerWidth < 768) {
@@ -725,6 +691,7 @@ export default {
         sidebarOpen.value = true;
       }
     };
+
 
     const handleNewMessageEvent = async (event) => {
       const message = event.detail;
@@ -760,11 +727,13 @@ export default {
       return `${Math.floor(diff / 86400)} days ago`;
     };
 
+
     watch(() => route.path, (newPath) => {
       if (newPath === '/shelter-dashboard/messages') {
         unreadMessagesCount.value = 0;
       }
     });
+
 
     onMounted(() => {
       const username = localStorage.getItem("Username");
@@ -807,6 +776,7 @@ export default {
       window.removeEventListener('message-read', handleMessageReadEvent);
     });
 
+
     onMounted(() => {
       const username = localStorage.getItem("Username");
       if (username) shelterUsername.value = username;
@@ -840,7 +810,6 @@ export default {
       loadPendingAdoptionCount();
       loadUpcomingEvents();
       loadUrgentPets();
-
       fetchUnreadMessagesCount();
   
       const interval = setInterval(fetchUnreadMessagesCount, 30000);

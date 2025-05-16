@@ -421,6 +421,29 @@ const getShelterByPetId = async (petId) => {
   }
 };
 
+async function getShelterById(shelterId) {
+  try {
+    const token = localStorage.getItem("token");
+    
+    const response = await fetch(`http://localhost:8080/users/shelter/${shelterId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Failed to fetch shelter with ID: ${shelterId}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error(`Error fetching shelter with ID ${shelterId}:`, error);
+    throw error;
+  }
+}
 
 
 export { 
@@ -441,5 +464,6 @@ export {
   changePassword,
   uploadShelterDocument,
   getAllShelters,
-  getShelterByPetId
+  getShelterByPetId,
+  getShelterById
  };

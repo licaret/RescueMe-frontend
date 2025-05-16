@@ -14,14 +14,12 @@
     <!-- Show approval message -->
     <div v-else-if="showWelcome" class="bg-white rounded-3xl shadow-xl p-8 md:p-12 max-w-3xl w-full mx-auto transition-all duration-500 transform hover:shadow-2xl">
       <div class="text-center">
-        <!-- Success icon with animation -->
         <div class="mx-auto flex items-center justify-center h-24 w-24 rounded-full bg-green-100 mb-8 animate__animated animate__bounceIn">
           <svg class="h-12 w-12 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
           </svg>
         </div>
         
-        <!-- Heading with gradient text -->
         <h1 class="text-3xl font-bold mb-6 bg-gradient-to-r from-red-600 to-red-400 text-transparent bg-clip-text">
           Congratulations! Your Shelter Has Been Approved!
         </h1>
@@ -63,8 +61,7 @@
             <p class="text-gray-600 text-sm">Keep your shelter information up to date for potential adopters.</p>
           </div>
         </div>
-        
-        <!-- CTA section with pulsing effect -->
+
         <div class="bg-gradient-to-r from-red-50 to-red-100 p-8 rounded-2xl mb-8 relative overflow-hidden">
           <div class="relative z-10">
             <h2 class="text-xl font-semibold text-gray-800 mb-4">Ready to start helping animals?</h2>
@@ -82,20 +79,19 @@
               </svg>
             </button>
           </div>
-          
-          <!-- Background decoration elements -->
+
           <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 rounded-full bg-red-200 opacity-50"></div>
           <div class="absolute bottom-0 left-0 -mb-4 -ml-4 w-16 h-16 rounded-full bg-red-200 opacity-50"></div>
+
         </div>
         
-        <!-- Footer note -->
         <p class="text-gray-500 text-sm">
           Have questions? Contact our support team at <a href="mailto:rescueme.care@gmail.com" class="text-red-600 hover:underline">rescueme.care@gmail.com</a>
         </p>
       </div>
     </div>
     
-    <!-- If no welcome needed, redirect with nicer loading -->
+    <!-- If no welcome needed -->
     <div v-else class="text-center py-10">
       <div class="flex flex-col items-center">
         <svg class="animate-spin h-10 w-10 text-red-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

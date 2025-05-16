@@ -282,6 +282,7 @@ async function getBreedsBySpecies(species) {
     return [];
   }
 }
+
 async function getPetPhotoById(photoId) {
   try {
     const response = await fetch(`http://localhost:8080/pet-photos/${photoId}`);

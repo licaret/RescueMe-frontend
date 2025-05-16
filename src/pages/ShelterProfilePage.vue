@@ -244,19 +244,13 @@
                 </svg>
                 Donate Now
               </button>
-              <!-- <button class="w-full bg-white border-2 border-gray-300 hover:border-red-500 hover:bg-red-50 text-gray-700 hover:text-red-600 font-medium py-3 px-4 rounded-2xl transition-all shadow-sm hover:shadow-md transform hover:-translate-y-1 flex justify-center items-center">
-                <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-                Volunteer
-              </button> -->
             </div>
           </div>
 
         </div>
       </div>
 
-      <!-- Pet Showcase Section with Pagination -->
+      <!-- Pets Section with Pagination -->
       <div class="bg-white shadow-lg rounded-xl p-6 border border-gray-200 hover:shadow-xl transition-all duration-300 mt-6">
         <h2 class="text-xl font-bold text-gray-800 mb-6 border-b border-gray-200 pb-2 flex items-center">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -336,7 +330,7 @@
         </div>
       </div>
 
-      <!-- Event Showcase Section with Pagination -->
+      <!-- Events Section with Pagination -->
       <div class="bg-white shadow-lg rounded-xl p-6 border border-gray-200 hover:shadow-xl transition-all duration-300 mt-6">
         <h2 class="text-xl font-bold text-gray-800 mb-6 border-b border-gray-200 pb-2 flex items-center">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -409,17 +403,22 @@
       </div>
     </div>
   </div>
+
   <DonationModal 
     :is-open="isDonationModalOpen"
     :shelter-id="shelter.id"
     :shelter-name="shelter.username"
     @close="closeDonationModal"
   />
+
 </template>
 
 <script>
 import { ref, computed, onMounted } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+import { useRoute } from 'vue-router';
+import { getShelterById } from '@/services/user_service.js';
+import { fetchShelterPets } from '@/services/pet_service.js';
+import { fetchShelterEvents, fetchUserEvents } from '@/services/event_service.js';
 import Navbar from "@/components/Navbar.vue";
 import PetCard from "@/components/PetCard.vue";
 import EventCard from "@/components/EventCard.vue";
@@ -427,14 +426,15 @@ import DonationModal from "@/components/DonationModal.vue";
 
 export default {
   name: 'ShelterProfile',
+
   components: {
     Navbar,
     PetCard, 
     EventCard,
     DonationModal
   },
+
   setup() {
-    const router = useRouter();
     const route = useRoute();
 
     const shelterId = route.params.id;
@@ -443,46 +443,35 @@ export default {
     const error = ref('');
     const imageError = ref(false);
 
-    // Pets pagination
     const currentPage = ref(0);
     const petsPerPage = 3;
+    const eventCurrentPage = ref(0);
+    const eventsPerPage = 3;
 
-    // Donation modal state
     const isDonationModalOpen = ref(false);
 
-    // Donation statistics
     const donationStats = ref({
       totalDonations: 0,
       totalAmountRaised: 0,
       recentDonations: []
     });
 
-    // Open donation modal
+
     const openDonationModal = () => {
       isDonationModalOpen.value = true;
     };
 
-    // Close donation modal
+
     const closeDonationModal = () => {
       isDonationModalOpen.value = false;
     };
 
-    // Function to load donation statistics
-    const loadDonationStats = async () => {
-      try {
-        const response = await fetch(`http://localhost:8080/api/v1/donations/statistics/${shelterId}`);
-        if (response.ok) {
-          donationStats.value = await response.json();
-        }
-      } catch (err) {
-        console.error("Error loading donation statistics:", err);
-      }
-    };
 
     const availablePetsCount = computed(() => {
       if (!shelter.value.pets) return 0;
       return shelter.value.pets.filter(pet => pet.status === 'AVAILABLE').length;
     });
+
 
     const paginatedPets = computed(() => {
       if (!shelter.value.pets) return [];
@@ -490,10 +479,12 @@ export default {
       return shelter.value.pets.slice(start, start + petsPerPage);
     });
 
+
     const maxPage = computed(() => {
       if (!shelter.value.pets) return 0;
       return Math.ceil(shelter.value.pets.length / petsPerPage) - 1;
     });
+
 
     const nextPage = () => {
       if (currentPage.value < maxPage.value) {
@@ -501,20 +492,19 @@ export default {
       }
     };
 
+
     const prevPage = () => {
       if (currentPage.value > 0) {
         currentPage.value--;
       }
     };
 
-    // Events pagination
-    const eventCurrentPage = ref(0);
-    const eventsPerPage = 3;
 
     const eventMaxPage = computed(() => {
       if (!shelter.value.events || shelter.value.events.length === 0) return 0;
       return Math.ceil(shelter.value.events.length / eventsPerPage) - 1;
     });
+
 
     const displayedEvents = computed(() => {
       if (!shelter.value.events || shelter.value.events.length === 0) return [];
@@ -522,17 +512,20 @@ export default {
       return shelter.value.events.slice(start, start + eventsPerPage);
     });
 
+
     const nextEventPage = () => {
       if (eventCurrentPage.value < eventMaxPage.value) {
         eventCurrentPage.value++;
       }
     };
 
+
     const prevEventPage = () => {
       if (eventCurrentPage.value > 0) {
         eventCurrentPage.value--;
       }
     };
+
 
     const formatLocation = computed(() => {
       if (!shelter.value) return 'Location unavailable';
@@ -543,6 +536,7 @@ export default {
       if (county) return county;
       return 'Location unavailable';
     });
+
 
     const formatFullAddress = computed(() => {
       if (!shelter.value) return 'Address unavailable';
@@ -564,42 +558,36 @@ export default {
       }
     });
 
-    const adoptPet = (petId) => {
-      alert(`Starting adoption process for pet ID: ${petId}`);
-    };
 
-    // Event handlers for attendance status updates
+
     const updateEventStatus = ({ id, newStatus }) => {
       console.log(`Updating event ${id} status to ${newStatus}`);
       
-      // Find and update the event in shelter's events array
       if (shelter.value.events) {
         const eventIndex = shelter.value.events.findIndex(event => event.id === id);
         if (eventIndex !== -1) {
-          // Create a new event object with the updated status to maintain reactivity
           const updatedEvent = { 
             ...shelter.value.events[eventIndex],
-            userAttendanceStatus: newStatus  // This matches the property we set during fetch
+            userAttendanceStatus: newStatus  
           };
           
-          // Replace the old event with the updated one
           shelter.value.events.splice(eventIndex, 1, updatedEvent);
         }
       }
     };
+
 
     const onEventUpdated = (updatedEvent) => {
       console.log('Event updated:', updatedEvent);
       
-      // Find and update the event in shelter's events array
       if (shelter.value.events) {
         const eventIndex = shelter.value.events.findIndex(event => event.id === updatedEvent.id);
         if (eventIndex !== -1) {
-          // Replace the old event with the updated one
           shelter.value.events.splice(eventIndex, 1, updatedEvent);
         }
       }
     };
+
 
     const loadShelterData = async () => {
       try {
@@ -607,77 +595,48 @@ export default {
         error.value = '';
         imageError.value = false;
 
-        // Fetch shelter basic data
-        const response = await fetch(`http://localhost:8080/users/shelter/${shelterId}`);
-        if (!response.ok) throw new Error(`Failed to fetch shelter: ${response.status} ${response.statusText}`);
-        shelter.value = await response.json();
+        shelter.value = await getShelterById(shelterId);
 
-        // Fetch pets
-        const petsResponse = await fetch(`http://localhost:8080/pets/${shelterId}`);
-        if (petsResponse.ok) {
-          const petsData = await petsResponse.json();
-          shelter.value.pets = petsData.map(pet => {
-            if (pet.photos && pet.photos.length > 0) {
-              pet.photos.forEach(photo => {
-                if (!photo.url && photo.id) {
-                  photo.url = `data:image/jpeg;base64,${photo}`;
-                }
-              });
-            }
-            return pet;
-          });
-        } else {
-          console.error("Failed to fetch pets for this shelter");
+        try {
+          const petsData = await fetchShelterPets(shelterId);
+          shelter.value.pets = petsData;
+        } catch (err) {
+          console.error("Failed to fetch pets for this shelter:", err);
           shelter.value.pets = [];
         }
 
-        // Fetch events with user participation status
-        const eventsResponse = await fetch(`http://localhost:8080/api/v1/events/shelter/${shelterId}`);
-        if (eventsResponse.ok) {
-          const eventsData = await eventsResponse.json();
+        try {
+          const eventsData = await fetchShelterEvents(shelterId);
           
-          // Filter for upcoming and active events
           const now = new Date();
           const upcomingEvents = eventsData.filter(event => 
             event.isActive && new Date(event.endDateTime) > now
           );
           
-          // Get current user ID for checking participation
           const userId = localStorage.getItem('Id');
           
-          // If user is logged in, fetch participation status for all events at once
           if (userId) {
             try {
-              const userEventsResponse = await fetch(
-                `http://localhost:8080/api/v1/events/user/${userId}`
-              );
+              const userEvents = await fetchUserEvents(userId);
+              console.log('User events:', userEvents);
               
-              if (userEventsResponse.ok) {
-                const userEvents = await userEventsResponse.json();
-                console.log('User events:', userEvents);
-                
-                // Apply the participation status to each event
-                upcomingEvents.forEach(event => {
-                  const userEvent = userEvents.find(ue => ue.eventId === event.id);
-                  if (userEvent) {
-                    // Make sure we're using the right property name that the EventCard component expects
-                    event.userAttendanceStatus = userEvent.status; 
-                    console.log(`Event ${event.id} has status: ${event.userAttendanceStatus}`);
-                  }
-                });
-              }
+              upcomingEvents.forEach(event => {
+                const userEvent = userEvents.find(ue => ue.eventId === event.id);
+                if (userEvent) {
+                  event.userAttendanceStatus = userEvent.status; 
+                  console.log(`Event ${event.id} has status: ${event.userAttendanceStatus}`);
+                }
+              });
             } catch (err) {
               console.error("Failed to fetch user's participation status:", err);
             }
           }
           
           shelter.value.events = upcomingEvents;
-          
-        } else {
-          console.error("Failed to fetch events for this shelter");
+        } catch (err) {
+          console.error("Failed to fetch events for this shelter:", err);
           shelter.value.events = [];
         }
-        await loadDonationStats();
       } catch (err) {
         console.error("Error loading shelter data:", err);
         error.value = "Could not load shelter information. Please try again later.";
@@ -686,9 +645,11 @@ export default {
       }
     };
 
+
     onMounted(() => {
       loadShelterData();
     });
+
 
     return {
       shelter,
@@ -698,24 +659,23 @@ export default {
       availablePetsCount,
       formatLocation,
       formatFullAddress,
-      adoptPet,
       currentPage,
       paginatedPets,
       maxPage,
-      nextPage,
-      prevPage,
-      // Events
       eventCurrentPage,
       eventMaxPage,
       displayedEvents,
+      isDonationModalOpen,
+      donationStats,
+
+      nextPage,
+      prevPage,
       nextEventPage,
       prevEventPage,
       updateEventStatus,
       onEventUpdated,
-      isDonationModalOpen,
       openDonationModal,
-      closeDonationModal,
-      donationStats
+      closeDonationModal
     };
   }
 };
