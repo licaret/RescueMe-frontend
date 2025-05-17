@@ -1,6 +1,23 @@
 const API_URL = 'http://localhost:8080/api/v1';
 
+/**
+ * Function to create authorized headers with JWT token
+ * @returns {Object} Headers object with Authorization and Content-Type
+ */
+const getAuthHeaders = () => {
+  const token = localStorage.getItem('token');
+  return {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json'
+  };
+};
 
+/**
+ * Handles API responses uniformly, processing different response types and errors
+ * @param {Response} response - The fetch API response object
+ * @returns {Promise<Object|null>} The processed response data
+ * @throws {Error} Throws an error with message from the server if response is not ok
+ */
 const handleResponse = async (response) => {
   if (!response.ok) {
     let errorMessage;
@@ -31,22 +48,20 @@ const handleResponse = async (response) => {
   }
 };
 
-
-
+/**
+ * Submit a new adoption request
+ * @param {Object} adoptionData - Data for the adoption request
+ * @returns {Promise<Object>} The created adoption request
+ */
 async function submitAdoptionRequest(adoptionData) {
   try {
-    const token = localStorage.getItem('token');
-    
     console.log('Sending adoption request:', adoptionData);
     
     const cleanData = JSON.parse(JSON.stringify(adoptionData));
     
     const response = await fetch(`${API_URL}/adoptions/requests`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
+      headers: getAuthHeaders(),
       body: JSON.stringify(cleanData),
     });
     
@@ -57,14 +72,15 @@ async function submitAdoptionRequest(adoptionData) {
   }
 }
 
-
+/**
+ * Get all adoption requests for a specific user
+ * @param {number} userId - The ID of the user
+ * @returns {Promise<Array>} List of adoption requests for the user
+ */
 async function getUserAdoptionRequests(userId) {
   try {
-    const token = localStorage.getItem('token');
     const response = await fetch(`${API_URL}/adoptions/requests/user/${userId}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
+      headers: getAuthHeaders()
     });
     return handleResponse(response);
   } catch (error) {
@@ -73,14 +89,15 @@ async function getUserAdoptionRequests(userId) {
   }
 }
 
-
+/**
+ * Get all adoption requests for a specific shelter
+ * @param {number} shelterId - The ID of the shelter
+ * @returns {Promise<Array>} List of adoption requests for the shelter
+ */
 async function getShelterAdoptionRequests(shelterId) {
   try {
-    const token = localStorage.getItem('token');
     const response = await fetch(`${API_URL}/adoptions/requests/shelter/${shelterId}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
+      headers: getAuthHeaders()
     });
     return handleResponse(response);
   } catch (error) {
@@ -89,15 +106,15 @@ async function getShelterAdoptionRequests(shelterId) {
   }
 }
 
-
-
+/**
+ * Get details of a specific adoption request by ID
+ * @param {string} requestId - The ID of the adoption request
+ * @returns {Promise<Object>} The adoption request details
+ */
 async function getAdoptionRequestById(requestId) {
   try {
-    const token = localStorage.getItem('token');
     const response = await fetch(`${API_URL}/adoptions/requests/${requestId}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
+      headers: getAuthHeaders()
     });
     return handleResponse(response);
   } catch (error) {
@@ -106,17 +123,18 @@ async function getAdoptionRequestById(requestId) {
   }
 }
 
-
-
+/**
+ * Update the status of an adoption request
+ * @param {string} requestId - The ID of the adoption request
+ * @param {string} status - The new status (APPROVED, REJECTED, etc.)
+ * @param {string} notes - Optional notes about the status change
+ * @returns {Promise<Object>} The updated adoption request
+ */
 async function updateAdoptionRequestStatus(requestId, status, notes) {
   try {
-    const token = localStorage.getItem('token');
     const response = await fetch(`${API_URL}/adoptions/requests/${requestId}`, {
       method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
+      headers: getAuthHeaders(),
       body: JSON.stringify({ status, notes }),
     });
     return handleResponse(response);
@@ -126,16 +144,16 @@ async function updateAdoptionRequestStatus(requestId, status, notes) {
   }
 }
 
-
-
+/**
+ * Cancel an existing adoption request
+ * @param {string} requestId - The ID of the adoption request
+ * @returns {Promise<Object|null>} Response confirming cancellation
+ */
 async function cancelAdoptionRequest(requestId) {
   try {
-    const token = localStorage.getItem('token');
     const response = await fetch(`${API_URL}/adoptions/requests/${requestId}`, {
       method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
+      headers: getAuthHeaders()
     });
     return handleResponse(response);
   } catch (error) {
@@ -144,29 +162,31 @@ async function cancelAdoptionRequest(requestId) {
   }
 }
 
-
-const completeAdoption = async (requestId) => {
+/**
+ * Mark an adoption request as completed (pet is adopted)
+ * @param {string} requestId - The ID of the adoption request
+ * @returns {Promise<Object>} The completed adoption request
+ */
+async function completeAdoption(requestId) {
   try {
-    const response = await fetch(`http://localhost:8080/api/v1/adoptions/requests/${requestId}/complete`, {
+    const response = await fetch(`${API_URL}/adoptions/requests/${requestId}/complete`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      }
+      headers: getAuthHeaders()
     });
     
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to complete adoption');
-    }
-    
-    return await response.json();
+    return handleResponse(response);
   } catch (error) {
     console.error('Error completing adoption:', error);
     throw error;
   }
-};
+}
 
-
+/**
+ * Check if a user already has an active adoption request for a specific pet
+ * @param {number} userId - The ID of the user
+ * @param {number} petId - The ID of the pet
+ * @returns {Promise<boolean>} True if an active request exists, false otherwise
+ */
 async function checkExistingRequest(userId, petId) {
   try {
     const requests = await getUserAdoptionRequests(userId);
@@ -182,12 +202,17 @@ async function checkExistingRequest(userId, petId) {
 
 
 export { 
+  // Request submission and management
   submitAdoptionRequest,
+  cancelAdoptionRequest,
+  updateAdoptionRequestStatus,
+  completeAdoption,
+  
+  // Request retrieval
   getUserAdoptionRequests,
   getShelterAdoptionRequests,
   getAdoptionRequestById,
-  updateAdoptionRequestStatus,
-  cancelAdoptionRequest,
-  completeAdoption,
+  
+  // Utility functions
   checkExistingRequest
 };

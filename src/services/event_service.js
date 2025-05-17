@@ -1,24 +1,59 @@
-// src/services/event_service.js
-
 const API_BASE_URL = 'http://localhost:8080/api/v1/events';
 
 /**
- * Fetch all events
+ * Function to create authorized headers with JWT token
+ * @param {boolean} includeUserId - Whether to include the userId header
+ * @param {Object} additionalHeaders - Any additional headers to include
+ * @returns {Object} Headers object with Authorization and Content-Type
+ */
+const getAuthHeaders = (includeUserId = true, additionalHeaders = {}) => {
+  const token = localStorage.getItem('token');
+  const userId = localStorage.getItem('Id');
+  
+  const headers = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`,
+    ...additionalHeaders
+  };
+  
+  if (includeUserId && userId) {
+    headers['userId'] = userId;
+  }
+  
+  return headers;
+};
+
+/**
+ * Handles response error checking
+ * @param {Response} response - The fetch API response
+ * @param {string} errorMessage - Custom error message prefix
+ * @returns {Promise<any>} - The response JSON data
+ */
+const handleResponse = async (response, errorMessage) => {
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`${errorMessage}: ${errorText}`);
+  }
+  return await response.json();
+};
+
+/**
+ * Fetch all events - works with or without authentication
  * @returns {Promise<Array>} - Promise that resolves to an array of all events
  */
-// In event_service.js
 export async function fetchAllEvents() {
   try {
     const userId = localStorage.getItem("Id");
+    const token = localStorage.getItem("token");
     
-    // Create basic headers
+    // Create headers based on authentication status
     const headers = {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     };
     
     // Only add auth and userId headers if user is logged in
-    if (userId) {
-      headers['Authorization'] = `Bearer ${localStorage.getItem('token')}`;
+    if (userId && token) {
+      headers['Authorization'] = `Bearer ${token}`;
       headers['userId'] = userId;
     }
     
@@ -27,12 +62,7 @@ export async function fetchAllEvents() {
       headers: headers,
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Failed to fetch events: ${errorText}`);
-    }
-
-    return await response.json();
+    return handleResponse(response, "Failed to fetch events");
   } catch (error) {
     console.error('Error fetching all events:', error);
     throw error;
@@ -48,18 +78,10 @@ export async function fetchShelterEvents(shelterId) {
   try {
     const response = await fetch(`${API_BASE_URL}/shelter/${shelterId}`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-      },
+      headers: getAuthHeaders(false),
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Failed to fetch shelter events: ${errorText}`);
-    }
-
-    return await response.json();
+    return handleResponse(response, "Failed to fetch shelter events");
   } catch (error) {
     console.error('Error fetching shelter events:', error);
     throw error;
@@ -76,20 +98,11 @@ export async function createEvent(eventData, shelterId) {
   try {
     const response = await fetch(API_BASE_URL, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        'shelterId': shelterId
-      },
+      headers: getAuthHeaders(false, { 'shelterId': shelterId }),
       body: JSON.stringify(eventData)
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Failed to create event: ${errorText}`);
-    }
-
-    return await response.json();
+    return handleResponse(response, "Failed to create event");
   } catch (error) {
     console.error('Error creating event:', error);
     throw error;
@@ -107,22 +120,35 @@ export async function updateEvent(eventId, eventData, shelterId) {
   try {
     const response = await fetch(`${API_BASE_URL}/${eventId}`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        'shelterId': shelterId
-      },
+      headers: getAuthHeaders(false, { 'shelterId': shelterId }),
       body: JSON.stringify(eventData)
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Failed to update event: ${errorText}`);
-    }
-
-    return await response.json();
+    return handleResponse(response, "Failed to update event");
   } catch (error) {
     console.error('Error updating event:', error);
+    throw error;
+  }
+}
+
+/**
+ * Partially update an event
+ * @param {number} eventId - The ID of the event
+ * @param {Object} updateData - The partial data to update
+ * @param {number} shelterId - The ID of the shelter
+ * @returns {Promise<Object>} - Promise that resolves to the updated event
+ */
+export async function partialUpdateEvent(eventId, updateData, shelterId) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/${eventId}`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(false, { 'shelterId': shelterId }),
+      body: JSON.stringify(updateData)
+    });
+
+    return handleResponse(response, "Failed to partially update event");
+  } catch (error) {
+    console.error('Error partially updating event:', error);
     throw error;
   }
 }
@@ -137,10 +163,7 @@ export async function deleteEvent(eventId, shelterId) {
   try {
     const response = await fetch(`${API_BASE_URL}/${eventId}`, {
       method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        'shelterId': shelterId
-      }
+      headers: getAuthHeaders(false, { 'shelterId': shelterId })
     });
 
     if (!response.ok) {
@@ -153,8 +176,6 @@ export async function deleteEvent(eventId, shelterId) {
   }
 }
 
-
-
 /**
  * Fetch upcoming events
  * @param {number} userId - Optional user ID
@@ -162,23 +183,38 @@ export async function deleteEvent(eventId, shelterId) {
  */
 export async function fetchUpcomingEvents(userId) {
   try {
+    const headers = getAuthHeaders(false);
+    if (userId) {
+      headers['userId'] = userId;
+    }
+    
     const response = await fetch(`${API_BASE_URL}/upcoming`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        ...(userId && { 'userId': userId })
-      },
+      headers: headers
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Failed to fetch upcoming events: ${errorText}`);
-    }
-
-    return await response.json();
+    return handleResponse(response, "Failed to fetch upcoming events");
   } catch (error) {
     console.error('Error fetching upcoming events:', error);
+    throw error;
+  }
+}
+
+/**
+ * Fetch upcoming events for a specific shelter
+ * @param {number} shelterId - The ID of the shelter
+ * @returns {Promise<Array>} - Promise that resolves to an array of upcoming events
+ */
+export async function fetchUpcomingEventsForShelter(shelterId) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/upcoming/shelter/${shelterId}`, {
+      method: 'GET',
+      headers: getAuthHeaders(false)
+    });
+
+    return handleResponse(response, "Failed to fetch upcoming events for shelter");
+  } catch (error) {
+    console.error('Error fetching upcoming shelter events:', error);
     throw error;
   }
 }
@@ -198,18 +234,10 @@ export async function fetchUserEvents(userId, status) {
     
     const response = await fetch(url, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      },
+      headers: getAuthHeaders(false)
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Failed to fetch user events: ${errorText}`);
-    }
-
-    return await response.json();
+    return handleResponse(response, "Failed to fetch user events");
   } catch (error) {
     console.error('Error fetching user events:', error);
     throw error;
@@ -224,66 +252,15 @@ export async function fetchEventsGroupedByShelter() {
   try {
     const response = await fetch(`${API_BASE_URL}/shelters-with-events`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      }
+      headers: getAuthHeaders(false)
     });
     
-    if (!response.ok) {
-      throw new Error('Failed to fetch grouped events');
-    }
-    
-    return await response.json();
+    return handleResponse(response, "Failed to fetch grouped events");
   } catch (error) {
     console.error('Error fetching events grouped by shelter:', error);
     throw error;
   }
 }
-
-// export async function updateEventAttendance(eventId, userId, attendanceData) {
-//   try {
-//     // Determine the status based on attendanceData
-//     const status = attendanceData.going 
-//       ? 'GOING' 
-//       : (attendanceData.interested 
-//         ? 'INTERESTED' 
-//         : 'NONE');
-
-//     const response = await fetch(`${API_BASE_URL}/${eventId}/attendance?status=${status}`, {
-//       method: 'POST',
-//       headers: {
-//         'Authorization': `Bearer ${localStorage.getItem('token')}`,
-//         'userId': userId,
-//         'Content-Type': 'application/json'
-//       }
-//     });
-
-//     if (!response.ok) {
-//       const errorText = await response.text();
-//       throw new Error(`Failed to update event attendance: ${errorText}`);
-//     }
-
-//     // Fetch the updated event details with the user's attendance status
-//     const updatedEventResponse = await fetch(`${API_BASE_URL}/${eventId}`, {
-//       method: 'GET',
-//       headers: {
-//         'Authorization': `Bearer ${localStorage.getItem('token')}`,
-//         'userId': userId  // Make sure to include userId here
-//       }
-//     });
-
-//     if (!updatedEventResponse.ok) {
-//       const errorText = await updatedEventResponse.text();
-//       throw new Error(`Failed to fetch updated event: ${errorText}`);
-//     }
-
-//     return await updatedEventResponse.json();
-//   } catch (error) {
-//     console.error('Error updating event attendance:', error);
-//     throw error;
-//   }
-// }
 
 /**
  * Update a user's attendance status for an event
@@ -305,11 +282,7 @@ export async function updateEventAttendance(eventId, userId, attendanceData) {
 
     const response = await fetch(`${API_BASE_URL}/${eventId}/attendance?status=${status}`, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        'userId': userId,
-        'Content-Type': 'application/json'
-      }
+      headers: getAuthHeaders(false, { 'userId': userId })
     });
 
     if (!response.ok) {
@@ -317,21 +290,12 @@ export async function updateEventAttendance(eventId, userId, attendanceData) {
       throw new Error(`Failed to update event attendance: ${errorText}`);
     }
 
-    // Fetch the updated event details with the user's attendance status
     const updatedEventResponse = await fetch(`${API_BASE_URL}/${eventId}`, {
       method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        'userId': userId  // Make sure to include userId here
-      }
+      headers: getAuthHeaders(false, { 'userId': userId })
     });
 
-    if (!updatedEventResponse.ok) {
-      const errorText = await updatedEventResponse.text();
-      throw new Error(`Failed to fetch updated event: ${errorText}`);
-    }
-
-    return await updatedEventResponse.json();
+    return handleResponse(updatedEventResponse, "Failed to fetch updated event");
   } catch (error) {
     console.error('Error updating event attendance:', error);
     throw error;
@@ -348,10 +312,7 @@ export async function removeEventAttendance(eventId, userId) {
   try {
     const response = await fetch(`${API_BASE_URL}/${eventId}/attendance`, {
       method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        'userId': userId
-      }
+      headers: getAuthHeaders(false, { 'userId': userId })
     });
 
     if (!response.ok) {
@@ -361,80 +322,32 @@ export async function removeEventAttendance(eventId, userId) {
 
     const updatedEventResponse = await fetch(`${API_BASE_URL}/${eventId}`, {
       method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        'userId': userId
-      }
+      headers: getAuthHeaders(false, { 'userId': userId })
     });
 
-    if (!updatedEventResponse.ok) {
-      const errorText = await updatedEventResponse.text();
-      throw new Error(`Failed to fetch updated event: ${errorText}`);
-    }
-
-    return await updatedEventResponse.json();
+    return handleResponse(updatedEventResponse, "Failed to fetch updated event");
   } catch (error) {
     console.error('Error removing event attendance:', error);
     throw error;
   }
 }
 
-export const partialUpdateEvent = async (eventId, updateData, shelterId) => {
-  const response = await fetch(`${baseUrl}/events/${eventId}`, {
-    method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-      'shelterId': shelterId
-    },
-    body: JSON.stringify(updateData)
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to partially update event");
-  }
-
-  return await response.json();
-};
-
-/**
- * Fetch upcoming events for a specific shelter
- * @param {number} shelterId
- * @returns {Promise<Array>}
- */
-export async function fetchUpcomingEventsForShelter(shelterId) {
-  try {
-    const response = await fetch(`${API_BASE_URL}/upcoming/shelter/${shelterId}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      }
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Failed to fetch upcoming events for shelter: ${errorText}`);
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error('Error fetching upcoming shelter events:', error);
-    throw error;
-  }
-}
-
-
-
-// Export all functions
 export default {
+  // Event CRUD operations
   fetchAllEvents,
   fetchShelterEvents,
   createEvent,
   updateEvent,
+  partialUpdateEvent,
   deleteEvent,
-  updateEventAttendance,
-  removeEventAttendance,
+  
+  // Event filtering/viewing
   fetchUpcomingEvents,
+  fetchUpcomingEventsForShelter,
   fetchUserEvents,
-  fetchEventsGroupedByShelter
+  fetchEventsGroupedByShelter,
+  
+  // Attendance management
+  updateEventAttendance,
+  removeEventAttendance
 };

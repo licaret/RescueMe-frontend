@@ -1,9 +1,30 @@
-const API_URL = 'http://localhost:8080/api/v1/favorites'; 
+const API_URL = 'http://localhost:8080/api/v1/favorites';
 
+/**
+ * Helper function to create authorized headers with JWT token
+ * @param {Object} additionalHeaders - Any additional headers to include
+ * @returns {Object} Headers object with Authorization and Content-Type
+ */
+const getAuthHeaders = (additionalHeaders = {}) => {
+  const token = localStorage.getItem('token');
+  return {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json',
+    ...additionalHeaders
+  };
+};
 
+/**
+ * Get all favorites for a user
+ * @param {number} userId - The ID of the user
+ * @returns {Promise<Array>} List of pet IDs that the user has favorited
+ */
 const getFavorites = async (userId) => {
   try {
-    const response = await fetch(`${API_URL}/${userId}`);
+    const response = await fetch(`${API_URL}/${userId}`, {
+      headers: getAuthHeaders()
+    });
+    
     if (!response.ok) {
       throw new Error(`Error: ${response.status} ${response.statusText}`);
     }
@@ -14,16 +35,19 @@ const getFavorites = async (userId) => {
   }
 };
 
-
-
+/**
+ * Add a pet to a user's favorites
+ * @param {number} userId - The ID of the user
+ * @param {number} petId - The ID of the pet to add to favorites
+ * @returns {Promise<Object>} Response confirming the addition
+ */
 const addToFavorites = async (userId, petId) => {
   try {
     const response = await fetch(`${API_URL}/${userId}/${petId}`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      }
+      headers: getAuthHeaders()
     });
+    
     if (!response.ok) {
       throw new Error(`Error: ${response.status} ${response.statusText}`);
     }
@@ -37,13 +61,19 @@ const addToFavorites = async (userId, petId) => {
   }
 };
 
-
-
+/**
+ * Remove a pet from a user's favorites
+ * @param {number} userId - The ID of the user
+ * @param {number} petId - The ID of the pet to remove from favorites
+ * @returns {Promise<Object>} Response confirming the removal
+ */
 const removeFromFavorites = async (userId, petId) => {
   try {
     const response = await fetch(`${API_URL}/${userId}/${petId}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: getAuthHeaders()
     });
+    
     if (!response.ok) {
       throw new Error(`Error: ${response.status} ${response.statusText}`);
     }
@@ -57,11 +87,18 @@ const removeFromFavorites = async (userId, petId) => {
   }
 };
 
-
-
+/**
+ * Check if a pet is in a user's favorites
+ * @param {number} userId - The ID of the user
+ * @param {number} petId - The ID of the pet to check
+ * @returns {Promise<boolean>} True if the pet is a favorite, false otherwise
+ */
 const checkIfFavorite = async (userId, petId) => {
   try {
-    const response = await fetch(`${API_URL}/check/${userId}/${petId}`);
+    const response = await fetch(`${API_URL}/check/${userId}/${petId}`, {
+      headers: getAuthHeaders()
+    });
+    
     if (!response.ok) {
       throw new Error(`Error: ${response.status} ${response.statusText}`);
     }
@@ -73,11 +110,17 @@ const checkIfFavorite = async (userId, petId) => {
   }
 };
 
-
-
+/**
+ * Get the count of favorites for a user
+ * @param {number} userId - The ID of the user
+ * @returns {Promise<number>} The number of favorites
+ */
 const getFavoritesCount = async (userId) => {
   try {
-    const response = await fetch(`${API_URL}/count/${userId}`);
+    const response = await fetch(`${API_URL}/count/${userId}`, {
+      headers: getAuthHeaders()
+    });
+    
     if (!response.ok) {
       throw new Error(`Error: ${response.status} ${response.statusText}`);
     }
@@ -88,7 +131,6 @@ const getFavoritesCount = async (userId) => {
     return 0;
   }
 };
-
 
 
 export { 

@@ -1,13 +1,38 @@
+/*
+ * Real-time messaging functionality using WebSockets and REST fallbacks
+ */
+
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 
 const API_URL = 'http://localhost:8080/api/v1/messages';
 const ATTACHMENT_API_URL = 'http://localhost:8080/api/v1/attachments';
 
+// Singleton WebSocket client
 let stompClient = null;
 let messageCallbacks = [];
 let readReceiptCallbacks = [];
 
+/**
+ * Function to create authorized headers with JWT token
+ * @param {Object} additionalHeaders - Any additional headers to include
+ * @returns {Object} Headers object with Authorization and Content-Type
+ */
+const getAuthHeaders = (additionalHeaders = {}) => {
+  const token = localStorage.getItem('token');
+  return {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json',
+    ...additionalHeaders
+  };
+};
+
+/**
+ * Connect to WebSocket chat for a specific user
+ * @param {number} userId - The ID of the user
+ * @param {Function} onConnected - Callback when connection is established
+ * @param {Function} onDisconnected - Callback when connection is lost or failed
+ */
 export function connectToChat(userId, onConnected, onDisconnected) {
   if (stompClient && stompClient.active) return;
 
@@ -21,14 +46,14 @@ export function connectToChat(userId, onConnected, onDisconnected) {
     debug: str => console.log('[CHAT DEBUG]', str),
 
     onConnect: (frame) => {
-      console.log('✅ [Chat] Connected:', frame);
+      console.log('[Chat] Connected:', frame);
       
-      // Folosim topic în loc de user queue
+      // Subscribe to personal message channel
       stompClient.subscribe(`/topic/chat/${userId}`, (msg) => {
-        console.log("🔔 MESSAGE RECEIVED:", msg);
+        console.log("MESSAGE RECEIVED:", msg);
         try {
           const parsed = JSON.parse(msg.body);
-          console.log("📦 PARSED MESSAGE:", parsed);
+          console.log("PARSED MESSAGE:", parsed);
 
           // Dispatch a custom event for new messages
           const event = new CustomEvent('new-message', { detail: parsed });
@@ -36,24 +61,24 @@ export function connectToChat(userId, onConnected, onDisconnected) {
 
           messageCallbacks.forEach(cb => cb(parsed));
         } catch (e) {
-          console.error("❌ Error parsing message:", e);
+          console.error("Error parsing message:", e);
         }
       });
       
-      // Folosim topic în loc de user queue pentru read receipts
+      // Subscribe to read receipts channel
       stompClient.subscribe(`/topic/read/${userId}`, (receipt) => {
-        console.log("📬 READ RECEIPT RECEIVED:", receipt);
+        console.log("READ RECEIPT RECEIVED:", receipt);
         try {
           const parsed = JSON.parse(receipt.body);
           readReceiptCallbacks.forEach(cb => cb(parsed));
         } catch (e) {
-          console.error("❌ Error parsing read receipt:", e);
+          console.error("Error parsing read receipt:", e);
         }
       });
       
-      // Subscribe to system events like new conversations
+      // Subscribe to system events channel
       stompClient.subscribe(`/topic/system/${userId}`, (event) => {
-        console.log("🔄 SYSTEM EVENT RECEIVED:", event);
+        console.log("SYSTEM EVENT RECEIVED:", event);
         try {
           const parsed = JSON.parse(event.body);
           
@@ -63,7 +88,7 @@ export function connectToChat(userId, onConnected, onDisconnected) {
             window.dispatchEvent(refreshEvent);
           }
         } catch (e) {
-          console.error("❌ Error parsing system event:", e);
+          console.error("Error parsing system event:", e);
         }
       });
       
@@ -87,6 +112,9 @@ export function connectToChat(userId, onConnected, onDisconnected) {
   stompClient.activate();
 }
 
+/**
+ * Disconnect from the WebSocket chat
+ */
 export function disconnectFromChat() {
   if (stompClient && stompClient.active) {
     stompClient.deactivate();
@@ -94,6 +122,11 @@ export function disconnectFromChat() {
   }
 }
 
+/**
+ * Register a callback for received messages
+ * @param {Function} callback - Function to call when a message is received
+ * @returns {Function} Unsubscribe function to remove the callback
+ */
 export function onMessageReceived(callback) {
   console.log("Registering message callback");
   messageCallbacks.push(callback);
@@ -102,6 +135,11 @@ export function onMessageReceived(callback) {
   };
 }
 
+/**
+ * Register a callback for read receipts
+ * @param {Function} callback - Function to call when a read receipt is received
+ * @returns {Function} Unsubscribe function to remove the callback
+ */
 export function onReadReceipt(callback) {
   console.log("Registering read receipt callback");
   readReceiptCallbacks.push(callback);
@@ -110,11 +148,19 @@ export function onReadReceipt(callback) {
   };
 }
 
+/**
+ * Check if WebSocket is connected
+ * @returns {boolean} True if connected, false otherwise
+ */
 export function isConnected() {
   return stompClient && stompClient.active && stompClient.connected;
 }
 
-// Trimite mesaj text simplu
+/**
+ * Send a text message
+ * @param {Object} messageData - Message data to send
+ * @returns {Promise<Object>} The sent message data
+ */
 export function sendMessage(messageData) {
   return new Promise((resolve, reject) => {
     console.log("Attempting to send message, connection status:", stompClient?.connected);
@@ -126,7 +172,7 @@ export function sendMessage(messageData) {
           destination: '/app/chat.send',
           body: JSON.stringify(messageData)
         });
-        // Rezolvăm direct cu datele trimise prin WebSocket
+        // Resolve directly with the sent data
         resolve(messageData);
       } catch (err) {
         console.error("WebSocket send error:", err);
@@ -140,10 +186,16 @@ export function sendMessage(messageData) {
   });
 }
 
+/**
+ * Send a message via REST API (fallback)
+ * @param {Object} messageData - Message data to send
+ * @param {Function} resolve - Promise resolve function
+ * @param {Function} reject - Promise reject function
+ */
 function sendViaRest(messageData, resolve, reject) {
   fetch(`${API_URL}/send`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify(messageData)
   })
   .then(res => {
@@ -159,27 +211,41 @@ function sendViaRest(messageData, resolve, reject) {
   });
 }
 
-// Trimite mesaj cu atașamente
+/**
+ * Send a message with attachments
+ * @param {Object} messageData - Message data to send
+ * @param {Array<File>} files - Array of files to attach
+ * @returns {Promise<Object>} The sent message with attachments
+ */
 export function sendMessageWithAttachments(messageData, files) {
   return new Promise((resolve, reject) => {
     console.log("Sending message with attachments:", messageData, files);
     
     const formData = new FormData();
     
-    // Adăugăm mesajul ca JSON
+    // Add message as JSON blob
     const messageBlob = new Blob([JSON.stringify(messageData)], { type: 'application/json' });
     formData.append('message', messageBlob);
     
-    // Adăugăm fișierele
+    // Add files
     if (files && files.length > 0) {
       files.forEach(file => {
         formData.append('files', file);
       });
     }
     
-    // Trimitem la server
+    // Add authorization token to form data
+    const token = localStorage.getItem('token');
+    if (token) {
+      formData.append('token', token); 
+    }
+    
+    // Send to server
     fetch(`${API_URL}/send-with-attachments`, {
       method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
       body: formData
     })
     .then(res => {
@@ -196,6 +262,12 @@ export function sendMessageWithAttachments(messageData, files) {
   });
 }
 
+/**
+ * Mark a conversation as read
+ * @param {string} conversationId - The ID of the conversation
+ * @param {number} userId - The ID of the user
+ * @returns {Promise<void>} Promise that resolves when operation completes
+ */
 export function markConversationAsRead(conversationId, userId) {
   return new Promise((resolve, reject) => {
     if (isConnected()) {
@@ -217,9 +289,17 @@ export function markConversationAsRead(conversationId, userId) {
   });
 }
 
+/**
+ * Mark a conversation as read via REST API (fallback)
+ * @param {string} conversationId - The ID of the conversation
+ * @param {number} userId - The ID of the user
+ * @param {Function} resolve - Promise resolve function
+ * @param {Function} reject - Promise reject function
+ */
 function markAsReadViaRest(conversationId, userId, resolve, reject) {
   fetch(`${API_URL}/conversation/${conversationId}/read?userId=${userId}`, {
-    method: 'POST'
+    method: 'POST',
+    headers: getAuthHeaders()
   })
   .then(res => res.ok ? resolve() : Promise.reject(`Failed to mark as read: ${res.status} ${res.statusText}`))
   .catch(error => {
@@ -228,8 +308,16 @@ function markAsReadViaRest(conversationId, userId, resolve, reject) {
   });
 }
 
+/**
+ * Get messages for a conversation
+ * @param {string} conversationId - The ID of the conversation
+ * @param {number} userId - The ID of the user
+ * @returns {Promise<Array>} Array of messages in the conversation
+ */
 export function getConversationMessages(conversationId, userId) {
-  return fetch(`${API_URL}/conversation/${conversationId}?userId=${userId}`)
+  return fetch(`${API_URL}/conversation/${conversationId}?userId=${userId}`, {
+    headers: getAuthHeaders()
+  })
     .then(res => {
       if (!res.ok) {
         return Promise.reject(`Failed to fetch messages: ${res.status} ${res.statusText}`);
@@ -242,27 +330,34 @@ export function getConversationMessages(conversationId, userId) {
     });
 }
 
+/**
+ * Get all conversations for a user
+ * @param {number} userId - The ID of the user
+ * @returns {Promise<Array>} Array of conversation objects
+ */
 export function getUserConversations(userId) {
-  return fetch(`${API_URL}/conversations/${userId}`)
+  return fetch(`${API_URL}/conversations/${userId}`, {
+    headers: getAuthHeaders()
+  })
     .then(res => {
       if (!res.ok) {
         console.error(`Failed to fetch conversations: ${res.status} ${res.statusText}`);
-        // Returnează o listă goală în loc să întrerupă fluxul aplicației
         return [];
       }
       return res.json();
     })
     .then(conversations => {
-      // Adăugăm profilePicture pentru fiecare conversație dacă nu există
       const conversationsWithPromises = conversations.map(async conversation => {
         if (!conversation.participantProfilePicture && conversation.participantId) {
           try {
-            // Încercăm să obținem poza de profil pentru acest participant
-            const response = await fetch(`http://localhost:8080/users/${conversation.participantId}/profilePicture`);
+            // Try to get profile picture for this participant
+            const response = await fetch(`http://localhost:8080/users/${conversation.participantId}/profilePicture`, {
+              headers: getAuthHeaders()
+            });
             if (response.ok) {
               const blob = await response.blob();
               const base64data = await blobToBase64(blob);
-              // Eliminăm prefixul data:image
+              // Remove data:image prefix
               const base64Clean = base64data.split(',')[1] || base64data;
               conversation.participantProfilePicture = base64Clean;
             }
@@ -273,17 +368,19 @@ export function getUserConversations(userId) {
         return conversation;
       });
       
-      // Așteptăm toate promisiunile să se rezolve
       return Promise.all(conversationsWithPromises);
     })
     .catch(error => {
       console.error("Error fetching conversations:", error);
-      // Returnează o listă goală în caz de eroare
       return [];
     });
 }
 
-// Helper function to convert Blob to Base64
+/**
+ * Helper function to convert Blob to Base64
+ * @param {Blob} blob - The binary blob to convert
+ * @returns {Promise<string>} Base64 encoded string
+ */
 function blobToBase64(blob) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -293,23 +390,38 @@ function blobToBase64(blob) {
   });
 }
 
+/**
+ * Get the count of unread messages for a user
+ * @param {number} userId - The ID of the user
+ * @returns {Promise<number>} The count of unread messages
+ */
 export function getUnreadMessagesCount(userId) {
-  return fetch(`${API_URL}/unread/${userId}`)
+  return fetch(`${API_URL}/unread/${userId}`, {
+    headers: getAuthHeaders()
+  })
     .then(res => {
       if (!res.ok) {
         console.error(`Failed to fetch unread count: ${res.status} ${res.statusText}`);
-        return 0; // Valoare implicită în caz de eroare
+        return 0; 
       }
       return res.json();
     })
     .catch(error => {
       console.error("Error fetching unread count:", error);
-      return 0; // Valoare implicită în caz de eroare
+      return 0; 
     });
 }
 
+/**
+ * Get the conversation ID for two users
+ * @param {number} user1Id - The ID of the first user
+ * @param {number} user2Id - The ID of the second user
+ * @returns {Promise<string>} The conversation ID
+ */
 export function getConversationId(user1Id, user2Id) {
-  return fetch(`${API_URL}/conversation-id?user1Id=${user1Id}&user2Id=${user2Id}`)
+  return fetch(`${API_URL}/conversation-id?user1Id=${user1Id}&user2Id=${user2Id}`, {
+    headers: getAuthHeaders()
+  })
     .then(res => {
       if (!res.ok) {
         return Promise.reject(`Failed to fetch conversation ID: ${res.status} ${res.statusText}`);
@@ -323,17 +435,22 @@ export function getConversationId(user1Id, user2Id) {
     });
 }
 
-// Funcții noi pentru atașamente
 
-// Obține informații despre un atașament
+// === ATTACHMENT FUNCTIONS ===
+
+/**
+ * Get information about an attachment
+ * @param {number|string} attachmentId - The ID of the attachment
+ * @returns {Promise<Object>} Attachment information
+ */
 export function getAttachmentInfo(attachmentId) {
-  // Verifică dacă ID-ul este temporar
   if (typeof attachmentId === 'string' && attachmentId.startsWith('temp-')) {
-    // Pentru ID-uri temporare, returnăm o promisiune cu un obiect gol
     return Promise.resolve({});
   }
   
-  return fetch(`${ATTACHMENT_API_URL}/${attachmentId}/info`)
+  return fetch(`${ATTACHMENT_API_URL}/${attachmentId}/info`, {
+    headers: getAuthHeaders()
+  })
     .then(res => {
       if (!res.ok) {
         return Promise.reject(`Failed to fetch attachment info: ${res.status} ${res.statusText}`);
@@ -346,36 +463,43 @@ export function getAttachmentInfo(attachmentId) {
     });
 }
 
-// Obține URL-ul pentru descărcarea unui atașament
+/**
+ * Get download URL for an attachment
+ * @param {number|string} attachmentId - The ID of the attachment
+ * @returns {string|null} URL for downloading the attachment or null for temporary IDs
+ */
 export function getAttachmentDownloadUrl(attachmentId) {
-  // Verifică dacă ID-ul este temporar
   if (typeof attachmentId === 'string' && attachmentId.startsWith('temp-')) {
-    // Pentru ID-uri temporare, returnăm null
     return null;
   }
   return `${ATTACHMENT_API_URL}/${attachmentId}/download`;
 }
 
-// Obține URL-ul pentru miniatura unui atașament
+/**
+ * Get thumbnail URL for an attachment
+ * @param {number|string} attachmentId - The ID of the attachment
+ * @returns {string|null} URL for the attachment thumbnail or null for temporary IDs
+ */
 export function getAttachmentThumbnailUrl(attachmentId) {
-  // Verifică dacă ID-ul este temporar
   if (typeof attachmentId === 'string' && attachmentId.startsWith('temp-')) {
-    // Pentru ID-uri temporare, returnăm null
     return null;
   }
   return `${ATTACHMENT_API_URL}/${attachmentId}/thumbnail`;
 }
 
-// Șterge un atașament
+/**
+ * Delete an attachment
+ * @param {number|string} attachmentId - The ID of the attachment
+ * @returns {Promise<boolean>} True if deletion was successful
+ */
 export function deleteAttachment(attachmentId) {
-  // Verifică dacă ID-ul este temporar
   if (typeof attachmentId === 'string' && attachmentId.startsWith('temp-')) {
-    // Pentru ID-uri temporare, nu facem nimic
     return Promise.resolve(true);
   }
   
   return fetch(`${ATTACHMENT_API_URL}/${attachmentId}`, {
-    method: 'DELETE'
+    method: 'DELETE',
+    headers: getAuthHeaders()
   })
   .then(res => {
     if (!res.ok) {
@@ -389,7 +513,11 @@ export function deleteAttachment(attachmentId) {
   });
 }
 
-// Verifică dacă un ID de atașament este temporar
+/**
+ * Check if an attachment ID is temporary
+ * @param {number|string} attachmentId - The ID to check
+ * @returns {boolean} True if the ID is temporary
+ */
 export function isTemporaryAttachmentId(attachmentId) {
   return typeof attachmentId === 'string' && attachmentId.startsWith('temp-');
 }
