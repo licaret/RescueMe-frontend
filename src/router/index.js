@@ -32,20 +32,31 @@ import DonationsPage from '@/pages/DonationsPage.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+
+    // Rute publice
     {
       path: '/',
       name: 'LandingPage',
       component: LandingPage, 
+      meta: { guestOnly: true },
     },
     {
       path: '/signup',
       name: 'SignUpPage',
       component: SignUpPage, 
+      meta: { guestOnly: true },
     },
     {
       path: '/login',
       name: 'LoginPage',
       component: LoginPage, 
+      meta: { guestOnly: true },
+    },
+    {
+      path: '/home',
+      name: 'HomePage',
+      component: HomePage,
+      meta: { allowGuest: true, role: 'ADOPTER' },
     },
     {
       path: '/request-reset-password',
@@ -58,69 +69,54 @@ const router = createRouter({
       component: ResetPasswordPage, 
     },
     {
+      path: '/contact',
+      name: 'ContactUsPage',
+      component: ContactUsPage, 
+    },
+    {
+      path: '/about-us',
+      name: 'AboutUsPage',
+      component: AboutUsPage, 
+    },
+    
+    // Rute pentru ADMIN
+    {
+      path: '/admin-dashboard',
+      name: 'AdminDashboardPage',
+      component: AdminDashboardPage, 
+      meta: { requiresAuth: true, role: 'ADMIN' },
+    },
+    
+    // Rute pentru SHELTER
+    {
       path: '/shelter-profile-completion',
       name: 'ShelterProfileCompletionPage',
       component: ShelterProfileCompletionPage,
-      meta: { requiresAuth: true }, 
+      meta: { requiresAuth: true, role: 'SHELTER' }, 
     },
     {
-      path: '/home',
-      name: 'HomePage',
-      component: HomePage, 
-      // meta: { requiresAuth: true },
-    },
-    {
-      path: '/favorites',
-      name: 'FavoritesPage',
-      component: FavoritesPage, 
-      meta: { requiresAuth: true },
-    },
-    {
-      path: '/available-pets',
-      name: 'AvailablePetsPage',
-      component: AvailablePetsPage, 
-      // meta: { requiresAuth: true },
-    },
-    {
-      path: '/events',
-      name: 'EventsPage',
-      component: EventsPage, 
-      // meta: { requiresAuth: true },
-    },
-    {
-      path: '/shelter/:id',
-      name: 'ShelterProfilePage',
-      component: ShelterProfilePage, 
-      props: true,
-      meta: { requiresAuth: true },
-    },
-    {
-      path: '/profile',
-      name: 'MyProfile',
-      component: MyProfilePage, 
-      meta: { requiresAuth: true },
-    },
-    {
-      path: '/donate',
-      name: 'Donations',
-      component: DonationsPage,
-      meta: { requiresAuth: true }
+      path: '/welcome',
+      name: 'WelcomePage',
+      component: WelcomePage, 
+      meta: { requiresAuth: true, role: 'SHELTER' },
     },
     {
       path: '/shelter-dashboard/',
       name: 'ShelterDashboardPage',
       component: ShelterDashboardPage, 
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, role: 'SHELTER' },
       children: [
         {
           path: 'manage-pets',
           name: 'ManagePets',
-          component: ManagePets
+          component: ManagePets,
+          meta: { requiresAuth: true, role: 'SHELTER' },
         },
         {
           path: 'adoption-requests',
           name: 'ShelterAdoptionRequests',
           component: ShelterAdoptionRequests,
+          meta: { requiresAuth: true, role: 'SHELTER' },
           props: route => ({ 
             shelterId: parseInt(localStorage.getItem('Id')) 
           })
@@ -128,167 +124,215 @@ const router = createRouter({
         {
           path: 'manage-events',
           name: 'ManageEvents',
-          component: ManageEvents
+          component: ManageEvents,
+          meta: { requiresAuth: true, role: 'SHELTER' },
         },
         {
           path: 'messages',
           name: 'shelter-messages',
           component: ShelterMessages,
+          meta: { requiresAuth: true, role: 'SHELTER' },
         },
         {
           path: 'donations',
           name: 'ShelterDonations',
-          component: ShelterDonations
+          component: ShelterDonations,
+          meta: { requiresAuth: true, role: 'SHELTER' },
         },
         {
           path: 'edit-profile',
           name: 'EditShelterProfileVue',
-          component: EditShelterProfileVue
+          component: EditShelterProfileVue,
+          meta: { requiresAuth: true, role: 'SHELTER' },
         },
       ]
     },
+
+    // Rute pentru ADOPTER
     {
-      path: '/contact',
-      name: 'ContactUsPage',
-      component: ContactUsPage, 
-      // meta: { requiresAuth: true },
+      path: '/available-pets',
+      name: 'AvailablePetsPage',
+      component: AvailablePetsPage, 
+      meta: { requiresAuth: true, role: 'ADOPTER' },
     },
     {
-      path: '/about-us',
-      name: 'AboutUsPage',
-      component: AboutUsPage, 
-      // meta: { requiresAuth: true },
+      path: '/favorites',
+      name: 'FavoritesPage',
+      component: FavoritesPage, 
+      meta: { requiresAuth: true, role: 'ADOPTER' },
     },
     {
-      path: '/admin-dashboard',
-      name: 'AdminDashboardPage',
-      component: AdminDashboardPage, 
-      meta: { requiresAuth: true },
+      path: '/adopt/:petId',
+      name: 'AdoptionForm',
+      component: AdoptionRequestForm,
+      meta: { requiresAuth: true, role: 'ADOPTER' },
+      props: route => ({
+        petId: route.params.petId,
+        pet: route.params.pet || null
+      }),
     },
     {
-      path: '/welcome',
-      name: 'WelcomePage',
-      component: WelcomePage, 
-      meta: { requiresAuth: true },
+      path: '/my-adoption-requests',
+      name: 'AdoptionRequests',
+      component: AdoptionRequestsView,
+      meta: { requiresAuth: true, role: 'ADOPTER' },
+    },
+    {
+      path: '/my-adoption-requests/:id',
+      name: 'AdoptionRequestDetail',
+      component: AdoptionRequestDetail,
+      meta: { requiresAuth: true, role: 'ADOPTER' },
+    },
+    {
+      path: '/events',
+      name: 'EventsPage',
+      component: EventsPage, 
+      meta: { requiresAuth: true, role: 'ADOPTER' },
+    },
+    {
+      path: '/shelter/:id',
+      name: 'ShelterProfilePage',
+      component: ShelterProfilePage, 
+      props: true,
+      meta: { requiresAuth: true, role: 'ADOPTER' },
+    },
+    {
+      path: '/profile',
+      name: 'MyProfile',
+      component: MyProfilePage, 
+      meta: { requiresAuth: true, role: 'ADOPTER' },
+    },
+    {
+      path: '/donate',
+      name: 'Donations',
+      component: DonationsPage,
+      meta: { requiresAuth: true, role: 'ADOPTER' },
     },
     {
       path: '/messages',
       name: 'messages',
       component: MessagesPage,
-      meta: { requiresAuth: true } // Optional: if you have auth guards
+      meta: { requiresAuth: true, role: 'ADOPTER' },
     },
     {
       path: '/donation-complete',
       name: 'DonationComplete',
       component: DonationComplete,
-      meta: { requiresAuth: true } 
+      meta: { requiresAuth: true, role: 'ADOPTER' },
     },
-    {
-      path: '/adopt/:petId',
-      name: 'AdoptionForm',
-      meta: { requiresAuth: true }, 
-      component: AdoptionRequestForm,
-      props: route => {
-        return {
-          petId: route.params.petId,
-          pet: route.params.pet || null
-        };
-      },
-      // Guard to check if user is logged in and is an ADOPTER
-      beforeEnter: (to, from, next) => {
-        const userId = localStorage.getItem('Id');
-        const userRole = localStorage.getItem('Role');
-        
-        if (!userId) {
-          // Redirect to login
-          next({
-            path: '/login',
-            query: { redirect: 'adoption', petId: to.params.petId }
-          });
-        } else if (userRole !== 'ADOPTER') {
-          // Only adopters can submit adoption requests
-          alert('Only adopters can submit adoption requests.');
-          next(from);
-        } else {
-          next();
-        }
-      }
-    },
-    {
-      path: '/my-adoption-requests',
-      name: 'AdoptionRequests',
-      meta: { requiresAuth: true }, 
-      component: AdoptionRequestsView,
-      // Guard to ensure user is logged in
-      beforeEnter: (to, from, next) => {
-        const userId = localStorage.getItem('Id');
-        
-        if (!userId) {
-          next({ path: '/login' });
-        } else {
-          next();
-        }
-      }
-    },
-    {
-      path: '/my-adoption-requests/:id',
-      name: 'AdoptionRequestDetail',
-      meta: { requiresAuth: true }, 
-      component: AdoptionRequestDetail,
-      // Guard to ensure user is logged in
-      beforeEnter: (to, from, next) => {
-        const userId = localStorage.getItem('Id');
-        
-        if (!userId) {
-          next({ path: '/login' });
-        } else {
-          next();
-        }
-      }
-    }
   ],
 });
 
 
-router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem('token'); 
-  const isAuthenticated = !!token; 
-  const isFirstLogin = localStorage.getItem("firstLogin") === "true";
-  const isShelter = localStorage.getItem("Role") === "SHELTER";
+function isAuthenticated() {
+  return !!localStorage.getItem('token');
+}
 
-  if (
-    (from.path === '/login' || from.path === '/signup') && 
-    to.path === '/' && 
-    from.path !== to.path 
-  ) {
-    next(); 
+
+function getUserRole() {
+  return localStorage.getItem('Role');
+}
+
+
+function isShelter() {
+  return getUserRole() === 'SHELTER';
+}
+
+
+function checkRoutePermission(to) {
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+  const allowGuest = to.matched.some(record => record.meta.allowGuest);
+  
+  if (allowGuest && !isAuthenticated()) {
+    return true;
+  }
+  
+  if (!requiresAuth && !to.matched.some(record => record.meta.role && !record.meta.allowGuest)) {
+    return true;
+  }
+  
+  if (requiresAuth && !isAuthenticated()) {
+    return false;
+  }
+  
+  const requiredRole = to.matched.find(record => record.meta.role)?.meta.role;
+  
+  if (!requiredRole) {
+    return true;
+  }
+  
+  if (allowGuest && isAuthenticated()) {
+    const userRole = getUserRole();
+    return userRole === requiredRole;
+  }
+  
+  const userRole = getUserRole();
+  return userRole === requiredRole;
+}
+
+router.beforeEach((to, from, next) => {
+  const guestOnly = to.matched.some(record => record.meta.guestOnly);
+  if (guestOnly && isAuthenticated()) {
+    const userRole = getUserRole();
+    if (userRole === 'ADOPTER') {
+      next('/available-pets');
+    } else if (userRole === 'SHELTER') {
+      next('/shelter-dashboard');
+    } else if (userRole === 'ADMIN') {
+      next('/admin-dashboard');
+    } else {
+      next('/home');
+    }
     return;
   }
-
-  // daca ajung la landing page sa nu mai pot da back din browser
-  if (to.path === '/') {
-    window.history.replaceState(null, null, '/');
-  }
-
-  if (isAuthenticated && isFirstLogin && isShelter && to.path !== '/shelter-profile-completion') {
+  
+  const isFirstLogin = localStorage.getItem("firstLogin") === "true";
+  if (isAuthenticated() && isFirstLogin && isShelter() && to.path !== '/shelter-profile-completion') {
     next('/shelter-profile-completion');
     return;
   }
 
-  if (to.matched.some((record) => record.meta.requiresAuth) && !isAuthenticated) {
-    next('/login'); 
-  } else {
-    next();
+  if (!checkRoutePermission(to)) {
+    if (!isAuthenticated()) {
+      next({
+        path: '/login',
+        query: { redirect: to.fullPath } 
+      });
+      return;
+    }
+    
+    const userRole = getUserRole();
+    
+    if (userRole === 'ADOPTER') {
+      next('/available-pets'); 
+    } else if (userRole === 'SHELTER') {
+      next('/shelter-dashboard'); 
+    } else if (userRole === 'ADMIN') {
+      next('/admin-dashboard'); 
+    } else {
+      next('/home');
+    }
+    return;
   }
+  
+  next();
 });
 
 
 window.addEventListener('popstate', () => {
   const currentPath = window.location.pathname;
-  if (currentPath === '/login' || currentPath === '/signup') {
-    router.push('/');
+  if ((currentPath === '/login' || currentPath === '/signup') && isAuthenticated()) {
+    const userRole = getUserRole();
+    if (userRole === 'ADOPTER') {
+      router.push('/available-pets');
+    } else if (userRole === 'SHELTER') {
+      router.push('/shelter-dashboard');
+    } else if (userRole === 'ADMIN') {
+      router.push('/admin-dashboard');
+    } else {
+      router.push('/home');
+    }
   }
 });
-
 
 export default router;
