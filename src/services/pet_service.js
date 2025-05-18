@@ -8,7 +8,6 @@ const PHOTO_API_URL = 'http://localhost:8080/pet-photos';
  */
 const getAuthHeaders = (additionalHeaders = {}) => {
   const token = localStorage.getItem('token');
-  const shelterId = localStorage.getItem('Id');
   
   return {
     'Authorization': `Bearer ${token}`,
