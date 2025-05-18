@@ -925,6 +925,13 @@
       @confirm="performLogout"
     />
 
+    <RejectionModal
+      :show="showRejectionModal"
+      :shelter-id="shelterToReject"
+      @confirm="confirmRejectShelter"
+      @cancel="showRejectionModal = false"
+    />
+
   </div>
 </template>
 
@@ -938,9 +945,9 @@ import {
   getTotalAnimalCount, 
   getPendingShelters, 
   getApprovedShelters, 
-  approveShelter,
-  rejectShelter,
-  suspendShelter,
+  approveShelter as approveSheterAPI,  
+  rejectShelter as rejectShelterAPI,   
+  suspendShelter as suspendShelterAPI,
   getShelterDetails
 } from '@/services/admin_dashboard_service.js';
 import { logout } from '@/services/user_service.js';
@@ -949,13 +956,15 @@ import { getPetCountByShelter } from '@/services/pet_service.js';
 import blankProfilePicture from '@/assets/blank_profile_picture.jpg';
 import ShelterDetailsModal from '@/components/ShelterDetailsModal.vue';
 import LogoutConfirmationModal from '@/components/LogoutConfirmationModal.vue';
+import RejectionModal from '@/components/RejectionModal.vue';
 
 
 export default {
   name: 'AdminDashboard',
   components: {
     ShelterDetailsModal,
-    LogoutConfirmationModal
+    LogoutConfirmationModal,
+    RejectionModal
   },
   setup() {
     const router = useRouter()
@@ -972,6 +981,8 @@ export default {
     const defaultShelterImage = ref(blankProfilePicture);
     const defaultUserImage = ref(blankProfilePicture);
     const showLogoutConfirmation = ref(false);
+    const showRejectionModal = ref(false);
+    const shelterToReject = ref(null);
     
     const stats = ref({
       totalShelters: 0,
@@ -1340,11 +1351,11 @@ export default {
       showConfirmationModal.value = true;
     };
 
-
     
     const rejectShelter = (Id, fromModal = false) => {
       if (fromModal) {
-        performShelterAction(Id, 'reject');
+        shelterToReject.value = Id;
+        showRejectionModal.value = true;
         return;
       }
       
@@ -1352,8 +1363,33 @@ export default {
       confirmationMessage.value = 'Are you sure you want to reject this shelter application? This action cannot be undone.';
       confirmationActionType.value = 'reject';
       confirmationActionText.value = 'Reject';
-      confirmationCallback.value = () => performShelterAction(Id, 'reject');
+      confirmationCallback.value = () => {
+        shelterToReject.value = Id;
+        showRejectionModal.value = true;
+      };
       showConfirmationModal.value = true;
+    };
+
+
+    const confirmRejectShelter = async (shelterId, rejectionData) => {
+      try {
+        await rejectShelterAPI(shelterId, rejectionData);
+        
+        showRejectionModal.value = false;
+        
+        if (showShelterModal.value) {
+          showShelterModal.value = false;
+        }
+        
+        pendingShelters.value = pendingShelters.value.filter(s => s.id !== shelterId);
+        stats.value.pendingApprovals = pendingShelters.value.length;
+        
+        successMessage.value = 'Shelter application has been rejected successfully.';
+        isSubmitted.value = true;
+      } catch (error) {
+        console.error('Error rejecting shelter:', error);
+        showToastMessage('Failed to reject shelter. Please try again.');
+      }
     };
 
 
@@ -1378,11 +1414,9 @@ export default {
         let responseData;
         
         if (action === 'approve') {
-          responseData = await approveShelter(Id);
-        } else if (action === 'reject') {
-          responseData = await rejectShelter(Id);
+          responseData = await approveSheterAPI(Id);  
         } else if (action === 'suspend') {
-          responseData = await suspendShelter(Id);
+          responseData = await suspendShelterAPI(Id); 
         } else {
           throw new Error(`Unknown action: ${action}`);
         }
@@ -1395,16 +1429,11 @@ export default {
           showConfirmationModal.value = false;
         }
         
-        if (action === 'approve' || action === 'reject') {
+        if (action === 'approve') {
           pendingShelters.value = pendingShelters.value.filter(s => s.id !== Id);
           stats.value.pendingApprovals = pendingShelters.value.length;
-          
-          if (action === 'approve') {
-            successMessage.value = 'Shelter has been approved successfully.';
-            fetchDashboardData();
-          } else {
-            successMessage.value = 'Shelter application has been rejected.';
-          }
+          successMessage.value = 'Shelter has been approved successfully.';
+          fetchDashboardData();
         } else if (action === 'suspend') {
           successMessage.value = 'Shelter has been suspended successfully.';
         }
@@ -1797,7 +1826,8 @@ export default {
       successMessage,
       defaultShelterImage,
       defaultUserImage,
-      
+      showRejectionModal,
+      shelterToReject,
       filteredApprovedShelters,
       paginatedShelters,
       totalPages,
@@ -1806,13 +1836,13 @@ export default {
       paginatedUsers,
       userTotalPages,
       userPaginationPages,
-      
       showLogoutConfirmation,
       pendingCurrentPage,
       pendingItemsPerPage,
       paginatedPendingShelters,
       pendingPaginationPages,
-
+      
+      confirmRejectShelter,
       sortPendingShelters,
       formatRelativeTime,
       viewShelterDetails,

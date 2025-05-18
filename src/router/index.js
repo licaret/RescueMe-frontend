@@ -29,6 +29,7 @@ import DonationComplete from '@/pages/DonationComplete.vue';
 import ShelterDonations from '@/components/ShelterDonations.vue';
 import DonationsPage from '@/pages/DonationsPage.vue'
 import UnauthorizedPage from '@/pages/UnauthorizedPage.vue';
+import ShelterRejectedPage from '@/pages/ShelterRejectedPage.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -95,6 +96,12 @@ const router = createRouter({
     },
     
     // Rute pentru SHELTER
+        {
+      path: '/shelter-rejected',
+      name: 'ShelterRejectedPage',
+      component: ShelterRejectedPage,
+      meta: { requiresAuth: false },
+    },
     {
       path: '/shelter-profile-completion',
       name: 'ShelterProfileCompletionPage',
@@ -241,11 +248,6 @@ function getUserRole() {
 }
 
 
-function isShelter() {
-  return getUserRole() === 'SHELTER';
-}
-
-
 function checkRoutePermission(to) {
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
   const allowGuest = to.matched.some(record => record.meta.allowGuest);
@@ -278,12 +280,25 @@ function checkRoutePermission(to) {
 }
 
 router.beforeEach((to, from, next) => {
-  // Skip authorization check for unauthorized page itself
+  const isAuthenticated = () => {
+    return !!localStorage.getItem('token');
+  };
+  
+  const getUserRole = () => {
+    return localStorage.getItem("Role");
+  };
+  
+  const token = localStorage.getItem('token');
+  const simpleIsAuthenticated = !!token;
+  const isShelter = localStorage.getItem("Role") === "SHELTER";
+  const shelterStatus = localStorage.getItem("ShelterStatus");
+  const isFirstLogin = localStorage.getItem("firstLogin") === "true";
+  
   if (to.name === 'Unauthorized') {
     next();
     return;
   }
-
+  
   const guestOnly = to.matched.some(record => record.meta.guestOnly);
   if (guestOnly && isAuthenticated()) {
     const userRole = getUserRole();
@@ -299,22 +314,25 @@ router.beforeEach((to, from, next) => {
     return;
   }
   
-  const isFirstLogin = localStorage.getItem("firstLogin") === "true";
-  if (isAuthenticated() && isFirstLogin && isShelter() && to.path !== '/shelter-profile-completion') {
+  if (isShelter && shelterStatus === "REJECTED" && to.path !== '/shelter-rejected') {
+    next('/shelter-rejected');
+    return;
+  }
+  
+  if (simpleIsAuthenticated && isFirstLogin && isShelter && to.path !== '/shelter-profile-completion') {
     next('/shelter-profile-completion');
     return;
   }
-
-  if (!checkRoutePermission(to)) {
+  
+  if (typeof checkRoutePermission === 'function' && !checkRoutePermission(to)) {
     if (!isAuthenticated()) {
       next({
         path: '/login',
-        query: { redirect: to.fullPath } 
+        query: { redirect: to.fullPath }
       });
       return;
     }
     
-    // Redirect to unauthorized page when user is authenticated but doesn't have permission
     next('/unauthorized');
     return;
   }

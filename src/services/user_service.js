@@ -120,17 +120,27 @@ async function login(email, password) {
       body: JSON.stringify({ email, password }),
     });
 
-    const data = await handleApiResponse(response, "Login failed");
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Login failed");
+    }
+
+    const data = await response.json();
     
     localStorage.setItem("token", data.token);
     localStorage.setItem("Id", data.id);
-    localStorage.setItem("refreshToken", data.refreshToken);
     localStorage.setItem("Username", data.username);
     localStorage.setItem("Role", data.role);
     
-    //first login flag for shelters
     if (data.role === "SHELTER") {
-      if (data.first_login_after_approval === true) {
+      localStorage.setItem("ShelterStatus", data.status);
+      
+      if (data.status === "REJECTED") {
+        localStorage.setItem("rejectionReason", data.rejectionReason || "UNSPECIFIED");
+        localStorage.setItem("rejectionDetails", data.rejectionDetails || "");
+      }
+      
+      if (data.first_login_after_approval == true) {
         localStorage.setItem("firstLogin", "true");
       } else {
         localStorage.removeItem("firstLogin");

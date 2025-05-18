@@ -184,16 +184,17 @@ async function approveShelter(Id) {
 }
 
 /**
- * Reject a shelter's registration
+ * Reject a shelter's registration with detailed reason
  * @param {number} Id - The shelter ID to reject
+ * @param {Object} rejectionData - The rejection details
  * @returns {Promise<Object>} Response confirming rejection
  */
-async function rejectShelter(Id) {
+async function rejectShelter(Id, rejectionData) {
   try {
     const response = await fetch(`${API_URL}/shelters/${Id}/reject`, {
       method: 'POST',
       headers: getAuthHeaders(),
-      body: JSON.stringify({})
+      body: JSON.stringify(rejectionData)
     });
     
     if (!response.ok) {
