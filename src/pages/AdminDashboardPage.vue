@@ -1033,12 +1033,9 @@ export default {
     const performLogout = async () => {
       try {
         showLogoutConfirmation.value = false;
-        await logout(); // Aceasta va face cererea către API și va șterge localStorage
-        // Nu mai este nevoie să faci manual router.push("/") deoarece
-        // funcția logout() deja face acest lucru
+        await logout();
       } catch (error) {
         console.error("Error during logout:", error);
-        // Fallback în caz că cererea API eșuează
         localStorage.clear();
         router.push("/");
       }

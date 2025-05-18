@@ -173,23 +173,17 @@ export default {
         return; 
       }
 
-      //pt admin
-      if (this.email === "rescueme.care@gmail.com" && this.password === "ParolaAdmin!") {
-        localStorage.setItem("token", "admin-token");
-        localStorage.setItem("Id", "admin-id");
-        localStorage.setItem("Username", "Admin");
-        localStorage.setItem("Role", "ADMIN");
-        
-        this.successMessage = "Admin login successful! Redirecting to dashboard...";
-        setTimeout(() => {
-          this.$router.push("/admin-dashboard");
-        }, 2000);
-        return; 
-      }
-
-      //pt adopter si shelter
       try {
         const data = await login(this.email, this.password);
+
+        //pt admin
+        if (data.role === "ADMIN") {
+            this.successMessage = "Admin login successful! Redirecting to dashboard...";
+            setTimeout(() => {
+                this.$router.push("/admin-dashboard");
+            }, 2000);
+            return;
+        }
 
         //pt shelter
         if (data.role === "SHELTER") {
