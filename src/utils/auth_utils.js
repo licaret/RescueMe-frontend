@@ -11,17 +11,15 @@ export function isTokenExpired() {
         const token = localStorage.getItem('token');
         if (!token) return true;
         
-        // decode JWT token
+        // decode JWT
         const base64Url = token.split('.')[1];
         const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
         const payload = JSON.parse(window.atob(base64));
         
-        // check expiration
-        const exp = payload.exp * 1000; // milliseconds
+        const exp = payload.exp * 1000;  // millisec
         const now = Date.now();
         
-        // true if token expires in < 30 seconds
-        return exp < (now + 30000); 
+        return exp <= now;
     } catch (error) {
         console.error('Error checking token expiration:', error);
         return true; 

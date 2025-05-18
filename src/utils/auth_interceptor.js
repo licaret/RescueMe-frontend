@@ -1,6 +1,5 @@
 import { isTokenExpired, refreshAccessToken } from './auth_utils.js';
 
-
 const PUBLIC_URLS = [
   '/api/v1/auth/login',
   '/api/v1/auth/register',
@@ -17,29 +16,6 @@ function isPublicUrl(url) {
   return PUBLIC_URLS.some(publicUrl => url.includes(publicUrl));
 }
 
-function startTokenExpirationChecker() {
-    const interval = setInterval(async () => {
-        if (!localStorage.getItem('token')) {
-            return;
-        }
-        
-        if (isTokenExpired()) {
-            console.log('Token is about to expire, refreshing...');
-            try {
-                await refreshAccessToken();
-                console.log('Token refreshed proactively');
-            } catch (error) {
-                console.error('Proactive token refresh failed:', error);
-            }
-        }
-    }, 30000); // 30 sec
-    
-    window.addEventListener('beforeunload', () => {
-        clearInterval(interval);
-    });
-}
-
-
 export function setupAuthInterceptor() {
     const originalFetch = window.fetch;
     
@@ -51,12 +27,12 @@ export function setupAuthInterceptor() {
         let token = localStorage.getItem('token');
         
         if (!token || isTokenExpired()) {
-                token = await refreshAccessToken();
+            token = await refreshAccessToken();
         }
         
         const updatedOptions = {
             ...options,
-            credentials: 'include' // cookies
+            credentials: 'include'  // cookies
         };
         
         // authorization header
@@ -95,7 +71,5 @@ export function setupAuthInterceptor() {
         }
     };
     
-    startTokenExpirationChecker();
-    
-    console.log('Auth interceptor setup complete with proactive token refresh');
+    console.log('Auth interceptor setup complete');
 }
