@@ -36,8 +36,8 @@
           <div class="bg-white overflow-hidden shadow rounded-2xl">
             <div class="px-4 py-5 sm:p-6">
               <dl>
-                <dt class="text-sm font-medium text-gray-500 truncate">Total Shelters</dt>
-                <dd class="mt-1 text-3xl font-semibold text-gray-900">{{ stats.totalShelters }}</dd>
+                <dt class="text-sm font-medium text-gray-500 truncate">Approved Shelters</dt>
+                <dd class="mt-1 text-3xl font-semibold text-gray-900">{{ approvedShelters.length }}</dd>
               </dl>
             </div>
           </div>
@@ -943,6 +943,7 @@ import {
   suspendShelter,
   getShelterDetails
 } from '@/services/admin_dashboard_service.js';
+import { logout } from '@/services/user_service.js';
 import { getDocumentViewUrl } from '@/services/shelter_profile_service.js';
 import { getPetCountByShelter } from '@/services/pet_service.js';
 import blankProfilePicture from '@/assets/blank_profile_picture.jpg';
@@ -1029,9 +1030,18 @@ export default {
       showLogoutConfirmation.value = true;
     };
     
-    const performLogout = () => {
-      showLogoutConfirmation.value = false;
-      router.push("/");
+    const performLogout = async () => {
+      try {
+        showLogoutConfirmation.value = false;
+        await logout(); // Aceasta va face cererea către API și va șterge localStorage
+        // Nu mai este nevoie să faci manual router.push("/") deoarece
+        // funcția logout() deja face acest lucru
+      } catch (error) {
+        console.error("Error during logout:", error);
+        // Fallback în caz că cererea API eșuează
+        localStorage.clear();
+        router.push("/");
+      }
     };
     
     const sortPendingShelters = (ascending = false) => {
@@ -1542,12 +1552,6 @@ export default {
       };
       
       return names[documentType] || documentType;
-    };
-
-    
-    const logout = () => {
-      localStorage.clear();
-      router.push("/");
     };
 
 

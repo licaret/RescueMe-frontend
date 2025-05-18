@@ -513,14 +513,17 @@
       const loadShelters = async () => {
         loadingShelters.value = true;
         try {
-          shelters.value = await getAllShelters;
+          const allShelters = await getAllShelters();
+          
+          shelters.value = allShelters.filter(shelter => 
+            shelter.status === 'APPROVED'
+          );
         } catch (error) {
           console.error('Error loading shelters:', error);
         } finally {
           loadingShelters.value = false;
         }
       };
-  
 
       const formatCurrency = (amount) => {
         return new Intl.NumberFormat('ro-RO', {

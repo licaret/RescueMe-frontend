@@ -28,10 +28,17 @@ import ShelterMessages from '@/components/ShelterMessages.vue';
 import DonationComplete from '@/pages/DonationComplete.vue';
 import ShelterDonations from '@/components/ShelterDonations.vue';
 import DonationsPage from '@/pages/DonationsPage.vue'
+import UnauthorizedPage from '@/pages/UnauthorizedPage.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    
+    {
+      path: '/unauthorized',
+      name: 'Unauthorized',
+      component: UnauthorizedPage
+    },
 
     // Rute publice
     {
@@ -271,6 +278,12 @@ function checkRoutePermission(to) {
 }
 
 router.beforeEach((to, from, next) => {
+  // Skip authorization check for unauthorized page itself
+  if (to.name === 'Unauthorized') {
+    next();
+    return;
+  }
+
   const guestOnly = to.matched.some(record => record.meta.guestOnly);
   if (guestOnly && isAuthenticated()) {
     const userRole = getUserRole();
@@ -301,17 +314,8 @@ router.beforeEach((to, from, next) => {
       return;
     }
     
-    const userRole = getUserRole();
-    
-    if (userRole === 'ADOPTER') {
-      next('/available-pets'); 
-    } else if (userRole === 'SHELTER') {
-      next('/shelter-dashboard'); 
-    } else if (userRole === 'ADMIN') {
-      next('/admin-dashboard'); 
-    } else {
-      next('/home');
-    }
+    // Redirect to unauthorized page when user is authenticated but doesn't have permission
+    next('/unauthorized');
     return;
   }
   
