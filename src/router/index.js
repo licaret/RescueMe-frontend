@@ -146,6 +146,10 @@ const router = createRouter({
           name: 'shelter-messages',
           component: ShelterMessages,
           meta: { requiresAuth: true, role: 'SHELTER' },
+          props: route => ({
+            initialRecipientId: route.query.adopterId || route.query.shelterId,
+            initialRecipientUsername: route.query.adopterName || route.query.shelterName
+          })
         },
         {
           path: 'donations',
@@ -226,7 +230,7 @@ const router = createRouter({
       path: '/messages',
       name: 'messages',
       component: MessagesPage,
-      meta: { requiresAuth: true, role: 'ADOPTER' },
+      meta: { requiresAuth: true },
     },
     {
       path: '/donation-complete',

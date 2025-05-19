@@ -4,8 +4,8 @@
     <div class="flex-1 container mx-auto px-4 py-6 mt-20 max-w-7xl">
       <div class="bg-white rounded-2xl shadow-lg">
         <Messaging 
-          :initialRecipientId="shelterId" 
-          :initialRecipientUsername="shelterName" 
+          :initialRecipientId="recipientId" 
+          :initialRecipientUsername="recipientName" 
         />
       </div>
     </div>
@@ -28,20 +28,33 @@ export default {
   
   setup() {
     const route = useRoute();
+    const currentUserRole = localStorage.getItem('Role');
     
-    const shelterId = ref(null);
-    const shelterName = ref(null);
+    const recipientId = ref(null);
+    const recipientName = ref(null);
     
     onMounted(() => {
-      if (route.query.shelterId) {
-        shelterId.value = route.query.shelterId;
-        shelterName.value = route.query.shelterName || 'Shelter';
+      if (currentUserRole === 'SHELTER' && route.query.adopterId) {
+        recipientId.value = route.query.adopterId;
+        recipientName.value = route.query.adopterName || 'Adopter';
+      } 
+      else if (currentUserRole === 'ADOPTER' && route.query.shelterId) {
+        recipientId.value = route.query.shelterId;
+        recipientName.value = route.query.shelterName || 'Shelter';
+      }
+      else if (route.query.adopterId) {
+        recipientId.value = route.query.adopterId;
+        recipientName.value = route.query.adopterName || 'User';
+      } 
+      else if (route.query.shelterId) {
+        recipientId.value = route.query.shelterId;
+        recipientName.value = route.query.shelterName || 'User';
       }
     });
     
     return {
-      shelterId,
-      shelterName
+      recipientId,
+      recipientName
     };
   }
 }

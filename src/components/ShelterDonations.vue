@@ -132,7 +132,7 @@
                 <td class="px-6 py-4 whitespace-nowrap">
                   <button 
                     v-if="!donation.anonymous && donation.donorName"
-                    @click="messageUser(donation.id, donation.donorName)" 
+                    @click="messageUser(donation.userId || donation.donorUserId || donation.id, donation.donorName)" 
                     class="text-blue-600 hover:text-blue-900 text-sm font-medium flex items-center"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -391,14 +391,22 @@
       });
 
 
-      const messageUser = (donationId, donorName) => {
-        if (!donationId) {
-          console.error('No donation ID provided');
+      const messageUser = (donorId, donorName) => {
+        console.log('Donation data:', donorId, donorName);
+        if (!donorId) {
+          console.error('No donor ID provided');
           return;
         }
         
-        window.location.href = `/messages?shelterId=${donationId}&shelterName=${encodeURIComponent(donorName || 'Donor')}`;
+        const currentUrl = window.location.href;
+        
+        if (currentUrl.includes('/shelter-dashboard/')) {
+          window.location.href = `/shelter-dashboard/messages?adopterId=${donorId}&adopterName=${encodeURIComponent(donorName || 'Donor')}`;
+        } else {
+          window.location.href = `/messages?adopterId=${donorId}&adopterName=${encodeURIComponent(donorName || 'Donor')}`;
+        }
       };
+
       
       return {
         donations,

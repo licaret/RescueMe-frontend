@@ -711,19 +711,18 @@ export default {
       
       const relevantRequest = requests.value.find(req => req.userId === adopterId || req.adopterId === adopterId);
       
-      if (!relevantRequest) {
-        console.error('Could not find request information for this adopter');
-        
-        window.location.href = `/messages?shelterId=${adopterId}`;
-        return;
-      }
-      
-      const adopterName = relevantRequest.requestDetails?.contactInfo?.name || 
+      const adopterName = relevantRequest?.requestDetails?.contactInfo?.name || 
+                          relevantRequest?.userName ||
                           'Adopter';
       
-      window.location.href = `/messages?shelterId=${adopterId}&shelterName=${encodeURIComponent(adopterName)}`;
+      const currentUrl = window.location.href;
+      
+      if (currentUrl.includes('/shelter-dashboard/')) {
+        window.location.href = `/shelter-dashboard/messages?adopterId=${adopterId}&adopterName=${encodeURIComponent(adopterName)}`;
+      } else {
+        window.location.href = `/messages?adopterId=${adopterId}&adopterName=${encodeURIComponent(adopterName)}`;
+      }
     };
-
 
 
     return {

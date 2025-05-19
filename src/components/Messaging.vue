@@ -958,7 +958,7 @@ export default {
         return;
       }
       
-      const recipientId = initialRecipient.value.id || route.query.shelterId;
+      const recipientId = initialRecipient.value.id || route.query.adopterId || route.query.shelterId;
       if (!recipientId) {
         console.error("No recipient ID provided");
         return;
@@ -991,31 +991,37 @@ export default {
           console.log("Found conversation by ID:", existingById);
           selectConversation(existingById);
         } else {
-          let shelterData = null;
+          let recipientData = null;
           try {
             const response = await fetch(`http://localhost:8080/users/${recipientId}`);
             if (response.ok) {
-              shelterData = await response.json();
+              recipientData = await response.json();
             }
           } catch (err) {
-            console.warn("Could not fetch shelter profile data:", err);
+            console.warn("Could not fetch recipient profile data:", err);
           }
           
           console.log("Creating temporary conversation with ID:", conversationId);
+          
           const recipientUsername = initialRecipient.value.username || 
+                                  route.query.adopterName || 
                                   route.query.shelterName || 
-                                  'User';
+                                  (recipientData ? recipientData.username : 'User');
                                   
+          const participantRole = recipientData ? 
+                              (recipientData.role === 'SHELTER' ? 2 : 1) : 
+                              (route.query.adopterId ? 1 : 2);
+          
           const tempConversation = {
             conversationId,
             participantId: parseInt(recipientId),
             participantUsername: recipientUsername,
-            participantRole: 2, 
+            participantRole: participantRole,
             lastMessage: '',
             lastMessageTime: new Date().toISOString(),
             hasUnreadMessages: false,
             unreadCount: 0,
-            participantProfilePicture: shelterData?.profilePicture || null
+            participantProfilePicture: recipientData?.profilePicture || null
           };
           
           conversations.value = [tempConversation, ...conversations.value];
