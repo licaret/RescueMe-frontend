@@ -526,6 +526,42 @@ async function fetchWithAuth(endpoint, options = {}) {
 }
 
 
+/**
+ * Get shelters filtered by status
+ * @param {string} status - Status of shelters to filter by (APPROVED, NEW, REJECTED)
+ * @returns {Promise<Array>} List of shelters with specified status
+ */
+async function getSheltersByStatus(status) {
+  try {
+    const response = await fetch(`${USERS_API_URL}/shelters/status/${status}`, {
+      headers: getAuthHeaders()
+    });
+    
+    return handleApiResponse(response, `Failed to fetch shelters with status: ${status}`);
+  } catch (error) {
+    console.error(`Error fetching shelters with status ${status}:`, error);
+    throw error;
+  }
+}
+
+/**
+ * Get only approved shelters
+ * @returns {Promise<Array>} List of approved shelters
+ */
+async function getApprovedShelters() {
+  try {
+    const response = await fetch(`${USERS_API_URL}/shelters/approved`, {
+      headers: getAuthHeaders()
+    });
+    
+    return handleApiResponse(response, "Failed to fetch approved shelters");
+  } catch (error) {
+    console.error("Error fetching approved shelters:", error);
+    throw error;
+  }
+}
+
+
 export { 
   // Authentication
   registerAdopter,
@@ -552,7 +588,9 @@ export {
   getShelterById,
   getShelterByPetId,
   uploadShelterDocument,
-  
+  getSheltersByStatus,
+  getApprovedShelters,
+
   // Utility
   fetchWithAuth,
   getAuthHeaders

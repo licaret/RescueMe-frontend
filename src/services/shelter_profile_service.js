@@ -266,15 +266,101 @@ function getDocumentUrl(shelterId, documentType) {
   return `${API_BASE_URL}/shelters/${shelterId}/documents/${documentType}?t=${Date.now()}`;
 }
 
+
 /**
  * Get URL for viewing a document in the browser
  * @param {number} shelterId - The ID of the shelter
  * @param {string} documentType - Type of document to get URL for
  * @returns {string} URL for viewing the document
  */
-function getDocumentViewUrl(shelterId, documentType) {
-  return `${API_BASE_URL}/shelters/${shelterId}/documents/${documentType}`;
+async function getDocumentViewUrl(shelterId, documentType) {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_BASE_URL}/shelters/${shelterId}/documents/${documentType}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch document: ${response.status}`);
+    }
+    
+    let filename = `${documentType}.pdf`; 
+    const contentDisposition = response.headers.get('Content-Disposition');
+    if (contentDisposition) {
+      const filenameMatch = contentDisposition.match(/filename="?([^"]*)"?/);
+      if (filenameMatch && filenameMatch[1]) {
+        filename = filenameMatch[1];
+      }
+    } else {
+      const docNames = {
+        'taxCertificate': 'Tax_Certificate',
+        'vetAuthorization': 'Veterinary_Authorization',
+        'vetContract': 'Veterinarian_Contract',
+        'idCard': 'ID_Card'
+      };
+      filename = `${docNames[documentType] || documentType}_${shelterId}.pdf`;
+    }
+    
+    const blob = await response.blob();
+    
+    const file = new Blob([blob], { type: blob.type });
+    
+    return {
+      url: URL.createObjectURL(file),
+      filename: filename
+    };
+  } catch (error) {
+    console.error(`Error loading document ${documentType}:`, error);
+    return null;
+  }
 }
+
+/**
+ * Opens a document in a new window with the specified filename
+ * @param {Blob|string} content - The content of the document or its URL
+ * @param {string} filename - The name of the file
+ */
+function openDocumentWithFilename(content, filename) {
+  if (typeof content === 'string') {
+    const newWindow = window.open('', '_blank');
+    if (newWindow) {
+      newWindow.document.write(`
+        <html>
+          <head>
+            <title>${filename}</title>
+          </head>
+          <body style="margin:0;padding:0;overflow:hidden;height:100vh;">
+              <iframe src="${content}" style="border:none;width:100%;height:100vh;"></iframe>
+          </body>
+        </html>
+      `);
+      newWindow.document.close();
+    }
+    return;
+  }
+  
+  const url = (content instanceof Blob) 
+    ? URL.createObjectURL(content) 
+    : content;
+  
+  const newWindow = window.open('', '_blank');
+  if (newWindow) {
+    newWindow.document.write(`
+      <html>
+        <head>
+          <title>${filename}</title>
+        </head>
+        <body style="margin:0;padding:0;overflow:hidden;height:100vh;">
+          <iframe src="${url}" style="border:none;width:100%;height:100vh;"></iframe>
+        </body>
+      </html>
+    `);
+    newWindow.document.close();
+  }
+}
+
 
 /**
  * Check if shelter profile is complete
@@ -356,5 +442,6 @@ export {
   deleteDocument,
   getDocumentStatus,
   getDocumentUrl,
-  getDocumentViewUrl
+  getDocumentViewUrl,
+  openDocumentWithFilename
 };

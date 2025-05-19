@@ -330,7 +330,7 @@
   <script>
   import { ref, computed, onMounted, watch } from 'vue';
   import { getDonationsForUser } from '@/services/donation_service.js'
-  import { getAllShelters } from '@/services/user_service.js'
+  import { getApprovedShelters  } from '@/services/user_service.js'
   import Navbar from '@/components/Navbar.vue';
   import DonationModal from '@/components/DonationModal.vue';
   
@@ -513,17 +513,19 @@
       const loadShelters = async () => {
         loadingShelters.value = true;
         try {
-          const allShelters = await getAllShelters();
+          const allShelters = await getApprovedShelters();
+          console.log('Fetched shelters:', allShelters);
           
-          shelters.value = allShelters.filter(shelter => 
-            shelter.status === 'APPROVED'
-          );
+          shelters.value = allShelters;
+          
+          console.log('Shelters to display:', shelters.value.length);
         } catch (error) {
           console.error('Error loading shelters:', error);
         } finally {
           loadingShelters.value = false;
         }
       };
+
 
       const formatCurrency = (amount) => {
         return new Intl.NumberFormat('ro-RO', {

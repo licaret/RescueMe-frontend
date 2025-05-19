@@ -951,7 +951,7 @@ import {
   getShelterDetails
 } from '@/services/admin_dashboard_service.js';
 import { logout } from '@/services/user_service.js';
-import { getDocumentViewUrl } from '@/services/shelter_profile_service.js';
+import { getDocumentViewUrl, openDocumentWithFilename } from '@/services/shelter_profile_service.js';
 import { getPetCountByShelter } from '@/services/pet_service.js';
 import blankProfilePicture from '@/assets/blank_profile_picture.jpg';
 import ShelterDetailsModal from '@/components/ShelterDetailsModal.vue';
@@ -1225,9 +1225,26 @@ export default {
     });
 
 
-    const viewShelterDocument = (Id, documentType) => {
-      const documentUrl = getDocumentViewUrl(Id, documentType);
-      window.open(documentUrl, '_blank');
+    const viewShelterDocument = async (shelterId, documentType) => {
+      try {
+        const documentTypeName = getDocumentTypeName(documentType);
+        const shelterName = pendingShelters.value.find(s => s.id === shelterId)?.username || 
+                            approvedShelters.value.find(s => s.id === shelterId)?.username || 
+                            'Shelter';
+        
+        const filename = `${documentTypeName} - ${shelterName}.pdf`;
+        
+        const documentData = await getDocumentViewUrl(shelterId, documentType);
+        
+        if (documentData && documentData.url) {
+          openDocumentWithFilename(documentData.url, documentData.filename || filename);
+        } else {
+          showToastMessage('Failed to load document. Please try again.');
+        }
+      } catch (error) {
+        console.error(`Error viewing document ${documentType}:`, error);
+        showToastMessage('Failed to load document. Please try again.');
+      }
     };
 
 
