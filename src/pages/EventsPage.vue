@@ -16,7 +16,6 @@
       :sort-by="sortBy"
       :is-logged-in="isLoggedIn"
       :counties="counties"
-      :filtered-cities="filteredCities"
       :is-any-filter-applied="isAnyFilterApplied"
       :active-filter-count="activeFilterCount"
       @update:filters="filters = $event"
@@ -223,21 +222,12 @@ export default {
     );
     
 
-    const filteredCities = computed(() => {
-      if (!filters.value.county) return [];
-      
-      const selectedCounty = judete.judete.find(judet => 
-        judet.nume === filters.value.county
-      );
-      
-      return selectedCounty 
-        ? selectedCounty.localitati.map(loc => loc.nume).sort() 
-        : [];
-    });
+    watch(() => filters.value, () => {
+      currentPage.value = 1;
+    }, { deep: true });
 
-
-    watch(() => filters.value.county, () => {
-      filters.value.city = '';
+    watch(() => sortBy.value, () => {
+      currentPage.value = 1;
     });
 
 
@@ -519,9 +509,13 @@ export default {
     };
 
     
-    watch(() => [filters.value, sortBy.value], () => {
+    watch(filters, () => {
       currentPage.value = 1;
     }, { deep: true });
+
+    watch(sortBy, () => {
+      currentPage.value = 1;
+    });
 
 
     return {
@@ -537,7 +531,6 @@ export default {
       totalPages,
       displayedPages,
       counties,
-      filteredCities,
       isAnyFilterApplied,
       activeFilterCount,
 

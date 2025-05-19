@@ -428,8 +428,8 @@ export default {
 
         
         const timeInShelter = newPet.timeSpentInShelter ?? 0;
-        const shelterTimeInMonths = Math.round(timeInShelter * 12);
-        petData.value.shelterTimeValue = shelterTimeInMonths < 12 ? shelterTimeInMonths : Math.floor(timeInShelter);
+        const shelterTimeInMonths = Math.round(parseFloat(timeInShelter) * 12);
+        petData.value.shelterTimeValue = shelterTimeInMonths < 12 ? shelterTimeInMonths : Math.floor(parseFloat(timeInShelter));
         petData.value.shelterTimeUnit = shelterTimeInMonths < 12 ? "months" : "years";
 
         console.log("State after initialization:", {

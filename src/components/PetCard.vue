@@ -426,7 +426,9 @@ export default {
     const formatShelterTime = (time) => {
       if (!time) return 'New arrival';
       
-      const shelterTimeInMonths = parseInt(time);
+      const timeInYears = parseFloat(time);
+      const shelterTimeInMonths = Math.round(timeInYears * 12);
+      
       if (shelterTimeInMonths >= 12) {
         const years = Math.floor(shelterTimeInMonths / 12);
         return `${years} ${years === 1 ? 'year' : 'years'} in shelter`;

@@ -130,7 +130,7 @@
           <div class="space-y-2">
             <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide ml-1">City</label>
             <div class="relative">
-              <select v-model="filters.city" class="enhanced-filter-input" :disabled="!filters.county">
+              <select v-model="localFilters.city" class="enhanced-filter-input" :disabled="!localFilters.county">
                 <option value="">All Cities</option>
                 <option v-for="city in filteredCities" :key="city" :value="city">{{ city }}</option>
               </select>

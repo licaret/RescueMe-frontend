@@ -84,17 +84,6 @@
             >
               Approved Shelters
             </button>
-            <button 
-              @click="activeTab = 'users'" 
-              :class="[
-                activeTab === 'users' 
-                  ? 'border-red-500 text-red-600' 
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
-                'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm'
-              ]"
-            >
-              User Management
-            </button>
           </nav>
         </div>
         
@@ -389,12 +378,12 @@
                       >
                         View
                       </button>
-                      <button 
+                      <!-- <button 
                         @click="suspendShelter(shelter.id)" 
                         class="text-gray-600 hover:text-gray-900"
                       >
                         Suspend
-                      </button>
+                      </button> -->
                     </td>
                   </tr>
                 </tbody>
@@ -448,203 +437,6 @@
             </div>
           </div>
         </div>
-        
-        <!-- User Management Tab -->
-        <div v-if="activeTab === 'users'">
-          <div class="bg-white shadow overflow-hidden sm:rounded-2xl">
-            <div class="px-4 py-5 border-b border-gray-200 sm:px-6">
-              <h3 class="text-lg leading-6 font-medium text-gray-900">
-                User Management
-              </h3>
-              <p class="mt-1 max-w-2xl text-sm text-gray-500">
-                Manage all users of the RescueMe platform.
-              </p>
-            </div>
-            
-            <div class="px-4 py-4 sm:px-6 flex flex-col md:flex-row justify-between space-y-4 md:space-y-0">
-              <div class="relative w-full md:w-64">
-                <input 
-                  v-model="userSearchQuery" 
-                  type="text" 
-                  placeholder="Search users..." 
-                  class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-2xl leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-red-500 focus:border-red-500 sm:text-sm"
-                >
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-                  </svg>
-                </div>
-              </div>
-              <div class="flex space-x-4">
-                <select v-model="userRole" class="block w-40 pl-3 pr-10 py-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm">
-                  <option value="">All Roles</option>
-                  <option value="USER">Regular Users</option>
-                  <option value="SHELTER">Shelters</option>
-                  <option value="ADMIN">Admins</option>
-                </select>
-                <select v-model="userStatus" class="block w-40 pl-3 pr-10 py-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm">
-                  <option value="">All Statuses</option>
-                  <option value="ACTIVE">Active</option>
-                  <option value="SUSPENDED">Suspended</option>
-                  <option value="DELETED">Deleted</option>
-                </select>
-              </div>
-            </div>
-            
-            <div v-if="isLoadingUsers" class="flex justify-center items-center py-10">
-              <svg class="animate-spin -ml-1 mr-3 h-8 w-8 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              <span class="text-gray-700">Loading users...</span>
-          </div>
-          
-          <div v-else-if="filteredUsers.length === 0" class="py-10 text-center">
-            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-            </svg>
-            <h3 class="mt-2 text-sm font-medium text-gray-900">No users found</h3>
-            <p class="mt-1 text-sm text-gray-500">Try adjusting your search criteria.</p>
-          </div>
-          
-          <div v-else class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    User
-                  </th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Role
-                  </th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Joined
-                  </th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody class="bg-white divide-y divide-gray-200">
-                <tr v-for="user in paginatedUsers" :key="user.id">
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="flex items-center">
-                      <div class="flex-shrink-0 h-10 w-10">
-                        <img :src="user.profilePicture || defaultUserImage" alt="" class="h-10 w-10 rounded-full object-cover">
-                      </div>
-                      <div class="ml-4">
-                        <div class="text-sm font-medium text-gray-900">{{ user.username }}</div>
-                        <div class="text-sm text-gray-500">{{ user.email }}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <span :class="[
-                      user.role === 'ADMIN' ? 'bg-purple-100 text-purple-800' : 
-                      user.role === 'SHELTER' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800',
-                      'px-2 inline-flex text-xs leading-5 font-semibold rounded-full'
-                    ]">
-                      {{ user.role }}
-                    </span>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <span :class="[
-                      user.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : 
-                      user.status === 'SUSPENDED' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800',
-                      'px-2 inline-flex text-xs leading-5 font-semibold rounded-full'
-                    ]">
-                      {{ user.status }}
-                    </span>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {{ formatDate(user.createdAt) }}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button 
-                      @click="viewUserDetails(user.id)" 
-                      class="text-red-600 hover:text-red-900 mr-3"
-                    >
-                      View
-                    </button>
-                    <button 
-                      v-if="user.status === 'ACTIVE'"
-                      @click="suspendUser(user.id)" 
-                      class="text-yellow-600 hover:text-yellow-900 mr-3"
-                    >
-                      Suspend
-                    </button>
-                    <button 
-                      v-if="user.status === 'SUSPENDED'"
-                      @click="activateUser(user.id)" 
-                      class="text-green-600 hover:text-green-900 mr-3"
-                    >
-                      Activate
-                    </button>
-                    <button 
-                      v-if="user.role !== 'ADMIN'"
-                      @click="deleteUser(user.id)" 
-                      class="text-red-600 hover:text-red-900"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          
-          <!-- User Pagination -->
-          <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-            <div class="flex-1 flex justify-between sm:hidden">
-              <button @click="userPage > 1 && userPage--" :disabled="userPage === 1" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                Previous
-              </button>
-              <button @click="userPage < userTotalPages && userPage++" :disabled="userPage === userTotalPages" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                Next
-              </button>
-            </div>
-            <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-              <div>
-                <p class="text-sm text-gray-700">
-                  Showing <span class="font-medium">{{ (userPage - 1) * userItemsPerPage + 1 }}</span> to <span class="font-medium">{{ Math.min(userPage * userItemsPerPage, filteredUsers.length) }}</span> of <span class="font-medium">{{ filteredUsers.length }}</span> users
-                </p>
-              </div>
-              <div>
-                <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                  <button @click="userPage > 1 && userPage--" :disabled="userPage === 1" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                    <span class="sr-only">Previous</span>
-                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                      <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-                    </svg>
-                  </button>
-                  <button 
-                    v-for="page in userPaginationPages" 
-                    :key="page" 
-                    @click="userPage = page" 
-                    :class="[
-                      page === userPage ? 'z-10 bg-red-50 border-red-500 text-red-600' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50',
-                      'relative inline-flex items-center px-4 py-2 border text-sm font-medium'
-                    ]"
-                  >
-                    {{ page }}
-                  </button>
-                  <button @click="userPage < userTotalPages && userPage++" :disabled="userPage === userTotalPages" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                    <span class="sr-only">Next</span>
-                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                      <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                    </svg>
-                  </button>
-                </nav>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      
     </main>
     
     <!-- Shelter Details Modal -->
@@ -659,172 +451,6 @@
       @view-document="viewShelterDocument"
     />
     
-    <!-- User Details Modal -->
-    <div v-if="showUserModal" class="fixed z-10 inset-0 overflow-y-auto">
-      <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 transition-opacity" aria-hidden="true" @click="showUserModal = false">
-          <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
-        </div>
-        
-        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-        
-        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
-          <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-            <div class="sm:flex sm:items-start">
-              <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
-                <svg class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-              </div>
-              <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                <h3 class="text-lg leading-6 font-medium text-gray-900">
-                  User Details
-                </h3>
-                <div class="mt-2">
-                  <p class="text-sm text-gray-500">
-                    View user information and activity.
-                  </p>
-                </div>
-              </div>
-            </div>
-            
-            <div v-if="isLoadingUserDetails" class="flex justify-center items-center py-10">
-              <svg class="animate-spin -ml-1 mr-3 h-8 w-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              <span class="text-gray-700">Loading user details...</span>
-            </div>
-            
-            <div v-else-if="selectedUser" class="mt-5 divide-y divide-gray-200">
-              <!-- Basic Info Section -->
-              <div class="py-4">
-                <div class="flex items-center mb-4">
-                  <img :src="selectedUser.profilePicture || defaultUserImage" alt="User profile" class="h-20 w-20 rounded-full object-cover mr-4">
-                  <div>
-                    <h4 class="text-lg font-bold text-gray-900">{{ selectedUser.username }}</h4>
-                    <p class="text-sm text-gray-500">{{ selectedUser.email }}</p>
-                    <div class="mt-1">
-                      <span :class="[
-                        selectedUser.role === 'ADMIN' ? 'bg-purple-100 text-purple-800' : 
-                        selectedUser.role === 'SHELTER' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800',
-                        'px-2 inline-flex text-xs leading-5 font-semibold rounded-full'
-                      ]">
-                        {{ selectedUser.role }}
-                      </span>
-                      <span :class="[
-                        selectedUser.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : 
-                        selectedUser.status === 'SUSPENDED' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800',
-                        'px-2 ml-2 inline-flex text-xs leading-5 font-semibold rounded-full'
-                      ]">
-                        {{ selectedUser.status }}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                  <div>
-                    <p class="text-sm font-medium text-gray-500">Full Name</p>
-                    <p class="mt-1">{{ selectedUser.firstName || 'N/A' }} {{ selectedUser.lastName || '' }}</p>
-                  </div>
-                  <div>
-                    <p class="text-sm font-medium text-gray-500">Phone Number</p>
-                    <p class="mt-1">{{ selectedUser.phoneNumber || 'Not provided' }}</p>
-                  </div>
-                  <div>
-                    <p class="text-sm font-medium text-gray-500">Registration Date</p>
-                    <p class="mt-1">{{ formatDate(selectedUser.createdAt) }}</p>
-                  </div>
-                  <div>
-                    <p class="text-sm font-medium text-gray-500">Last Login</p>
-                    <p class="mt-1">{{ formatDate(selectedUser.lastLogin) || 'Never' }}</p>
-                  </div>
-                </div>
-              </div>
-              
-              <!-- Activity Section -->
-              <div class="py-4">
-                <h4 class="text-lg font-medium text-gray-900 mb-2">User Activity</h4>
-                <div class="space-y-2">
-                  <div v-if="selectedUser.activities && selectedUser.activities.length">
-                    <ul class="space-y-3">
-                      <li v-for="(activity, index) in selectedUser.activities.slice(0, 5)" :key="index" class="bg-gray-50 p-3 rounded-md">
-                        <div class="flex items-start">
-                          <div class="flex-shrink-0 mt-0.5">
-                            <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                          </div>
-                          <div class="ml-3">
-                            <p class="text-sm text-gray-700">{{ activity.description }}</p>
-                            <p class="text-xs text-gray-500">{{ formatDate(activity.timestamp) }}</p>
-                          </div>
-                        </div>
-                      </li>
-                    </ul>
-                    <div v-if="selectedUser.activities.length > 5" class="mt-3 text-center">
-                      <button class="text-sm text-blue-600 hover:text-blue-800">View All Activity</button>
-                    </div>
-                  </div>
-                  <div v-else class="text-center py-4 text-gray-500">
-                    No activity recorded for this user.
-                  </div>
-                </div>
-              </div>
-              
-              <!-- Notes Section -->
-              <div class="py-4">
-                <h4 class="text-lg font-medium text-gray-900 mb-2">Admin Notes</h4>
-                <textarea 
-                  v-model="userNotes" 
-                  rows="3" 
-                  class="shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border border-gray-300 rounded-md p-2"
-                  placeholder="Add notes about this user..."
-                ></textarea>
-                <div class="mt-2 flex justify-end">
-                  <button 
-                    @click="saveUserNotes" 
-                    class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                  >
-                    Save Notes
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-            <button 
-              v-if="selectedUser && selectedUser.status === 'ACTIVE'"
-              @click="suspendUser(selectedUser.id, true)" 
-              class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-yellow-600 text-base font-medium text-white hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 sm:ml-3 sm:w-auto sm:text-sm"
-            >
-              Suspend
-            </button>
-            <button 
-              v-if="selectedUser && selectedUser.status === 'SUSPENDED'"
-              @click="activateUser(selectedUser.id, true)" 
-              class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm"
-            >
-              Activate
-            </button>
-            <button 
-              v-if="selectedUser && selectedUser.role !== 'ADMIN'"
-              @click="deleteUser(selectedUser.id, true)" 
-              class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
-            >
-              Delete
-            </button>
-            <button 
-              @click="showUserModal = false" 
-              class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
     
     <!-- Confirmation Modal -->
     <div v-if="showConfirmationModal" class="fixed z-10 inset-0 overflow-y-auto">
@@ -860,7 +486,7 @@
               @click="confirmAction" 
               :class="[
                 confirmationActionType === 'approve' ? 'bg-green-600 hover:bg-green-700 focus:ring-green-500' :
-                confirmationActionType === 'suspend' ? 'bg-yellow-600 hover:bg-yellow-700 focus:ring-yellow-500' :
+                // confirmationActionType === 'suspend' ? 'bg-yellow-600 hover:bg-yellow-700 focus:ring-yellow-500' :
                 'bg-red-600 hover:bg-red-700 focus:ring-red-500'
               ]"
               class="w-full inline-flex justify-center rounded-2xl border border-transparent shadow-sm px-4 py-2 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"

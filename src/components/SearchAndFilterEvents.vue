@@ -215,6 +215,7 @@
 
 <script>
 import { ref, watch, computed } from 'vue';
+import judete from "@/assets/judete.json";
 
 export default {
   name: 'SearchAndFilterEvents',
@@ -232,10 +233,6 @@ export default {
       default: false
     },
     counties: {
-      type: Array,
-      default: () => []
-    },
-    filteredCities: {
       type: Array,
       default: () => []
     },
@@ -265,10 +262,27 @@ export default {
     
     const localFilters = ref({...props.filters});
     const localSortBy = ref(props.sortBy);
+
+    const filteredCities = computed(() => {
+      if (!localFilters.value.county) return [];
+      
+      const selectedCounty = judete.judete.find(judet => 
+        judet.nume === localFilters.value.county
+      );
+      
+      return selectedCounty 
+        ? selectedCounty.localitati.map(loc => loc.nume).sort() 
+        : [];
+    });
+
+    watch(() => localFilters.value.county, () => {
+      localFilters.value.city = '';
+      emit('update:filters', JSON.parse(JSON.stringify(localFilters.value)));
+    });
     
 
     watch(localFilters, (newFilters) => {
-      emit('update:filters', {...newFilters});
+      emit('update:filters', JSON.parse(JSON.stringify(newFilters)));
     }, { deep: true });
     
 
@@ -278,14 +292,15 @@ export default {
     
 
     watch(() => props.filters, (newFilters) => {
-      localFilters.value = {...newFilters};
+      if (JSON.stringify(localFilters.value) !== JSON.stringify(newFilters)) {
+        localFilters.value = JSON.parse(JSON.stringify(newFilters));
+      }
     }, { deep: true });
     
 
     watch(() => props.sortBy, (newSortBy) => {
       localSortBy.value = newSortBy;
     });
-    
 
     const clearFilter = (key) => {
       emit('clear-single-filter', key);
@@ -301,6 +316,7 @@ export default {
       showFilters,
       localFilters,
       localSortBy,
+      filteredCities,
 
       clearFilter,
       clearAllFilters
