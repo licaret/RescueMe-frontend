@@ -128,6 +128,7 @@ async function login(email, password) {
     const data = await response.json();
     
     localStorage.setItem("token", data.token);
+    localStorage.setItem("refreshToken", data.refreshToken);
     localStorage.setItem("Id", data.id);
     localStorage.setItem("Username", data.username);
     localStorage.setItem("Role", data.role);

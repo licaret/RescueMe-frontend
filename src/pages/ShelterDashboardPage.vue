@@ -165,9 +165,6 @@
             <div class="lg:col-span-2 bg-white rounded-2xl shadow h-full flex flex-col">
               <div class="p-4 border-b flex items-center justify-between">
                 <h2 class="text-lg font-semibold text-gray-800">Recent Activity</h2>
-                <router-link to="/shelter-dashboard/reports" class="text-sm font-medium text-blue-600 hover:text-blue-800">
-                  View all activity
-                </router-link>
               </div>
               <div class="p-4">
                 <ul class="divide-y" v-if="recentNotifications.length > 0">

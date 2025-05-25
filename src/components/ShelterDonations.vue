@@ -87,9 +87,9 @@
                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Message from donator
                 </th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <!-- <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Action
-                </th>
+                </th> -->
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
@@ -129,7 +129,7 @@
                     {{ donation.message || 'No message' }}
                   </div>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap">
+                <!-- <td class="px-6 py-4 whitespace-nowrap">
                   <button 
                     v-if="!donation.anonymous && donation.donorName"
                     @click="messageUser(donation.userId || donation.donorUserId || donation.id, donation.donorName)" 
@@ -141,7 +141,7 @@
                     Message
                   </button>
                   <span v-else class="text-gray-400 text-sm">Anonymous</span>
-                </td>
+                </td> -->
               </tr>
             </tbody>
           </table>

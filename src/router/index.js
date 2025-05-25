@@ -224,7 +224,7 @@ const router = createRouter({
       path: '/donate',
       name: 'Donations',
       component: DonationsPage,
-      meta: { requiresAuth: true, role: 'ADOPTER' },
+      meta: { requiresAuth: true},
     },
     {
       path: '/messages',
@@ -236,7 +236,7 @@ const router = createRouter({
       path: '/donation-complete',
       name: 'DonationComplete',
       component: DonationComplete,
-      meta: { requiresAuth: true, role: 'ADOPTER' },
+      meta: { requiresAuth: true },
     },
   ],
 });

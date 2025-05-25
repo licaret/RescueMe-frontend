@@ -1076,7 +1076,6 @@ export default {
   max-width: 75%;
 }
 
-/* Hide scrollbar but maintain functionality */
 .overflow-y-auto {
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 0, 0, 0.1) transparent;
@@ -1095,7 +1094,6 @@ export default {
   border-radius: 3px;
 }
 
-/* Animation for new messages */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -1112,12 +1110,10 @@ export default {
   animation: fadeIn 0.2s ease-out forwards;
 }
 
-/* File upload previews */
 .max-w-32 {
   max-width: 8rem;
 }
 
-/* Add these styles to ensure your modal displays correctly */
 .fixed {
   position: fixed;
 }
@@ -1132,12 +1128,6 @@ export default {
 .z-50 {
   z-index: 50;
 }
-
-/* .modal-image {
-  max-height: 80vh;
-  max-width: 100%;
-  object-fit: contain;
-} */
 
 .object-contain {
   object-fit: contain;

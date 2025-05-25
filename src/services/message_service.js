@@ -472,9 +472,10 @@ export function getAttachmentDownloadUrl(attachmentId) {
   if (typeof attachmentId === 'string' && attachmentId.startsWith('temp-')) {
     return null;
   }
-  return `${ATTACHMENT_API_URL}/${attachmentId}/download`;
+  
+  const token = localStorage.getItem('token');
+  return `${ATTACHMENT_API_URL}/${attachmentId}/download?token=${token}&t=${Date.now()}`;
 }
-
 /**
  * Get thumbnail URL for an attachment
  * @param {number|string} attachmentId - The ID of the attachment
@@ -484,7 +485,9 @@ export function getAttachmentThumbnailUrl(attachmentId) {
   if (typeof attachmentId === 'string' && attachmentId.startsWith('temp-')) {
     return null;
   }
-  return `${ATTACHMENT_API_URL}/${attachmentId}/thumbnail`;
+  
+  const token = localStorage.getItem('token');
+  return `${ATTACHMENT_API_URL}/${attachmentId}/thumbnail?token=${token}&t=${Date.now()}`;
 }
 
 /**
