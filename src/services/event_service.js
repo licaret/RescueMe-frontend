@@ -46,12 +46,10 @@ export async function fetchAllEvents() {
     const userId = localStorage.getItem("Id");
     const token = localStorage.getItem("token");
     
-    // Create headers based on authentication status
     const headers = {
       'Content-Type': 'application/json',
     };
     
-    // Only add auth and userId headers if user is logged in
     if (userId && token) {
       headers['Authorization'] = `Bearer ${token}`;
       headers['userId'] = userId;

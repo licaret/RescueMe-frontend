@@ -77,7 +77,7 @@
                 </svg>
                 <span 
                   v-if="favoritesCount > 0" 
-                  class="absolute -top-2.5 -right-3 bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"
+                  class="absolute -top-8 -right-9 bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"
                 >
                   {{ favoritesCount }}
                 </span>

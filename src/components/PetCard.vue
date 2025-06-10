@@ -352,8 +352,6 @@ export default {
     const adoptPet = (event) => {
       if (event) event.stopPropagation();
       
-      console.log("Adopt button clicked for pet:", props.pet);
-      
       const userId = localStorage.getItem('Id');
       const userRole = localStorage.getItem('Role');
       

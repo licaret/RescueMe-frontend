@@ -43,6 +43,7 @@
     <!-- Search and Filter Section -->
     <FilterSearchFavorites 
       :shelters="shelters"
+      :breed-options="breedOptions"
       :county-data="{
         counties: counties,
         citiesByCounty: citiesByCounty,
@@ -495,14 +496,15 @@
       const breedOptions = computed(() => {
         if (!filters.value.species) return [];
         
-        const allBreeds = shelters.value
+        const allFavoriteBreeds = shelters.value
           .flatMap(shelter => (shelter.pets || []))
-          .filter(pet => pet && pet.species && 
+          .filter(pet => pet && favoriteIds.value.includes(pet.id)) 
+          .filter(pet => pet.species && 
                   pet.species.toLowerCase() === filters.value.species.toLowerCase())
           .map(pet => pet.breed)
           .filter(breed => breed); 
         
-        return [...new Set(allBreeds)].sort();
+        return [...new Set(allFavoriteBreeds)].sort();
       });
   
 

@@ -145,17 +145,14 @@ async function submitShelterProfile(shelterId, profileData) {
  * @throws {Error} For validation errors or failed uploads
  */
 async function uploadDocument(shelterId, documentType, file) {
-  // Validate parameters
   if (!shelterId || !documentType || !file) {
     throw new Error("Missing required parameters");
   }
   
-  // Check file size (2MB limit)
   if (file.size > 2 * 1024 * 1024) {
     throw new Error("File size exceeds maximum allowed (2MB)");
   }
   
-  // Validate file type
   const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
   if (!allowedTypes.includes(file.type)) {
     throw new Error("Invalid file type. Only PDF, JPEG, and PNG files are accepted");

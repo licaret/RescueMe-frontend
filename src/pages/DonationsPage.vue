@@ -50,7 +50,7 @@
               <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500"></div>
             </div>
   
-            <div v-else-if="donations.length === 0" class="text-center py-12 bg-gray-50 rounded-2xl">
+            <div v-else-if="completedDonations.length === 0" class="text-center py-12 bg-gray-50 rounded-2xl">
               <div class="mx-auto h-20 w-20 text-gray-400 mb-4">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -129,7 +129,7 @@
               <!-- Pagination -->
               <div class="mt-6 flex justify-between items-center">
                 <div class="text-sm text-gray-500">
-                  Showing {{ paginationStart }} to {{ paginationEnd }} of {{ donations.length }} donations
+                  Showing {{ paginationStart }} to {{ paginationEnd }} of {{ completedDonations.length }} donations
                 </div>
                 <div class="flex space-x-2">
                   <button 
@@ -376,27 +376,30 @@
           shelter.username.toLowerCase().includes(query)
         );
       });
-      
+    
+      const completedDonations = computed(() => {
+        return donations.value.filter(d => d.paymentStatus === 'COMPLETED');
+      });
 
       const paginatedDonations = computed(() => {
         const start = (currentPage.value - 1) * itemsPerPage;
         const end = start + itemsPerPage;
-        return donations.value.slice(start, end);
+        return completedDonations.value.slice(start, end);
       });
       
 
       const totalPages = computed(() => {
-        return Math.ceil(donations.value.length / itemsPerPage);
+        return Math.ceil(completedDonations.value.length / itemsPerPage);
       });
       
 
       const paginationStart = computed(() => {
-        return donations.value.length === 0 ? 0 : (currentPage.value - 1) * itemsPerPage + 1;
+        return completedDonations.value.length === 0 ? 0 : (currentPage.value - 1) * itemsPerPage + 1;
       });
       
 
       const paginationEnd = computed(() => {
-        return Math.min(currentPage.value * itemsPerPage, donations.value.length);
+        return Math.min(currentPage.value * itemsPerPage, completedDonations.value.length);
       });
       
 
@@ -598,6 +601,7 @@
         shelterPaginationStart,
         shelterPaginationEnd,
         shelterPaginationArray,
+        completedDonations,
         
         formatCurrency,
         formatDate,

@@ -13,7 +13,6 @@
   </section>
 </template>
 
-
 <script>
 export default {
   data() {
@@ -34,7 +33,6 @@ export default {
   },
 };
 </script>
-
 
 <style scoped>
 h1, img, .hero {
@@ -57,18 +55,38 @@ h1, img, .hero {
 .hero-title {
   position: absolute;
   bottom: 15%;
-  left:50%;
+  left: 50%;
   transform: translateX(-50%);
   font-size: clamp(10rem, 15vw, 35rem);
   font-weight: bold;
   letter-spacing: 2rem;
-  color: transparent;
-  background: url("@/assets/bck-adopt2.jpg") no-repeat center;
-  background-size: cover;
-  -webkit-background-clip: text;
-  background-clip: text;
   z-index: 1;
   opacity: 0.7;
+  
+  color: #484848;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+@supports (-webkit-background-clip: text) or (background-clip: text) {
+  .hero-title {
+    color: transparent;
+    background: url("@/assets/bck-adopt2.jpg") no-repeat center;
+    background-size: cover;
+    background-attachment: fixed;
+    -webkit-background-clip: text;
+    background-clip: text;
+    text-shadow: none;
+  }
+}
+
+@-moz-document url-prefix() {
+  .hero-title {
+    color: #606060;
+    background: none;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    -webkit-background-clip: unset;
+    background-clip: unset;
+  }
 }
 
 .hero-image {

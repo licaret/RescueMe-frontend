@@ -48,14 +48,12 @@ export function connectToChat(userId, onConnected, onDisconnected) {
     onConnect: (frame) => {
       console.log('[Chat] Connected:', frame);
       
-      // Subscribe to personal message channel
       stompClient.subscribe(`/topic/chat/${userId}`, (msg) => {
         console.log("MESSAGE RECEIVED:", msg);
         try {
           const parsed = JSON.parse(msg.body);
           console.log("PARSED MESSAGE:", parsed);
 
-          // Dispatch a custom event for new messages
           const event = new CustomEvent('new-message', { detail: parsed });
           window.dispatchEvent(event);
 
@@ -65,7 +63,6 @@ export function connectToChat(userId, onConnected, onDisconnected) {
         }
       });
       
-      // Subscribe to read receipts channel
       stompClient.subscribe(`/topic/read/${userId}`, (receipt) => {
         console.log("READ RECEIPT RECEIVED:", receipt);
         try {
@@ -76,13 +73,11 @@ export function connectToChat(userId, onConnected, onDisconnected) {
         }
       });
       
-      // Subscribe to system events channel
       stompClient.subscribe(`/topic/system/${userId}`, (event) => {
         console.log("SYSTEM EVENT RECEIVED:", event);
         try {
           const parsed = JSON.parse(event.body);
           
-          // Trigger event based on type
           if (parsed.type === 'NEW_CONVERSATION') {
             const refreshEvent = new CustomEvent('refresh-conversations');
             window.dispatchEvent(refreshEvent);
@@ -111,6 +106,7 @@ export function connectToChat(userId, onConnected, onDisconnected) {
 
   stompClient.activate();
 }
+
 
 /**
  * Disconnect from the WebSocket chat
@@ -155,6 +151,8 @@ export function onReadReceipt(callback) {
 export function isConnected() {
   return stompClient && stompClient.active && stompClient.connected;
 }
+
+
 
 /**
  * Send a text message
@@ -210,6 +208,8 @@ function sendViaRest(messageData, resolve, reject) {
     reject(error);
   });
 }
+
+
 
 /**
  * Send a message with attachments

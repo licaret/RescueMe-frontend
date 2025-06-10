@@ -218,7 +218,7 @@ export default {
     const formKey = ref(0);
     const isLoading = ref(false);
 
-    const itemsPerPage = 12;
+    const itemsPerPage = 8;
     const currentPage = ref(1);
 
     const filters = ref({
@@ -513,7 +513,11 @@ export default {
           return standardFiltersPass && ageRangeFilterPasses;
         })
         .sort((a, b) => {
-          if (!sortBy.value) return 0;
+          if (!sortBy.value) {
+            const dateA = new Date(a.createdAt);
+            const dateB = new Date(b.createdAt);
+            return dateB - dateA; 
+          }
 
           let modifier = sortOrder.value === "asc" ? 1 : -1;
 

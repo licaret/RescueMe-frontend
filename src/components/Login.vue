@@ -165,18 +165,18 @@ export default {
     async handleLogin() {
       this.loginError = "";
       this.successMessage = "";
-      this.isLoading = true; //activez spinnerul cand apas pe sign in
+      this.isLoading = true; 
       this.validateEmail();
 
       if (this.emailError || this.passwordError) {
-        this.isLoading = false; // dezactivez spinnerul in caz de eroare
+        this.isLoading = false; 
         return; 
       }
 
       try {
         const data = await login(this.email, this.password);
 
-        //pt admin
+        //ADMIN
         if (data.role === "ADMIN") {
             this.successMessage = "Admin login successful! Redirecting to dashboard...";
             setTimeout(() => {
@@ -185,9 +185,8 @@ export default {
             return;
         }
 
-        //pt shelter
+        //SHELTER
         if (data.role === "SHELTER") {
-          //verific statusul unui shelter
           try {
             const profileData = await getShelterProfile(data.id);
             const profileStatus = profileData.status; 
@@ -207,7 +206,7 @@ export default {
                 this.$router.push("/shelter-profile-completion");
               }, 2000);
             } else if (profileStatus === 'APPROVED') {
-                // aici verific daca e prima logare dupa ce adminul i a aprobat profilul
+                // FIRST LOGIN CHACK
                 try {
                   const welcomeData = await checkWelcomeStatus(data.id);
                   console.log("Welcome check response:", welcomeData);
@@ -218,7 +217,6 @@ export default {
                       this.$router.push("/welcome");
                     }, 2000);
                   } else {
-                    // no welcome needed
                     this.successMessage = "Login successful! Redirecting to dashboard...";
                     setTimeout(() => {
                       this.$router.push("/shelter-dashboard/");
@@ -226,14 +224,12 @@ export default {
                   }
                 } catch (welcomeError) {
                   console.error("Error checking welcome status:", welcomeError);
-                  // fallback to dashboard
                   this.successMessage = "Login successful! Redirecting to dashboard...";
                   setTimeout(() => {
                     this.$router.push("/shelter-dashboard/");
                   }, 2000);
                 }
               } else {
-              // default case - go to dashboard
               this.successMessage = "Login successful! Redirecting to dashboard...";
               setTimeout(() => {
                 this.$router.push("/shelter-dashboard/");
@@ -241,14 +237,13 @@ export default {
             }
           } catch (profileError) {
             console.error("Error fetching shelter profile:", profileError);
-            // default to profile completion on error
             this.successMessage = "Login successful! Redirecting...";
             setTimeout(() => {
               this.$router.push("/shelter-profile-completion");
             }, 2000);
           }
         } else {
-          // pt adopteri
+          // ADOPTER
           this.successMessage = "Login successful! Redirecting...";
           setTimeout(() => {
             this.$router.push("/home");

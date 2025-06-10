@@ -404,7 +404,6 @@ export default {
     watch(() => props.petToEdit, (newPet) => {
       if (newPet) {
         petData.value = { ...newPet };
-
         
         photoFiles.value = [];
         photoIdsToDelete.value = [];
@@ -420,23 +419,15 @@ export default {
           photoPreview.value = [];
         }
 
-        
         const age = newPet.age ?? 0;
         const ageInMonths = Math.round(age * 12);
         petData.value.ageValue = ageInMonths < 12 ? ageInMonths : Math.floor(age);
         petData.value.ageUnit = ageInMonths < 12 ? "months" : "years";
 
-        
         const timeInShelter = newPet.timeSpentInShelter ?? 0;
         const shelterTimeInMonths = Math.round(parseFloat(timeInShelter) * 12);
         petData.value.shelterTimeValue = shelterTimeInMonths < 12 ? shelterTimeInMonths : Math.floor(parseFloat(timeInShelter));
         petData.value.shelterTimeUnit = shelterTimeInMonths < 12 ? "months" : "years";
-
-        console.log("State after initialization:", {
-          petData: petData.value,
-          photoPreview: photoPreview.value,
-          existingPhotos: existingPhotos.value
-        });
       }
     }, { immediate: true });
 

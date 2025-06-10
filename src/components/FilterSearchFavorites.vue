@@ -323,6 +323,10 @@ export default {
     countyData: {
       type: Object,
       required: true
+    },
+    breedOptions: {  
+      type: Array,
+      default: () => []
     }
   },
 
@@ -464,20 +468,6 @@ export default {
     });
 
 
-    const breedOptions = computed(() => {
-      if (!filters.value.species) return [];
-      
-      const allBreeds = props.shelters
-        .flatMap(shelter => (shelter.pets || []))
-        .filter(pet => pet && pet.species && 
-                pet.species.toLowerCase() === filters.value.species.toLowerCase())
-        .map(pet => pet.breed)
-        .filter(breed => breed); 
-      
-      return [...new Set(allBreeds)].sort();
-    });
-
-
     const isAnyFilterApplied = computed(() => {
       return Object.values(filters.value).some(value => {
         return value !== "" && value !== false;
@@ -507,7 +497,6 @@ export default {
       activeFilters,
       counties,
       availableCities,
-      breedOptions,
       isAnyFilterApplied,
       
       formatFilterLabel,

@@ -784,11 +784,6 @@ export default {
           }
         });
 
-        const savedFavorites = localStorage.getItem('favoritePets');
-        if (savedFavorites) {
-          favorites.value = JSON.parse(savedFavorites);
-        }
-
       } catch (error) {
         console.error("Error loading data:", error);
         errorMessage.value = "Could not load shelter data. Please try again later.";

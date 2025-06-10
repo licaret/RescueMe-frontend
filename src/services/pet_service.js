@@ -22,7 +22,6 @@ const getAuthHeaders = (additionalHeaders = {}) => {
  * @returns {Object|Array} Processed pet data with consistent photo URLs
  */
 const processPetPhotos = (petData) => {
-  // Handle array of pets
   if (Array.isArray(petData)) {
     return petData.map(pet => ({
       ...pet,
@@ -32,7 +31,6 @@ const processPetPhotos = (petData) => {
       })) : []
     }));
   } 
-  // Handle single pet
   else {
     return {
       ...petData,
