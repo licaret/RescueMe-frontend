@@ -257,7 +257,7 @@
           alert('There was an error setting up your donation. Please try again.');
         }
       },
-      
+
 
       async initializeStripe(clientSecret) {
         try {
@@ -318,4 +318,5 @@
       }
     }
   }
+
   </script>

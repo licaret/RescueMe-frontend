@@ -246,25 +246,29 @@
       
 
       const filteredDonations = computed(() => {
-        if (filters.value.period === 'all') {
-          return donations.value;
+        let filtered = donations.value;
+        
+        filtered = filtered.filter(donation => donation.paymentStatus === 'COMPLETED');
+        
+        if (filters.value.period !== 'all') {
+          const now = new Date();
+          let compareDate = new Date();
+          
+          if (filters.value.period === 'month') {
+            compareDate.setMonth(now.getMonth() - 1);
+          } else if (filters.value.period === 'week') {
+            compareDate.setDate(now.getDate() - 7);
+          } else if (filters.value.period === 'day') {
+            compareDate.setDate(now.getDate() - 1);
+          }
+          
+          filtered = filtered.filter(donation => {
+            const donationDate = new Date(donation.donationDate);
+            return donationDate >= compareDate;
+          });
         }
         
-        const now = new Date();
-        let compareDate = new Date();
-        
-        if (filters.value.period === 'month') {
-          compareDate.setMonth(now.getMonth() - 1);
-        } else if (filters.value.period === 'week') {
-          compareDate.setDate(now.getDate() - 7);
-        } else if (filters.value.period === 'day') {
-          compareDate.setDate(now.getDate() - 1);
-        }
-        
-        return donations.value.filter(donation => {
-          const donationDate = new Date(donation.donationDate);
-          return donationDate >= compareDate;
-        });
+        return filtered;
       });
       
 
@@ -339,12 +343,21 @@
             return;
           }
 
-          stats.value = await getDonationStatistics(shelterId);
-
           const data = await getDonationsForShelter(shelterId);
           donations.value = data.sort((a, b) => 
             new Date(b.donationDate) - new Date(a.donationDate)
           );
+
+          const completedDonations = donations.value.filter(donation => 
+            donation.paymentStatus === 'COMPLETED'
+          );
+          
+          stats.value = {
+            totalDonations: completedDonations.length,
+            totalAmountRaised: completedDonations.reduce((sum, donation) => sum + (donation.amount || 0), 0),
+            recentDonations: completedDonations.slice(0, 5) 
+          };
+
         } catch (error) {
           console.error('Error loading donations:', error);
         } finally {

@@ -74,8 +74,8 @@
       </div>
     </div>
 
-    <div v-if="!loading && sheltersWithPets.length > 0" class="space-y-16">
-      <div v-for="shelter in sheltersWithPets" :key="shelter.id" class="max-w-[90rem] mx-auto">
+    <div v-if="!loading && paginatedShelters.length > 0" class="space-y-16">
+      <div v-for="shelter in paginatedShelters" :key="shelter.id" class="max-w-[90rem] mx-auto">
         <!-- Shelter Container -->
         <div class="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300">
           <!-- Shelter Header -->
@@ -225,6 +225,70 @@
       </div>
     </div>
 
+    <!-- Pagination for Shelters-->
+    <div v-if="!loading && sheltersWithPets.length > SHELTERS_PER_PAGE" class="mt-12 mb-8">
+      <div class="flex justify-center">
+        <nav class="inline-flex items-center space-x-1 bg-white rounded-lg shadow-md border border-gray-200 p-1">
+          <!-- Previous Button -->
+          <button 
+            @click="prevShelterPage"
+            :disabled="shelterCurrentPage === 1"
+            :class="[
+              'rounded-l-md px-4 py-2 focus:outline-none transition-colors duration-200 flex items-center gap-2',
+              shelterCurrentPage === 1 
+                ? 'text-gray-400 cursor-not-allowed' 
+                : 'text-gray-700 hover:bg-red-50 hover:text-red-600'
+            ]"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            <span class="hidden sm:inline">Previous</span>
+          </button>
+          
+          <!-- Page Numbers -->
+          <button 
+            v-for="page in shelterPaginationArray" 
+            :key="page" 
+            @click="goToShelterPage(page)"
+            :class="[
+              'px-4 py-2 focus:outline-none transition-colors duration-200',
+              page === shelterCurrentPage 
+                ? 'bg-red-600 text-white font-medium' 
+                : 'text-gray-700 hover:bg-red-50 hover:text-red-600'
+            ]"
+          >
+            {{ page }}
+          </button>
+          
+          <!-- Next Button -->
+          <button 
+            @click="nextShelterPage"
+            :disabled="shelterCurrentPage === shelterTotalPages"
+            :class="[
+              'rounded-r-md px-4 py-2 focus:outline-none transition-colors duration-200 flex items-center gap-2',
+              shelterCurrentPage === shelterTotalPages 
+                ? 'text-gray-400 cursor-not-allowed' 
+                : 'text-gray-700 hover:bg-red-50 hover:text-red-600'
+            ]"
+          >
+            <span class="hidden sm:inline">Next</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </nav>
+      </div>
+      
+      <!-- Page Info -->
+      <div class="text-center mt-4 text-sm text-gray-600">
+        Showing {{ shelterPaginationStart }} to {{ shelterPaginationEnd }} of {{ sheltersWithPets.length }} shelters
+        <span v-if="shelterTotalPages > 1">
+          (Page {{ shelterCurrentPage }} of {{ shelterTotalPages }})
+        </span>
+      </div>
+    </div>
+
     <!-- No Matching Pets (when filters are applied) -->
     <div v-if="!loading && sheltersWithPets.length === 0 && isAnyFilterApplied" class="text-center py-20 max-w-xl mx-auto">
       <div class="rounded-2xl">
@@ -293,6 +357,8 @@ export default {
     
     const paginationState = reactive({});
     const PETS_PER_PAGE = 4;
+    const shelterCurrentPage = ref(1);
+    const SHELTERS_PER_PAGE = 5;
 
     const counties = ref([]);
     const citiesByCounty = ref({});
@@ -758,6 +824,76 @@ export default {
       });
     };
 
+    const paginatedShelters = computed(() => {
+      const start = (shelterCurrentPage.value - 1) * SHELTERS_PER_PAGE;
+      const end = start + SHELTERS_PER_PAGE;
+      return sheltersWithPets.value.slice(start, end);
+    });
+
+    const shelterTotalPages = computed(() => {
+      return Math.ceil(sheltersWithPets.value.length / SHELTERS_PER_PAGE);
+    });
+
+    const shelterPaginationStart = computed(() => {
+      return sheltersWithPets.value.length === 0 ? 0 : 
+        (shelterCurrentPage.value - 1) * SHELTERS_PER_PAGE + 1;
+    });
+
+    const shelterPaginationEnd = computed(() => {
+      return Math.min(shelterCurrentPage.value * SHELTERS_PER_PAGE, 
+        sheltersWithPets.value.length);
+    });
+
+    const shelterPaginationArray = computed(() => {
+      const pages = [];
+      const maxVisiblePages = 5;
+      
+      if (shelterTotalPages.value <= maxVisiblePages) {
+        for (let i = 1; i <= shelterTotalPages.value; i++) {
+          pages.push(i);
+        }
+      } else {
+        let startPage = Math.max(1, shelterCurrentPage.value - Math.floor(maxVisiblePages / 2));
+        let endPage = startPage + maxVisiblePages - 1;
+        
+        if (endPage > shelterTotalPages.value) {
+          endPage = shelterTotalPages.value;
+          startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        }
+        
+        for (let i = startPage; i <= endPage; i++) {
+          pages.push(i);
+        }
+      }
+      
+      return pages;
+    });
+
+    const nextShelterPage = () => {
+      if (shelterCurrentPage.value < shelterTotalPages.value) {
+        shelterCurrentPage.value++;
+      }
+    };
+
+    const prevShelterPage = () => {
+      if (shelterCurrentPage.value > 1) {
+        shelterCurrentPage.value--;
+      }
+    };
+
+    const goToShelterPage = (page) => {
+      shelterCurrentPage.value = page;
+    };
+
+    watch(filters, () => {
+      shelterCurrentPage.value = 1;
+      Object.keys(paginationState).forEach(key => {
+        if (paginationState[key]) {
+          paginationState[key].currentPage = 1;
+        }
+      });
+    }, { deep: true });
+
 
     const loadData = async () => {
       try {
@@ -791,7 +927,6 @@ export default {
         loading.value = false;
       }
     };
-
 
     
     onMounted(() => {
@@ -854,6 +989,13 @@ export default {
       sortBy,
       activeFilters,
       paginationState,
+      paginatedShelters,
+      shelterCurrentPage,
+      shelterTotalPages,
+      shelterPaginationStart,
+      shelterPaginationEnd,
+      shelterPaginationArray,
+      SHELTERS_PER_PAGE,
       
       resetFilters,
       formatAge,
@@ -877,6 +1019,9 @@ export default {
       getPaginatedPets,
       updateFilters,
       updateSortBy,
+      nextShelterPage,
+      prevShelterPage,
+      goToShelterPage,
     };
   }
 };
